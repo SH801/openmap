@@ -1,0 +1,42 @@
+<label class="label">Farm outline</label>
+
+<div>
+  Click on polygon icon <img style="position:relative;top:-2px;" src="/static/assets/icon/polygonicon.png" /> to draw farm outline.
+</div>
+
+<div>
+
+  <label class="clickable-link" onClick="gotoCurrentLocation()">
+    <i style="position:relative;top:5px;" title="Goto current location" class="material-icons-outlined">location_on</i> 
+    Current location
+  </label> 
+
+  <label class="clickable-link" onClick="gotoPostcode()">
+    <i style="position:relative;top:5px;" title="Goto current location" class="material-icons-outlined">home</i> 
+    Goto postcode
+  </label> 
+
+  <label class="clickable-link" for="fileuploaded">
+    <i style="position:relative;top:5px;" title="Upload GeoJSON file" class="material-icons-outlined">upload_file</i> 
+    Upload GeoJSON
+  </label>
+
+  <label class="clickable-link" onClick="centerPolygons()">
+    <i style="position:relative;top:5px;" title="Upload GeoJSON file" class="material-icons-outlined">fit_screen</i> 
+    Centre on drawn areas
+  </label>
+
+</div>
+<div>
+    <input style="display: none;" id="fileuploaded" name="files[]" multiple="" type="file" name="Upload GeoJSON"/>
+</div>
+
+<div style="height: 500px; padding-bottom:0px;">
+  <div id="map" style="margin:0;padding:0;width: 100%; height: 100%; border: 0px solid rgb(204, 204, 204); position: relative; outline: none;" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0"></div>
+</div>   
+
+<textarea style="display:none;width:100%;height:400px!important;overflow-y:auto;" name="GeoJSON" id="id_GeoJSON" rows="20" cols="40"></textarea>
+
+{% if field.value %}
+{{ field.value|json_script:"field_featurecollection" }}
+{% endif %}

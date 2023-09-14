@@ -1,0 +1,50 @@
+{% extends "core/page.html" %}
+{% load widget_tweaks %}
+
+{% block title_head %}
+Edit Farm
+{% endblock %}
+
+{% block title_body %}
+Edit Farm
+{% endblock %}
+
+{% block body %}
+
+  <form spellcheck="false" autocomplete="off" class="form" method="post">
+
+    {% csrf_token %}
+
+    <div class="row">
+      <div class="col">
+
+        {% if form.errors %}
+
+        <div class="info info-horizontal">
+          <div class="description">
+            <div class="text-danger">There were some problems with the form - see below</div>
+          </div>
+        </div>
+
+        {% endif %}
+
+        {{ farm_form.fields.types.value }}
+        {% for field in farm_form %}
+
+          {% include "core/field.html" %}
+
+        {% endfor %}
+
+        <div class="form-group mt-5">
+          <input class="btn btn-round btn-info" type="submit" name="save" value="Save" /> 
+          <a href="/account/" class="btn btn-round btn-grey">Cancel</a>
+        </div>
+
+      </div>
+    </div>
+
+  </form>
+
+
+{% endblock %}
+

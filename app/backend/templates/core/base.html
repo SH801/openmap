@@ -1,0 +1,351 @@
+<!--
+=========================================================
+Material Kit - v2.0.7
+=========================================================
+
+Product Page: https://www.creative-tim.com/product/material-kit
+Copyright 2020 Creative Tim (https://www.creative-tim.com/)
+
+Coded by Creative Tim
+
+=========================================================
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="shortcut icon" type="image/png" href="/static/favicon.ico" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>
+      {% block title_head %}{{ self.title }}{% if self.description %} | {{ self.description }}{% endif %}{% endblock %} | Positive Farms
+    </title>
+    <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+
+    <!--     Fonts and icons     -->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">   
+    <link href="/static/material-kit/css/material-kit.css" rel="stylesheet" />
+    <link href="/static/material-kit/bootstrap-select/css/bootstrap-select.css" rel="stylesheet" />
+    <link href="/static/css/custom.css" rel="stylesheet" />
+    <!-- Map editing libraries -->
+    <script src="/static/leaflet/leaflet-src.js"></script>
+    <link rel="stylesheet" href="/static/leaflet/leaflet.css">
+
+    <script src="/static/leaflet/Leaflet.draw.js"></script>
+    <script src="/static/leaflet/Leaflet.Draw.Event.js"></script>
+    <link rel="stylesheet" href="/static/leaflet/leaflet.draw.css">
+
+    <script src="/static/leaflet/Toolbar.js"></script>
+    <script src="/static/leaflet/Tooltip.js"></script>
+
+    <script src="/static/leaflet/GeometryUtil.js"></script>
+    <script src="/static/leaflet/LatLngUtil.js"></script>
+    <script src="/static/leaflet/LineUtil.Intersect.js"></script>
+    <script src="/static/leaflet/Polygon.Intersect.js"></script>
+    <script src="/static/leaflet/Polyline.Intersect.js"></script>
+    <script src="/static/leaflet/TouchEvents.js"></script>
+
+    <script src="/static/leaflet/DrawToolbar.js"></script>
+    <script src="/static/leaflet/Draw.Feature.js"></script>
+    <script src="/static/leaflet/Draw.SimpleShape.js"></script>
+    <script src="/static/leaflet/Draw.Polyline.js"></script>
+    <script src="/static/leaflet/Draw.Marker.js"></script>
+    <script src="/static/leaflet/Draw.CircleMarker.js"></script>
+    <script src="/static/leaflet/Draw.Circle.js"></script>
+    <script src="/static/leaflet/Draw.Polygon.js"></script>
+    <script src="/static/leaflet/Draw.Rectangle.js"></script>
+    <script src="/static/leaflet/EditToolbar.js"></script>
+    <script src="/static/leaflet/EditToolbar.Edit.js"></script>
+    <script src="/static/leaflet/EditToolbar.Delete.js"></script>
+    <script src="/static/leaflet/Control.Draw.js"></script>
+    <script src="/static/leaflet/Edit.Poly.js"></script>
+
+    <script>
+    var osmUrl, osmAttrib, osm, map, drawnItems;
+    </script>
+
+    <style>
+    .navbar .navbar-brand {      
+        height:80px;
+    }
+
+    </style>
+  </head>
+
+  {% load templatetags %}
+
+  {% expr (request.path == '/accounts/login/') as islogin %}
+  {% expr (request.path == '/signup/') as issignup %}
+  {% expr (request.path == '/account/') as ishomepage %}
+  {% expr (islogin or issignup) as transparentnavbar %}
+
+  <body class="{% if islogin %}signup-page loginspecial-page{% elif issignup %}signup-page{% else %}sections-page{% endif %} sidebar-collapse">
+
+    <nav class="navbar navbar-expand-lg noshadow" style="-webkit-box-shadow: none!important;-moz-box-shadow: none!important;box-shadow: none!important;" id="sectionsNav">
+
+      <div class="container">
+        <div class="navbar-translate">
+          <a class="navbar-brand" style="font-size:28px;" href="/"><img width="120" alt="Positive Farms" title="Positive Farms" class="positivefarms-logo"  src="/static/assets/media/logo-positivefarms-black.png"/></a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
+
+        <div class="collapse navbar-collapse">
+
+          <ul class="navbar-nav ml-auto">
+
+	
+
+            <li class="nav-item ">
+                <a class="nav-link " href="/">Map</a>
+                
+            </li>       
+
+<!--            
+            <li class="nav-item ">
+                <a class="nav-link " href="/methods/">Methods</a>
+                
+            </li>       
+          
+            <li class="nav-item ">
+                <a class="nav-link " href="/contact/">Contact</a>
+                
+            </li>       
+
+-->
+	
+        
+<li class="dropdown nav-item">
+	<a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false">
+	  <i class="material-icons mdi-36px {% if user.is_authenticated %} groovy-connected{% else %} groovy-disconnected{% endif %}">account_circle</i> {% if user.is_authenticated %}Logged in as <b>{{ user.username}}</b>{% else %}Login{% endif %} 
+	<div class="ripple-container"></div></a>
+	<div class="dropdown-menu dropdown-with-icons">
+
+{% if user.is_authenticated %}
+
+		<a class="dropdown-item" href="{% url 'logout' %}"><i class="material-icons">exit_to_app</i> Logout</a>
+
+{% else %}
+
+		<a class="dropdown-item" href="{% url 'login' %}"><i class="material-icons">lock_open</i> Login</a>
+		<a class="dropdown-item" href="{% url 'signup' %}"><i class="material-icons">person_add</i> Register</a>
+	
+{% endif %}
+</div>
+
+</li>
+
+        
+        </ul>
+
+        </div>
+      </div>
+
+    </nav>
+
+    {% block supermain %}
+
+    <div class="main">
+      <div>
+        {% block carousel %}
+        {% endblock %}
+      </div>
+
+      <div class="container maincontent">
+
+          {% block content %}          
+          {% endblock %}
+
+      </div>
+
+      {% block local_footer %}
+      {% block footer %}
+          {% include 'core/footer.html' %}
+      {% endblock %}
+      {% endblock %}
+      
+    </div>
+
+    {% endblock %}  
+
+    <!--   Core JS Files   -->
+    <script src="/static/material-kit/js/core/jquery.min.js" type="text/javascript"></script>
+    <script src="/static/material-kit/js/core/popper.min.js" type="text/javascript"></script>
+    <script src="/static/material-kit/js/core/bootstrap-material-design.min.js" type="text/javascript"></script>
+    <script src="/static/material-kit/js/plugins/moment.min.js"></script>
+    <!--	Plugin for the Datepicker, full documentation here: https://github.com/Eonasdan/bootstrap-datetimepicker -->
+    <script src="/static/material-kit/js/plugins/bootstrap-datetimepicker.js" type="text/javascript"></script>
+    <!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
+    <script src="/static/material-kit/js/plugins/nouislider.min.js" type="text/javascript"></script>
+    <!--	Plugin for Select, full documentation here: http://silviomoreto.github.io/bootstrap-select -->
+    <script src="/static/material-kit/bootstrap-select/js/bootstrap-select.js" type="text/javascript"></script>
+    <!-- Control Center for Material Kit: parallax effects, scripts for the example pages etc -->
+    <script src="/static/material-kit/js/material-kit.js?v=2.0.7" type="text/javascript"></script>
+
+    <script src="/static/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <!-- Plugin for input masks that works for mobiles -->
+    <script src="/static/js/jquery.mask.min.js" type="text/javascript"></script>
+        
+    <script type="text/javascript">
+      tinymce.init({
+        selector: '.tinymce',
+        menubar: false,
+        height: 300,
+        plugins: 'lists',
+        toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist'
+      });
+
+      $("#fileuploaded").on("change", function (changeEvent) {
+      for (var i = 0; i < changeEvent.target.files.length; ++i) {
+          (function (file) {               // Wrap current file in a closure.
+          var loader = new FileReader();
+          loader.onload = function (loadEvent) {
+              if (loadEvent.target.readyState != 2)
+              return;
+              if (loadEvent.target.error) {
+              alert("Error while reading file " + file.name + ": " + loadEvent.target.error);
+              return;
+              }
+              $("#GeoJSON").val(loadEvent.target.result);
+              $('#fileuploaded').val('');
+              setDrawnItems(JSON.parse(loadEvent.target.result));
+          };
+          loader.readAsText(file);
+          })(changeEvent.target.files[i]);
+      }
+      });
+
+      function gotoCurrentLocation() {
+        navigator.geolocation.getCurrentPosition((position) => {
+          map.flyTo({lng: position.coords.longitude, lat: position.coords.latitude}, 14, {animate: true});
+        });
+      }
+                      
+      function gotoPostcode() {
+        var postcode = $('input[name=postcode]').val().trim();
+        if (postcode !== '') {
+          $(document).ready(function () {
+            $.ajax({ 
+                type: 'GET', 
+                url: '/locationposition', 
+                data: { location: postcode }, 
+                success: function (data) {
+                  map.setView(new L.LatLng(data.data['lat'], data.data['lng']), data.data['zoom']);
+                }
+            });
+          });
+        }
+        return true;
+      }
+
+      function centerPolygons() {
+        if (Object.keys(drawnItems._layers).length !== 0) {
+          map.fitBounds(drawnItems.getBounds());
+        }
+      }
+
+      function setDrawnItems(GeoJSONContent) {
+          var geojsonLayer = L.geoJson(GeoJSONContent);
+          geojsonLayer.eachLayer(
+              function(l){
+                  drawnItems.addLayer(l);
+          });
+          map.fitBounds(drawnItems.getBounds());
+          layersUpdated();
+      }
+
+      function layersUpdated() {
+          var featurecollection = {'type': 'FeatureCollection', 'features': []}
+          for (const [key, value] of Object.entries(drawnItems._layers)) {
+              featurecollection.features.push(value.toGeoJSON());
+          }
+          $('#id_GeoJSON').val(JSON.stringify(featurecollection, null, 2));
+      }
+
+      if ($('#map').length) {
+        osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        osmAttrib = '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+        osm = L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttrib});
+
+        var field_location = document.getElementById('field_location');
+        var field_featurecollection = document.getElementById('field_featurecollection');
+
+        if (JSON.stringify(field_location) === 'null') {
+          map = new L.Map('map', { scrollWheelZoom: false, center: new L.LatLng(55.69142309402058, -3.7832450866699223), zoom: 5 });
+        } else {
+          field_location = JSON.parse(field_location.text);
+          map = new L.Map('map', {scrollWheelZoom: false, center: new L.LatLng(field_location[0], field_location[1]), zoom: 13 });
+        }
+        drawnItems = L.featureGroup().addTo(map);
+
+        if (JSON.stringify(field_featurecollection) !== 'null') {
+          var featurecollection = field_featurecollection.text.trim();
+          if (featurecollection !== '') {
+            featurecollection = JSON.parse(JSON.parse(featurecollection));
+            setDrawnItems(featurecollection);
+          }
+        }
+
+        L.control.layers({
+          "OpenStreetMap": osm.addTo(map),
+          "Google Satellite": L.tileLayer('https://www.google.com/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}', {
+              attribution: 'Google'
+          })
+        }, {'Editing layer':drawnItems}, { position: 'topright', collapsed: false }).addTo(map);
+
+        map.addControl(new L.Control.Draw({
+            position: 'topright',
+            edit: {
+                featureGroup: drawnItems,
+                poly : {
+                    allowIntersection : false
+                }
+            },
+            draw: {
+                polyline: false,
+                circle: false,
+                circlemarker: false,
+                rectangle: false,
+                marker: false,
+                polygon : {
+                    allowIntersection: false,
+                    showArea:true
+                }
+            }
+        }));
+
+        // -----------------------------------------------
+        // Object change events
+        // -----------------------------------------------
+
+        map.on(L.Draw.Event.CREATED, function(event) {
+            var layer = event.layer;
+            drawnItems.addLayer(layer);
+            layersUpdated();
+        });
+
+        map.on(L.Draw.Event.EDITED, function(event) {
+            layersUpdated();
+        });
+
+        map.on(L.Draw.Event.DELETED, function(event) {
+            layersUpdated();
+        });
+
+      }
+
+
+
+    </script>
+
+  </body>
+</html>

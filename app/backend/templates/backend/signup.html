@@ -1,0 +1,76 @@
+{% extends "core/page.html" %}
+{% load widget_tweaks templatetags %}
+{% load templatetags %}
+
+{% block title_head %}
+Sign Up
+{% endblock %}
+
+{% block title_body %}
+Join the Network
+{% endblock %}
+
+{% block supermain %}
+
+<div class="page-header" style="background: white;">
+
+  <div class="container">
+    <div class="row">
+
+      <div class="col-lg-8 ml-auto mr-auto">
+        <div class="card card-signup">
+          <h2 class="card-title text-center">Register with Positive Farms</h2>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-12 mr-auto">
+                <form spellcheck="false" autocomplete="off" class="form" method="post">
+
+                  {% csrf_token %}
+
+                  <div class="info info-horizontal">
+                    <div class="description">
+                      {% if form.errors %}
+                      <div class="text-danger"><strong>There were some problems with the form - see below</strong></div>
+                      {% endif %}
+                    </div>
+                  </div>
+              
+                  {% for field in form.visible_fields %}
+
+                    {% include "core/field.html" %}
+
+                  {% endfor %}
+
+                  <div class="text-left form-group bmd-form-group">
+                    <div class="text-danger">
+                      <strong>
+                        {% for error in form.non_field_errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div class="text-left">
+                    <script src='https://www.google.com/recaptcha/api.js'></script>
+                    <p class="g-recaptcha" data-sitekey="{% settings_value 'REACT_APP_GOOGLE_RECAPTCHA_SITE_KEY' %}"></p>
+                  </div>
+
+                  <div class="text-center">
+                    <p><input type="submit" value="Sign up" class="btn btn-info btn-round" /></p>                
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- Due to conflict between bootstrap-select dropdown and footer links, we remove footer on registration page -->
+</div>
+
+{% endblock %}
+
+

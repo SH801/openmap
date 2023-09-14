@@ -1,0 +1,23 @@
+{% autoescape off %}
+
+Dear {{ user.last_name }},
+
+Thank you for signing up to the Positive Farms network. To enable your account, please click this link: 
+
+<a href="http://{{ domain }}{% url 'confirm_email' uidb64=uid token=token %}">http://{{ domain }}{% url 'confirm_email' uidb64=uid token=token %}</a>
+
+If the link does not work, copy and paste this address into your browser directly:
+
+http://{{ domain }}{% url 'confirm_email' uidb64=uid token=token %}
+
+Please save this email as a record of the email address and username you selected when you signed up.
+
+Username: {{ user.username }}
+Email address: {{ user.email }}
+
+Best wishes,
+
+Positive Farms
+{{ domain }}
+
+{% endautoescape %}

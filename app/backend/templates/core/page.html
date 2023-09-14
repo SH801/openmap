@@ -1,0 +1,38 @@
+{% extends "core/base.html" %}
+{% load templatetags %}
+
+{% block content %}
+
+{% captureas title_body_content %}{% spaceless %}{% block title_body %}{% endblock %}{% endspaceless %}{% endcaptureas %}
+
+<div class="container center mt-lg-3">
+    <div class="row justify-content-center">
+
+            <div class="col-md-12 col-lg-8 text-left">
+
+                {% block breadcrumb %}
+                {% include 'core/breadcrumb.html' %}
+                {% endblock %}
+                
+                {% if title_body_content %}
+                <h1 class="mb-4">
+                    {{ title_body_content }}
+                </h1>
+                {% endif %}
+
+                {% block body %}
+                {% endblock %}
+
+            </div>
+
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block local_footer %}
+    {% block footer %}
+        {% include 'core/footer.html' %}
+    {% endblock %}
+{% endblock %}

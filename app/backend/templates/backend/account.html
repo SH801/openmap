@@ -1,0 +1,158 @@
+{% extends 'core/page.html' %}
+{% load templatetags %}
+
+<!-- Account homepage that user will always be sent to -->
+
+{% block title_head %}
+Your Account
+{% endblock %}
+
+{% block breadcrumb %}
+<h6>
+    <a class="font-weight-normal"><i class="material-icons">home</i> Account Home</a>
+</h6>
+{% endblock %}
+
+{% block body %}
+
+<h1>Your Account</h1>
+
+<div class="row mt-4 mb-3">
+    <div class="col">
+        <h3><i class="material-icons mdi-36px farm-icon">location_on</i> Farms</h3>
+
+        {% get_farms as farms %}
+
+        {% if farms.farms.all %}
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <th class="text-left">Name</th>
+                        <th class="text-left">Type</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Edit</th>
+                        <th class="text-center">Preview</th>
+                        <th class="text-center">Delete</th>
+                    </thead>
+
+
+                    {% for farm in farms.farms %}
+
+                    <tr>
+                        <td class="text-left align-middle">
+                            {{ farm.name }}
+                        </td>
+                        <td class="text-left">
+                            {{ farm.types.all|join:", " }}
+                        </td>
+
+                        <td class="text-center">
+                            {{ farm.status }}
+                        </td>
+
+                        <td class="text-center"> 
+                            <a title="Edit" class="edit-button" href="/farm/{{ farm.pk }}">
+                                <i class="material-icons-outlined">edit</i>
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            {% if farm.status == 'Live' %}
+                            <a title="Preview" target="_new" class="edit-button" href="{{ domain }}/{{ farm.external_id }}">
+                                <i class="material-icons-outlined">visibility</i>
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a title="Delete" class="edit-button" href="/delete/farm/{{ farm.pk }}">
+                                <i class="material-icons-outlined">delete</i>
+                            </a>
+                        </td>
+                    </tr>
+                    
+                    {% endfor %}
+
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="mt-3 mb-3">No farms in your account</div>
+
+        {% endif %}
+
+        <a href="/farm/new" class="btn btn-round btn-info" >Add farm</a>
+
+    </div>
+</div>
+
+ <div class="row mt-4">
+    <div class="col">
+        <h3><i class="material-icons mdi-36px post-icon">message</i> Posts</h3>
+
+        {% get_posts as posts %}
+
+        {% if posts.posts.all %}
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <th class="text-left">Farm</th>
+                        <th class="text-left">Title</th>
+                        <th class="text-left">Posted</th>
+                        <th class="text-center">Edit</th>
+                        <th class="text-center">Delete</th>
+                    </thead>
+
+
+                    {% for post in posts.posts %}
+
+                    <tr>
+                        <td class="text-left">
+                            {{ post.farm }}
+                        </td>
+                        <td class="text-left">
+                            {{ post.title }}
+                        </td>
+                        <td class="text-left">
+                            {{ post.date }}
+                       </td>
+
+                        <td class="text-center"> 
+                            <a title="Edit" class="edit-button" href="/post/{{ post.pk }}">
+                                <i class="material-icons-outlined">edit</i>
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <a title="Delete" class="edit-button" href="/delete/post/{{ post.pk }}">
+                                <i class="material-icons-outlined">delete</i>
+                            </a>
+                        </td>
+
+                    </tr>
+                    
+                    {% endfor %}
+
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="mt-3 mb-3">No posts in your account</div>
+
+        {% endif %}
+
+        {% if farms.farms.all %}
+
+            <a href="/post/new" class="btn btn-round btn-info" >Add post</a>
+
+        {% else %}
+
+            <div class="mt-3"><i>To add posts, add one or more farms above</i></div>
+
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

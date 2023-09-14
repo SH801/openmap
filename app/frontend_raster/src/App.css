@@ -1,0 +1,77 @@
+/** 
+ * Copyright (c) Open Carbon, 2020
+ * 
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * App.css 
+ * 
+ * Global stylesheet
+ *
+ * Custom CSS to override UI issues
+ */ 
+
+.leaflet-popup-pane,
+.leaflet-popup-tip-container {
+  pointer-events: none!important;
+}
+
+.leaflet-popup-tip-container,
+.leaflet-popup-close-button {
+  display: none;
+}
+
+.list-md {
+  background-color: transparent;
+}
+
+.suggestion-container,
+.entity-details-container,
+.bottom-sheet,
+.accordion-post-list {
+  --offset-bottom: auto!important;
+  --overflow: hidden;
+  overflow: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.entity-details-container {
+  margin-bottom:60px;
+  background-color: #fcfcdcf2;
+}
+
+.ion-delegate-host {
+  background-color: #fcfcdcf2;
+}
+
+.accordion-list {
+  padding-top: 10px;
+  padding-bottom: 15px;
+}
+
+.toolbar-title {
+  padding-inline: 10px;
+}
+
+.toolbar-icon-name {
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-icon-title {
+  padding-left: 10px;
+}
+.futurefarms-logo {
+  padding-top: 10px;
+  padding-bottom: 7px;
+}
+
+.submit-enter {
+  position: absolute;
+  visibility: hidden;
+  left: -1000px;
+}

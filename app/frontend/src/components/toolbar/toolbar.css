@@ -1,0 +1,105 @@
+.toolbar {
+  position: relative;
+  background-color: #EEE;
+}
+.toolbar-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.login-icon,
+.share-icon {
+  font-size: 28px;
+  padding-top: 2px;
+  padding-left: 6px;
+  padding-right:8px;
+  /* color: white; */
+  color: #666;
+}
+.icon-container {
+  margin-right: 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-popover::part(content) {
+  /* min-width: 70vw; */
+  border-radius: 15px;
+  padding: 32px;
+}
+
+.info-popover .info-popover-txt {
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+.info-popover-title {
+  font-size: 24px;
+  margin-bottom: 24px;
+  text-align: left;
+  font-weight: 500;
+}
+.popover-content-container {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+.popover-btn {
+  width: 25%;
+  align-self: center;
+}
+.info-popover ol {
+  list-style-type: none;
+  counter-reset: elementcounter;
+}
+.info-popover li {
+  counter-increment: elementcounter;
+  margin-left: 30px;
+}
+.info-popover li::marker {
+  content: "Step " counter(elementcounter) ". ";
+  font-weight: bold;
+  color: #008468;
+}
+
+@media only screen and (max-width: 340px) {
+  .toolbar-title {
+    font-size: 16px;
+  }
+  .login-icon,
+  .share-icon {
+    font-size: 20px;
+    padding-left: 0;
+  }
+
+  .positivefarms-logo {
+    width: 40%;
+  }
+
+}
+
+@media only screen and (min-width: 340px) and (max-width: 600px) and (orientation: portrait) {
+  .login-icon,
+  .share-icon {
+    font-size: 24px;
+    padding-left: 0;
+  }
+  .toolbar-icon-title {
+    font-size: 16px;    
+  }
+  /* .positivefarms-logo {
+    width: 40%;
+  } */
+}
+@media only screen and (max-width: 999px) {
+  .info-popover::part(content) {
+    min-width: 94vw;
+    max-width: 94vw;
+    width: 94vw;
+    padding: 0
+  }
+  .info-popover .info-popover-txt  {
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,51 @@
+{% load widget_tweaks %}
+
+{% if field.field.widget.attrs.hidden == True %}
+
+  {% if field.value %}
+    {{ field.value|json_script:field.field.widget.attrs.fieldname }}
+  {% endif %}      
+
+{% else %}
+
+  <div class="bmd-form-group {% if field.errors %}has-danger{% endif %} {% if field.field.widget.input_type == 'select' %}select-custom{% endif %}">
+    {% if field.field.widget.input_type == 'select' %}
+      <div class="label select-custom">
+        {{ field.label }}
+      </div>
+      {{ field }}       
+
+    {% else %}
+
+      {% if field.field.widget.attrs.leafletdraw == True %}
+
+        {% include "core/addoutline.html" %}
+
+      {% else %}
+
+        {% if field.field.widget.attrs.tinymce == True %}
+            <label style="margin-top:10px;" class="label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {% render_field field class="form-control tinymce" autocomplete="off" %}  
+        {% else %}
+          <label class="bmd-label-floating" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {% render_field field class="form-control" autocomplete="off" %}  
+        {% endif %}
+
+      {% endif %}
+
+    {% endif %}
+
+    {% if field.errors %}
+    <span class="hide-on-click form-control-feedback">
+      <i class="material-icons">clear</i>
+    </span>
+    {% endif %}
+    {% for error in field.errors %}
+    <div class="hide-on-click text-danger">
+      {{ error }}
+    </div>   
+    {% endfor %}
+  </div>
+
+{% endif %}
+

@@ -257,7 +257,7 @@ export class MapContainer extends Component  {
             pitch: this.state.pitch,
             bearing: this.state.bearing
           }}    
-          mapStyle={require('../constants/mapstyletest.json')}
+          mapStyle={require('../constants/mapstyle.json')}
         >
           {this.props.isMobile ? (
               <>

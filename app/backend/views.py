@@ -379,7 +379,7 @@ def Export(request, exportid):
         if exportqueue is not None:
             shelloutput = ''
             if exportid == ExportQueueTypes.EXPORTQUEUE_ENTITY:
-                shelloutput = subprocess.run([EXPORT_ENTITIES], capture_output=True, text=True, universal_newlines=True) 
+                shelloutput = subprocess.run([EXPORT_ENTITIES], capture_output=True, text=True) 
 
             if (shelloutput != ''):
                 exportqueue.shelloutput = shelloutput.stdout

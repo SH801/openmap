@@ -383,7 +383,7 @@ def Export(request, exportid):
                 shelloutput = subprocess.run([EXPORT_ENTITIES], encoding="utf8", capture_output=True, text=True, universal_newlines=True) 
 
             if (shelloutput != ''):
-                exportqueue.shelloutput = shelloutput.stdout.encode('ascii', 'ignore')
+                exportqueue.shelloutput = shelloutput.stdout
                 exportqueue.exportdue = False
                 exportqueue.exported = Now()
                 exportqueue.save()

@@ -35,6 +35,12 @@ export const DEFAULT_LNG = -3.8231;
 // Default zoom scale
 export const DEFAULT_ZOOM = 5; 
 
+// Default pitch
+export const DEFAULT_PITCH = 26;
+
+// Default bearing
+export const DEFAULT_BEARING = 0;
+
 // Default maxbounds 
 
 export const DEFAULT_MAXBOUNDS = [

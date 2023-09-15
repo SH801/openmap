@@ -13,6 +13,8 @@ import {
   DEFAULT_LAT, 
   DEFAULT_LNG, 
   DEFAULT_ZOOM,
+  DEFAULT_PITCH,
+  DEFAULT_BEARING,
   AREA_STYLE_CONTEXT,
   DEFAULT_MAXBOUNDS
 } from "../constants";
@@ -92,8 +94,14 @@ export class MapContainer extends Component  {
     });    
   }
 
+  fetchLastExport = () => {
+    this.props.fetchLastExport();
+  }
+
   onLoad = (event) => {
-    this.props.setGlobalState({"mapref": this.mapRef});
+    this.props.setGlobalState({"mapref": this.mapRef}).then(() => {
+      setInterval(this.fetchLastExport, 15000);
+    });
     var map = this.mapRef.current.getMap();
 
     if (this.props.global.context) {
@@ -279,8 +287,8 @@ MapContainer.defaultProps = {
   lat: DEFAULT_LAT,
   lng: DEFAULT_LNG,
   zoom: DEFAULT_ZOOM,
-  pitch: 0,
-  bearing: 0
+  pitch: DEFAULT_PITCH,
+  bearing: DEFAULT_BEARING
 };
   
   
@@ -301,6 +309,9 @@ export const mapDispatchToProps = dispatch => {
       setSearchText: (searchtext) => {
         return dispatch(search.setSearchText(searchtext));
       },      
+      fetchLastExport: () => {
+        return dispatch(global.fetchLastExport());
+      },  
       fetchAllProperties: () => {
         return dispatch(global.fetchAllProperties());
       },  

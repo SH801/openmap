@@ -8,11 +8,17 @@ backend/views.py
 Django views for rendering default React page and delivering data to frontend
 """
 
+import sys
 import json
 import re
 import html
 import os
 import urllib
+import subprocess
+import time
+from datetime import datetime
+from datetime import timezone
+from time import gmtime
 from html.parser import HTMLParser
 from urllib.parse import urlparse
 from django.shortcuts import render, redirect
@@ -23,6 +29,7 @@ from django.contrib.gis.db.models import Extent
 from django.core.serializers import serialize
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models.functions import Now
 from django.contrib.gis.geos import Polygon
 from django.contrib.gis.db.models.aggregates import Union
 from django.contrib.gis.db.models.functions import AsGeoJSON, Centroid, Distance, Envelope
@@ -37,6 +44,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from shapely.geometry import MultiPolygon
+from django.core.cache import cache
 
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework import serializers
@@ -52,6 +60,8 @@ from .models import \
     Property, \
     PropertyTypes, \
     Location, \
+    ExportQueue, \
+    ExportQueueTypes, \
     Context, \
     Geometry, \
     GeometryTypes, \
@@ -67,11 +77,20 @@ from .forms import SignUpForm, UserForm, FarmForm, PostForm
 from .tokens import account_activation_token
 
 GOOGLE_RECAPTCHA_SECRET_KEY = os.environ.get("GOOGLE_RECAPTCHA_SECRET_KEY")
+EXPORT_ENTITIES = os.environ.get("EXPORT_ENTITIES")
 
 MAX_ZOOM = 15
 
 # Zoom level for all postcode searches
 POSTCODE_ZOOM = 13
+
+CACHE_KEY_ENTITY_LASTEXPORT = 'time_entity_lastexport'
+
+if ('makemigrations' not in sys.argv) & ('migrate' not in sys.argv):
+    entityqueue = ExportQueue.objects.filter(type=ExportQueueTypes.EXPORTQUEUE_ENTITY, exportdue=False).order_by('-exported').first()
+    if entityqueue:
+        cache.set(CACHE_KEY_ENTITY_LASTEXPORT, entityqueue.exported, timeout=None)
+        print("Time of last export", entityqueue.exported)
 
 def OutputJson(json_array={'result': 'failure'}):
     json_data = json.dumps(json_array, cls=DjangoJSONEncoder, indent=2)
@@ -347,6 +366,40 @@ def GetContext(request, context_shortcode):
     context['bounds'] = context['geometry__extent']
     del context['geometry__extent']
     return OutputJson(context)
+
+@csrf_exempt
+def Export(request, exportid):
+    """
+    Export particular data
+    """
+
+    exportid = int(exportid)
+    if request.user.is_superuser:
+        exportqueue = ExportQueue.objects.filter(type=exportid, exportdue=True).first()
+        if exportqueue is not None:
+            shelloutput = ''
+            if exportid == ExportQueueTypes.EXPORTQUEUE_ENTITY:
+                shelloutput = subprocess.run([EXPORT_ENTITIES], capture_output=True, text=True, universal_newlines=True) 
+
+            if (shelloutput != ''):
+                exportqueue.shelloutput = shelloutput.stdout
+                exportqueue.exportdue = False
+                exportqueue.exported = Now()
+                exportqueue.save()
+                entityqueue = ExportQueue.objects.filter(type=ExportQueueTypes.EXPORTQUEUE_ENTITY, exportdue=False).order_by('-exported').first()
+                cache.set(CACHE_KEY_ENTITY_LASTEXPORT, entityqueue.exported, timeout=None)
+
+        return render(request, 'backend/exported.html')
+    else:
+        return OutputError()
+
+@csrf_exempt
+def LastExport(request):
+    """
+    Gets datetime of last entity export
+    """
+    lastexport = cache.get(CACHE_KEY_ENTITY_LASTEXPORT)
+    return OutputJson({'lastexport': lastexport})
 
 @csrf_exempt
 def GeometryBounds(request):

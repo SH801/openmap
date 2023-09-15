@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from guardian.shortcuts import get_objects_for_user
-from backend.models import Entity, Post, EditTypes, Property, PropertyTypes
+from backend.models import Entity, Post, EditTypes, Property, PropertyTypes, ExportQueue, ExportQueueTypes
 
 import re
 import markdown
@@ -81,12 +81,28 @@ def do_expr(parser, token):
 do_expr = register.tag('expr', do_expr)
 
 @register.simple_tag(takes_context=True)
+def get_actions(context):
+    '''
+    Get actions for current user
+    '''
+
+    actions = []
+    exportqueue = ExportQueue.objects.filter(exportdue=True)
+    for queueitem in exportqueue:
+        actions.append({'action': 'export', 'type': queueitem.type,  'name': ExportQueueTypes.choices[queueitem.type][1]})
+
+    return {'actions': actions}
+
+@register.simple_tag(takes_context=True)
 def get_farms(context):
     '''
     Get farms for current user
     '''
 
-    farms = get_objects_for_user(context['request'].user, ['backend.change_entity'], Entity.objects.all().annotate(properties_list=ArrayAgg('properties')).order_by('name'))
+    if context['request'].user.is_superuser:
+        farms = Entity.objects.filter(status=EditTypes.EDIT_PUBLISH).annotate(properties_list=ArrayAgg('properties')).order_by('name')
+    else:
+        farms = get_objects_for_user(context['request'].user, ['backend.change_entity'], Entity.objects.all().annotate(properties_list=ArrayAgg('properties')).order_by('name'))
     for farm in farms:
         farm.status = EditTypes.choices[farm.status][1]
         farm.types = Property.objects.filter(pk__in=farm.properties_list).filter(type=PropertyTypes.PROPERTY_ENTITYTYPE).order_by('name').values_list('name', flat=True)

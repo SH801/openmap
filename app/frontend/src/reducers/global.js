@@ -44,6 +44,10 @@ export default function selector(state=initialStateGlobal, action) {
             newState = {...newState, context: action.context};
             return newState;
 
+        case 'FETCH_LASTEXPORT':
+            newState = {...newState, dataupdatepending: action.dataupdatepending, lastexport: action.lastexport};
+            return newState;
+    
         case 'RESET_CONTEXT':
             newState = {...newState, context: initialStateGlobal.context};
             return newState;

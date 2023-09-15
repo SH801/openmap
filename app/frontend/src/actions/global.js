@@ -108,6 +108,51 @@ export const fetchContext = (context, isMobile) => {
 }
 
 /**
+ * fetchLastExport
+ * 
+ * Fetches date of last export from backend server in order to check whether map update required
+ * 
+ */
+export const fetchLastExport = () => {
+  return (dispatch, getState) => {
+    let headers = {"Content-Type": "application/json"};
+    return fetch(API_URL + "/lastexport/", {headers, method: "POST"})
+      .then(res => {
+        if (res.status < 500) {
+          return res.json().then(data => {
+            return {status: res.status, data};
+          })
+        } else {
+          console.log("Server Error!");
+          throw res;
+        }
+      })
+      .then(res => {
+        if (res.status === 200) {
+          let dataupdatepending = false;
+          if (res.data['lastexport']) {
+            const lastexport = getState().global.lastexport;
+            if ((lastexport !== null) & (lastexport !== res.data['lastexport'])) {
+              console.log("Data update pending, refreshing map after delay...");
+              setTimeout(() => {
+                console.log("Refreshing map");
+                const { mapref } = getState().global;
+                if (mapref) {
+                  const map = mapref.current.getMap();
+                  map.style.sourceCaches['positivefarms'].clearTiles()
+                  map.style.sourceCaches['positivefarms'].update(map.transform)
+                  map.triggerRepaint()
+                }  
+              }, 10000);
+            }
+          }
+          return dispatch({type: 'FETCH_LASTEXPORT', dataupdatepending: dataupdatepending, lastexport: res.data['lastexport']});
+        }         
+      })
+  }
+}
+
+/**
  * fetchExternalReference
  * 
  * Attempts to retrieve entity info using external reference

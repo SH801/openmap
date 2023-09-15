@@ -18,11 +18,13 @@ from .models import Property
 from .models import Entity, EntityAdmin
 from .models import Post, PostAdmin
 from .models import Message, MessageAdmin
+from .models import ExportQueue, ExportQueueAdmin
 
 admin.site.register(Profile)
 admin.site.register(Context, ContextAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(Geometry, GeometryAdmin)
+admin.site.register(ExportQueue, ExportQueueAdmin)
 admin.site.register(GeometryCode)
 admin.site.register(Property)
 admin.site.register(Entity, EntityAdmin)

@@ -53,6 +53,9 @@ class UserEditTypes(models.IntegerChoices):
     EDIT_DRAFT          = 0, 'Draft'
     EDIT_PUBLISH        = 1, 'Publish'
 
+class ExportQueueTypes(models.IntegerChoices):
+    EXPORTQUEUE_ENTITY  = 0, 'Entities'
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email_is_confirmed = models.BooleanField(default=False)
@@ -183,6 +186,32 @@ class Property(models.Model):
     def __str__(self):
         return self.name
 
+class ExportQueue(models.Model):
+    """
+    Tracks status of vector map exports
+    """
+    type = models.IntegerField(default=0, choices=ExportQueueTypes.choices)
+    exportdue = models.BooleanField(null=True, verbose_name="Export due")
+    exported = models.DateTimeField(null=True, blank=True)
+    shelloutput = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ('-exportdue', '-exported' ) 
+        indexes = [
+            models.Index(fields=['type', 'exportdue', 'exported']),
+        ]
+
+    def __str__(self):
+        return ExportQueueTypes.choices[self.type][1]
+    
+class ExportQueueAdmin(admin.ModelAdmin):
+    list_display = ['type', 'exportdue', 'exported']
+
+    list_filter = (
+        'type',
+        'exportdue'
+    )
+
 class Entity(models.Model):
     """
     Stores entities within map system
@@ -220,7 +249,7 @@ class Entity(models.Model):
 
     status = models.IntegerField(default=0, choices=EditTypes.choices)
     name = models.CharField(max_length=255)
-    email = models.CharField(max_length=255)
+    email = models.CharField(max_length=255, blank=True)
     external_id = models.CharField(max_length=255, blank=True)
     featured = models.BooleanField(default=False, blank=True)
     img = models.CharField(max_length=1000, blank=True)
@@ -278,6 +307,15 @@ def entity_post_save(sender, **kwargs):
     """
 
     instance = kwargs["instance"]
+    print(instance.status)
+    # If status of entity is 'live', put vector map export request in queue
+    if instance.status == EditTypes.EDIT_LIVE:
+        queue = ExportQueue.objects.filter(type=ExportQueueTypes.EXPORTQUEUE_ENTITY, exportdue=True).first()
+        print(queue)
+        if queue is None:
+            ExportQueue(type=ExportQueueTypes.EXPORTQUEUE_ENTITY, exportdue=True).save()
+
+    # Add permissions to entity
     try:
         if instance.user is not None:
             if instance.user.is_superuser is False:
@@ -588,38 +626,3 @@ class MessageAdmin(admin.ModelAdmin):
         'email_from',
         'email_to'
     )
-
-
-# class Data(models.Model):
-#     """
-#     Stores geometry-related emissions data
-#     geometrycode maps to Geometry.code
-#     """
-#     type = models.IntegerField(choices=DATATYPES_CHOICES)
-#     year = models.CharField(max_length = 4)
-#     value = models.DecimalField(max_digits = 20, decimal_places=2)
-#     meters = models.FloatField()
-#     geometrycode = models.CharField(max_length = 200)
-#     geometrytype = models.CharField(max_length = 200, choices=GEOMETRY_CHOICES)
-
-#     class Meta:
-#         indexes = [
-#             models.Index(fields=['type',]),
-#             models.Index(fields=['year',]),
-#             models.Index(fields=['geometrycode',]),
-#             models.Index(fields=['geometrytype',]),
-#         ]
-
-#     def __str__(self):
-#         return str(self.geometrytype) + ": " + self.geometrycode
-
-# class DataAdmin(OSMGeoAdmin):
-#     """
-#     Admin class for managing data objects through admin interface
-#     """
-#     list_display = ['geometrytype', 'geometrycode', 'type', 'year', 'value', 'meters']
-
-#     search_fields = (
-#         'year',
-#         'geometrycode'
-#     )

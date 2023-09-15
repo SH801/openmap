@@ -19,6 +19,8 @@ export const initialStateGlobal = {
     showcontactmodal: false,
     geometry: 1,
     mapref: null,
+    lastexport: null,
+    dataupdatepending: false,
     periodstart: periodstart,
     periodend: periodend,
     areascale: areascale,

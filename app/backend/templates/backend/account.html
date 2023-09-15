@@ -17,9 +17,40 @@ Your Account
 
 <h1>Your Account</h1>
 
+{% if request.user.is_superuser %}
+
+<div class="row mt-4 mb-3">
+    <div class="col">
+        <div class="mb-3">
+            <h3><i class="material-icons mdi-36px farm-icon">sync</i> Actions</h3>
+        </div>
+
+        {% get_actions as actions %}
+
+        {% for action in actions.actions %}
+
+            <a href="/export/{{ action.type }}" class="btn btn-round btn-info mr-2" >Export {{ action.name }} </a>
+
+        {% empty %}
+
+            <div class="mt-3 mb-3">No available actions</div>
+
+        {% endfor %}
+
+    </div>
+</div>
+
+{% endif %}
+
 <div class="row mt-4 mb-3">
     <div class="col">
         <h3><i class="material-icons mdi-36px farm-icon">location_on</i> Farms</h3>
+
+        {% if request.user.is_superuser %}
+
+            <p>Published farms to review</p>
+
+        {% endif %}
 
         {% get_farms as farms %}
 

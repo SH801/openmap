@@ -230,6 +230,7 @@ The above copyright notice and this permission notice shall be included in all c
     <script src="/static/js/jquery.mask.min.js" type="text/javascript"></script>
         
     <script type="text/javascript">
+
       tinymce.init({
         selector: '.tinymce',
         menubar: false,
@@ -237,6 +238,46 @@ The above copyright notice and this permission notice shall be included in all c
         plugins: 'lists',
         toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist'
       });
+
+      function postcodeChanged() {
+        console.log("postcode changed");
+      }
+
+      var postcode = '';
+
+      function isValidPostcode(p) { 
+          if (p !== undefined) {
+            p = p.trim();
+            var postcodeRegEx = /^[A-Z]{1,2}[0-9]{1,2} ?[0-9][A-Z]{2}$/i; 
+            return postcodeRegEx.test(p); 
+          }
+      }
+
+      function setGotoPostcode() {
+        $('#goto-postcode').html('or <span style="cursor:pointer" id="goto-postcode" onClick="gotoPostcode()"><b>goto postcode</b></span>');
+      }
+
+      function clearGotoPostcode() {
+        $('#goto-postcode').html('');
+      }
+
+      $('input[name=postcode]').on("input", function (changeEvent) {
+        if (changeEvent.target.value != postcode) {
+          postcode = changeEvent.target.value;
+          if (isValidPostcode(postcode)) {
+            setGotoPostcode();
+          } else {
+            clearGotoPostcode();
+          }
+        }
+        return false;
+      });
+
+      if (isValidPostcode($('input[name=postcode]').val())) {
+        setGotoPostcode();
+      } else {
+        clearGotoPostcode();
+      }
 
       function gotoPostcode() {
         var postcode = $('input[name=postcode]').val().trim();
@@ -497,7 +538,7 @@ The above copyright notice and this permission notice shall be included in all c
               var featureIds = draw.add(newfeaturecollection);
               data = draw.getAll();
               map.fitBounds(turf.bbox(data), {duration: 0});
-              $('#GeoJSON').val(JSON.stringify(data, null, 2));
+              updateGeoJSON();
               $('#fileuploaded').val('');
           };
 
@@ -667,8 +708,12 @@ The above copyright notice and this permission notice shall be included in all c
       }
 
       function updateArea(e) {
-          const data = draw.getAll();
-          $('#GeoJSON').val(JSON.stringify(data, null, 2));
+        updateGeoJSON();
+      }
+
+      function updateGeoJSON() {
+        const data = draw.getAll();
+        $('#id_GeoJSON').val(JSON.stringify(data, null, 2));
       }
 
       const draw = new MapboxDraw({
@@ -734,6 +779,8 @@ The above copyright notice and this permission notice shall be included in all c
               if (featurecollection !== '') {
                 featurecollection = JSON.parse(JSON.parse(featurecollection));
                 draw.add(featurecollection);
+                data = draw.getAll();
+                map.fitBounds(turf.bbox(data), {duration: 0});
               }
             }
 
@@ -783,8 +830,7 @@ The above copyright notice and this permission notice shall be included in all c
                             })
                             const originalFeature = merge(sourceFeatures);
                             draw.add(originalFeature);
-                            data = draw.getAll();
-                            $('#GeoJSON').val(JSON.stringify(data, null, 2)); 
+                            updateGeoJSON();
                         }
                     }
                 }

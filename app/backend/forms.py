@@ -1,17 +1,20 @@
+import re
 from django import forms
 from django.db import models
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.forms import ValidationError
+from django.forms.fields import CharField
+from django.utils.translation import gettext_lazy as _
 from .models import Entity, Post, Property, PropertyTypes, EditTypes, UserEditTypes
 from localflavor.gb.forms import GBPostcodeField
 from guardian.shortcuts import get_objects_for_user
-
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(max_length=254)
     organisation = forms.CharField(max_length=254, label="Name of farm")
     address = forms.CharField(widget=forms.Textarea(attrs={'rows':4}), max_length = 1000, label="Address", required=False)
-    postcode = GBPostcodeField(required=False)   
+    postcode = GBPostcodeField(required=True)   
     GeoJSON = forms.CharField(widget=forms.Textarea(attrs={'leafletdraw': True}), required=True)
     type = forms.ModelMultipleChoiceField(queryset=Property.objects.filter(type=PropertyTypes.PROPERTY_ENTITYTYPE).order_by('name'), label="Type of farm", required=True)
     actions = forms.ModelMultipleChoiceField(queryset=Property.objects.filter(type=PropertyTypes.PROPERTY_ACTION).order_by('name'), label="What you're doing...", required=False)
@@ -46,7 +49,7 @@ class FarmForm(forms.ModelForm):
     name = forms.CharField(max_length = 200, label="Name of farm")
     email = forms.CharField(max_length = 200, label="Email for public contact - leave blank to prevent contact", required=False)
     address = forms.CharField(widget=forms.Textarea(attrs={'rows':4}), max_length = 1000, label="Address", required=False)
-    postcode = GBPostcodeField(required=False)   
+    postcode = GBPostcodeField(required=False)  
     location = forms.CharField(widget=forms.Textarea(attrs={'hidden': True, 'fieldname': 'field_location'}), required=False)
     GeoJSON = forms.CharField(widget=forms.Textarea(attrs={'leafletdraw': True}), required=False)
     type = forms.ModelMultipleChoiceField(queryset=Property.objects.filter(type=PropertyTypes.PROPERTY_ENTITYTYPE).order_by('name'), label="Type of farm", required=False)

@@ -307,11 +307,9 @@ def entity_post_save(sender, **kwargs):
     """
 
     instance = kwargs["instance"]
-    print(instance.status)
     # If status of entity is 'live', put vector map export request in queue
     if instance.status == EditTypes.EDIT_LIVE:
         queue = ExportQueue.objects.filter(type=ExportQueueTypes.EXPORTQUEUE_ENTITY, exportdue=True).first()
-        print(queue)
         if queue is None:
             ExportQueue(type=ExportQueueTypes.EXPORTQUEUE_ENTITY, exportdue=True).save()
 

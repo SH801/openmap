@@ -538,7 +538,7 @@ The above copyright notice and this permission notice shall be included in all c
               var featureIds = draw.add(newfeaturecollection);
               data = draw.getAll();
               map.fitBounds(turf.bbox(data), {duration: 0});
-              updateGeoJSON();
+              updateGeoJSONField();
               $('#fileuploaded').val('');
           };
 
@@ -708,10 +708,10 @@ The above copyright notice and this permission notice shall be included in all c
       }
 
       function updateArea(e) {
-        updateGeoJSON();
+        updateGeoJSONField();
       }
 
-      function updateGeoJSON() {
+      function updateGeoJSONField() {
         const data = draw.getAll();
         $('#id_GeoJSON').val(JSON.stringify(data, null, 2));
       }
@@ -781,6 +781,7 @@ The above copyright notice and this permission notice shall be included in all c
                 draw.add(featurecollection);
                 data = draw.getAll();
                 map.fitBounds(turf.bbox(data), {duration: 0});
+                updateGeoJSONField();
               }
             }
 
@@ -830,7 +831,7 @@ The above copyright notice and this permission notice shall be included in all c
                             })
                             const originalFeature = merge(sourceFeatures);
                             draw.add(originalFeature);
-                            updateGeoJSON();
+                            updateGeoJSONField();
                         }
                     }
                 }

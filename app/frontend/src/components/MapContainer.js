@@ -151,10 +151,6 @@ export class MapContainer extends Component  {
     var popup = this.popupRef.current;
 
     if (event.features.length > 0) {
-
-      var featureState = map.getFeatureState(event.features[0]);
-      if (featureState['invisible'] === true) return;
-
       if (this.hoveredPolygonId === null) {
         map.getCanvas().style.cursor = 'pointer';
         this.hoveredPolygonId = event.features[0].id;
@@ -188,11 +184,6 @@ export class MapContainer extends Component  {
 
   onClick = (event) => {
     if (event.features.length > 0) {
-
-      var map = this.mapRef.current.getMap();
-      var featureState = map.getFeatureState(event.features[0]);
-      if (featureState['invisible'] === true) return;
-
       var entityid = event.features[0].properties.entityid;
       this.selectEntity(entityid);
     }
@@ -247,7 +238,7 @@ export class MapContainer extends Component  {
           onMouseLeave={this.onMouseLeave}
           onMoveEnd={this.onMoveEnd}
           onClick={this.onClick}
-          minZoom={5}
+          minZoom={4}
           maxBounds={this.getMaxBounds()}
           interactiveLayerIds={['positivefarms_background', 'positivefarms_active']}
           initialViewState={{

@@ -1,32 +1,11 @@
 <label class="label">Farm outline</label>
 
-<div>
-  Click on polygon icon <img style="position:relative;top:-2px;" src="/static/assets/icon/polygonicon.png" /> to draw farm outline.
+<div class="mb-2">
+  Select <img style="position:relative;top:-2px;" src="/static/assets/icon/polygonicon.png" /> below to draw outline,
+  click <img style="position:relative;top:-2px;width:18px;height:18px;margin:2px;" src="/static/assets/icon/selectoricon.png" /> to select existing boundary  
+  or <span style="cursor:pointer" onClick="gotoPostcode()"><b>goto postcode</b></span>
 </div>
 
-<div>
-
-  <label class="clickable-link" onClick="gotoCurrentLocation()">
-    <i style="position:relative;top:5px;" title="Goto current location" class="material-icons-outlined">location_on</i> 
-    Current location
-  </label> 
-
-  <label class="clickable-link" onClick="gotoPostcode()">
-    <i style="position:relative;top:5px;" title="Goto current location" class="material-icons-outlined">home</i> 
-    Goto postcode
-  </label> 
-
-  <label class="clickable-link" for="fileuploaded">
-    <i style="position:relative;top:5px;" title="Upload GeoJSON file" class="material-icons-outlined">upload_file</i> 
-    Upload GeoJSON
-  </label>
-
-  <label class="clickable-link" onClick="centerPolygons()">
-    <i style="position:relative;top:5px;" title="Upload GeoJSON file" class="material-icons-outlined">fit_screen</i> 
-    Centre on drawn areas
-  </label>
-
-</div>
 <div>
     <input style="display: none;" id="fileuploaded" name="files[]" multiple="" type="file" name="Upload GeoJSON"/>
 </div>

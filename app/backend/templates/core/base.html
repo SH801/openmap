@@ -30,49 +30,83 @@ The above copyright notice and this permission notice shall be included in all c
     <link href="/static/material-kit/css/material-kit.css" rel="stylesheet" />
     <link href="/static/material-kit/bootstrap-select/css/bootstrap-select.css" rel="stylesheet" />
     <link href="/static/css/custom.css" rel="stylesheet" />
-    <!-- Map editing libraries -->
-    <script src="/static/leaflet/leaflet-src.js"></script>
-    <link rel="stylesheet" href="/static/leaflet/leaflet.css">
-
-    <script src="/static/leaflet/Leaflet.draw.js"></script>
-    <script src="/static/leaflet/Leaflet.Draw.Event.js"></script>
-    <link rel="stylesheet" href="/static/leaflet/leaflet.draw.css">
-
-    <script src="/static/leaflet/Toolbar.js"></script>
-    <script src="/static/leaflet/Tooltip.js"></script>
-
-    <script src="/static/leaflet/GeometryUtil.js"></script>
-    <script src="/static/leaflet/LatLngUtil.js"></script>
-    <script src="/static/leaflet/LineUtil.Intersect.js"></script>
-    <script src="/static/leaflet/Polygon.Intersect.js"></script>
-    <script src="/static/leaflet/Polyline.Intersect.js"></script>
-    <script src="/static/leaflet/TouchEvents.js"></script>
-
-    <script src="/static/leaflet/DrawToolbar.js"></script>
-    <script src="/static/leaflet/Draw.Feature.js"></script>
-    <script src="/static/leaflet/Draw.SimpleShape.js"></script>
-    <script src="/static/leaflet/Draw.Polyline.js"></script>
-    <script src="/static/leaflet/Draw.Marker.js"></script>
-    <script src="/static/leaflet/Draw.CircleMarker.js"></script>
-    <script src="/static/leaflet/Draw.Circle.js"></script>
-    <script src="/static/leaflet/Draw.Polygon.js"></script>
-    <script src="/static/leaflet/Draw.Rectangle.js"></script>
-    <script src="/static/leaflet/EditToolbar.js"></script>
-    <script src="/static/leaflet/EditToolbar.Edit.js"></script>
-    <script src="/static/leaflet/EditToolbar.Delete.js"></script>
-    <script src="/static/leaflet/Control.Draw.js"></script>
-    <script src="/static/leaflet/Edit.Poly.js"></script>
-
-    <script>
-    var osmUrl, osmAttrib, osm, map, drawnItems;
-    </script>
+    <link href="/static/css/mapbox-gl-draw.css" rel="stylesheet" />
+    <link href='/static/css/maplibre-gl.css' rel="stylesheet" />
+    <script src="/static/js/jquery-1.7.1.min.js"></script>
+    <script src='/static/js/maplibre-gl.js'></script>
+    <script src="/static/js/turf.min.js"></script>
+    <script src="/static/js/polygon-clipping.umd.min.js"></script>
+    <script src="/static/js/mapbox-gl-draw.js"></script>
+    
 
     <style>
+
     .navbar .navbar-brand {      
         height:80px;
     }
 
-    </style>
+    .maplibregl-style-list {
+      display: none;
+    }
+
+    .maplibregl-ctrl-group .maplibregl-style-list button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: block;
+      font-size: 14px;
+      padding: 8px 8px 6px;
+      text-align: right;
+      width: 100%;
+      height: auto;
+    }
+
+    .maplibregl-style-list button.active {
+      font-weight: bold;
+    }
+
+    .maplibregl-style-list button:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .maplibregl-style-list button + button {
+      border-top: 1px solid #ddd;
+    }
+
+    .maplibregl-style-switcher {
+      background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJDYXBhXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB3aWR0aD0iNTQuODQ5cHgiIGhlaWdodD0iNTQuODQ5cHgiIHZpZXdCb3g9IjAgMCA1NC44NDkgNTQuODQ5IiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1NC44NDkgNTQuODQ5OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PGc+PGc+PGc+PHBhdGggZD0iTTU0LjQ5NywzOS42MTRsLTEwLjM2My00LjQ5bC0xNC45MTcsNS45NjhjLTAuNTM3LDAuMjE0LTEuMTY1LDAuMzE5LTEuNzkzLDAuMzE5Yy0wLjYyNywwLTEuMjU0LTAuMTA0LTEuNzktMC4zMThsLTE0LjkyMS01Ljk2OEwwLjM1MSwzOS42MTRjLTAuNDcyLDAuMjAzLTAuNDY3LDAuNTI0LDAuMDEsMC43MTZMMjYuNTYsNTAuODFjMC40NzcsMC4xOTEsMS4yNTEsMC4xOTEsMS43MjksMEw1NC40ODgsNDAuMzNDNTQuOTY0LDQwLjEzOSw1NC45NjksMzkuODE3LDU0LjQ5NywzOS42MTR6Ii8+PHBhdGggZD0iTTU0LjQ5NywyNy41MTJsLTEwLjM2NC00LjQ5MWwtMTQuOTE2LDUuOTY2Yy0wLjUzNiwwLjIxNS0xLjE2NSwwLjMyMS0xLjc5MiwwLjMyMWMtMC42MjgsMC0xLjI1Ni0wLjEwNi0xLjc5My0wLjMyMWwtMTQuOTE4LTUuOTY2TDAuMzUxLDI3LjUxMmMtMC40NzIsMC4yMDMtMC40NjcsMC41MjMsMC4wMSwwLjcxNkwyNi41NiwzOC43MDZjMC40NzcsMC4xOSwxLjI1MSwwLjE5LDEuNzI5LDBsMjYuMTk5LTEwLjQ3OUM1NC45NjQsMjguMDM2LDU0Ljk2OSwyNy43MTYsNTQuNDk3LDI3LjUxMnoiLz48cGF0aCBkPSJNMC4zNjEsMTYuMTI1bDEzLjY2Miw1LjQ2NWwxMi41MzcsNS4wMTVjMC40NzcsMC4xOTEsMS4yNTEsMC4xOTEsMS43MjksMGwxMi41NDEtNS4wMTZsMTMuNjU4LTUuNDYzYzAuNDc3LTAuMTkxLDAuNDgtMC41MTEsMC4wMS0wLjcxNkwyOC4yNzcsNC4wNDhjLTAuNDcxLTAuMjA0LTEuMjM2LTAuMjA0LTEuNzA4LDBMMC4zNTEsMTUuNDFDLTAuMTIxLDE1LjYxNC0wLjExNiwxNS45MzUsMC4zNjEsMTYuMTI1eiIvPjwvZz48L2c+PC9nPjxnPjwvZz48Zz48L2c+PGc+PC9nPjxnPjwvZz48Zz48L2c+PGc+PC9nPjxnPjwvZz48Zz48L2c+PGc+PC9nPjxnPjwvZz48Zz48L2c+PGc+PC9nPjxnPjwvZz48Zz48L2c+PGc+PC9nPjwvc3ZnPg==);
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 70%;
+    }
+
+    .maplibregl-upload {
+      background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBpZD0iTGF5ZXJfMiIgZGF0YS1uYW1lPSJMYXllciAyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMjIsMTNhMSwxLDAsMCwwLTEsMXY0LjIxM0EyLjc5LDIuNzksMCwwLDEsMTguMjEzLDIxSDUuNzg3QTIuNzksMi43OSwwLDAsMSwzLDE4LjIxM1YxNGExLDEsMCwwLDAtMiwwdjQuMjEzQTQuNzkyLDQuNzkyLDAsMCwwLDUuNzg3LDIzSDE4LjIxM0E0Ljc5Miw0Ljc5MiwwLDAsMCwyMywxOC4yMTNWMTRBMSwxLDAsMCwwLDIyLDEzWiIvPjxwYXRoIGQ9Ik02LjcwNyw4LjcwNywxMSw0LjQxNFYxN2ExLDEsMCwwLDAsMiwwVjQuNDE0bDQuMjkzLDQuMjkzYTEsMSwwLDAsMCwxLjQxNC0xLjQxNGwtNi02YTEsMSwwLDAsMC0xLjQxNCwwbC02LDZBMSwxLDAsMCwwLDYuNzA3LDguNzA3WiIvPjwvc3ZnPgo=);
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 70%;
+    }
+
+    .maplibregl-selector {
+      background-image: url(data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgaGVpZ2h0PSI1MTIiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGRhdGEtbmFtZT0iTGF5ZXIgMSI+PHBhdGggZD0ibTQ5My41MTcgMTkuOTM5LTEuNDU2LTEuNDU2YTYzLjEwNiA2My4xMDYgMCAwIDAgLTg5LjI0NSAwbC0xMDEuMzM5IDEwMS4zNC03Ljc0NS03Ljc0NWEyMC40NzggMjAuNDc4IDAgMCAwIC0yOC45NiAwbC0uNDczLjQ3M2EyMC40NzggMjAuNDc4IDAgMCAwIDAgMjguOTZsMTEuOTc0IDExLjk3NC0yMTcuMDE2IDIxNy4wMTVhMTI0LjgyOCAxMjQuODI4IDAgMCAwIC0yOC44NTcgNDUuNDA4bC0yNy4zNDQgNTAuMzYyYTI0LjI3IDI0LjI3IDAgMCAwIC0yLjk1NiA5LjQ3OWMtLjc2NiA5LjAxMiAyLjkgMTguNzEzIDEwLjE2OCAyNS45ODJzMTYuOTcxIDEwLjkzNSAyNS45ODMgMTAuMTY5YTI0LjI3NSAyNC4yNzUgMCAwIDAgOS40NzktMi45NTZsNTAuMzYxLTI3LjM0NGExMjQuODUgMTI0Ljg1IDAgMCAwIDQ1LjQwOS0yOC44NTdsMjE3LjAxNS0yMTcuMDE3IDExLjk3NCAxMS45NzRhMjAuNDc2IDIwLjQ3NiAwIDAgMCAyOC45NiAwbC40NzMtLjQ3MmEyMC40NzggMjAuNDc4IDAgMCAwIDAtMjguOTZsLTcuNzQ1LTcuNzQ1IDEwMS4zNC0xMDEuMzM5YTYzLjEwNiA2My4xMDYgMCAwIDAgMC04OS4yNDV6bS0zNzIuMTE3IDQyMy4wMThhODYuMTE2IDg2LjExNiAwIDAgMSAtMjcuMTY3IDE4LjMyOCA4Ny4yNDcgODcuMjQ3IDAgMCAwIC0xMS4wNjEgNS44bC0zNC43MjEgMjEuMTgxYTE4LjMyNCAxOC4zMjQgMCAwIDEgLTIwLjg5NC0yLjEzMXEtLjQ0NC0uNC0uODctLjgyMmMtLjI4NS0uMjg0LS41NTktLjU3NS0uODIzLS44N2ExOC4zMjcgMTguMzI3IDAgMCAxIC0yLjEzMS0yMC44OTVsMjEuMTgzLTM0LjcyMWE4Ny41MTMgODcuNTEzIDAgMCAwIDUuOC0xMS4wNjEgODYuMDcyIDg2LjA3MiAwIDAgMSAxOC4zMjgtMjcuMTY2bDIyMS42NC0yMjEuNjQgNTIuMzU4IDUyLjM1OHoiLz48L3N2Zz4=);
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 70%;
+    }
+
+    .maplibregl-fitbounds {
+      background-image: url(data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTI4IDEyOCIgaGVpZ2h0PSI1MTIiIHZpZXdCb3g9IjAgMCAxMjggMTI4IiB3aWR0aD0iNTEyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGlkPSJNYXhpbWl6ZSIgZD0ibTExNiAxNnYyNGMwIDIuMjA5LTEuNzkxIDQtNCA0cy00LTEuNzkxLTQtNHYtMTQuMzQ0bC0yNS4xNzIgMjUuMTcyYy0uNzgxLjc4MS0xLjgwNSAxLjE3Mi0yLjgyOCAxLjE3MnMtMi4wNDctLjM5MS0yLjgyOC0xLjE3MmMtMS41NjMtMS41NjMtMS41NjMtNC4wOTQgMC01LjY1NmwyNS4xNzItMjUuMTcyaC0xNC4zNDRjLTIuMjA5IDAtNC0xLjc5MS00LTRzMS43OTEtNCA0LTRoMjRjMi4yMDkgMCA0IDEuNzkxIDQgNHptLTY1LjE3MiAyOS4xNzItMjUuMTcyLTI1LjE3MmgxNC4zNDRjMi4yMDkgMCA0LTEuNzkxIDQtNHMtMS43OTEtNC00LTRoLTI0Yy0yLjIwOSAwLTQgMS43OTEtNCA0djI0YzAgMi4yMDkgMS43OTEgNCA0IDRzNC0xLjc5MSA0LTR2LTE0LjM0NGwyNS4xNzIgMjUuMTcyYy43ODEuNzgxIDEuODA1IDEuMTcyIDIuODI4IDEuMTcyczIuMDQ3LS4zOTEgMi44MjgtMS4xNzJjMS41NjMtMS41NjIgMS41NjMtNC4wOTQgMC01LjY1NnptNjEuMTcyIDM4LjgyOGMtMi4yMDkgMC00IDEuNzkxLTQgNHYxNC4zNDRsLTI1LjE3Mi0yNS4xNzJjLTEuNTYzLTEuNTYzLTQuMDk0LTEuNTYzLTUuNjU2IDBzLTEuNTYzIDQuMDk0IDAgNS42NTZsMjUuMTcyIDI1LjE3MmgtMTQuMzQ0Yy0yLjIwOSAwLTQgMS43OTEtNCA0czEuNzkxIDQgNCA0aDI0YzIuMjA5IDAgNC0xLjc5MSA0LTR2LTI0YzAtMi4yMDktMS43OTEtNC00LTR6bS02MS4xNzItNi44MjhjLTEuNTYzLTEuNTYzLTQuMDk0LTEuNTYzLTUuNjU2IDBsLTI1LjE3MiAyNS4xNzJ2LTE0LjM0NGMwLTIuMjA5LTEuNzkxLTQtNC00cy00IDEuNzkxLTQgNHYyNGMwIDIuMjA5IDEuNzkxIDQgNCA0aDI0YzIuMjA5IDAgNC0xLjc5MSA0LTRzLTEuNzkxLTQtNC00aC0xNC4zNDRsMjUuMTcyLTI1LjE3MmMxLjU2My0xLjU2MiAxLjU2My00LjA5NCAwLTUuNjU2eiIvPjwvc3ZnPg==);
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 70%;
+    }
+
+    .maplibregl-inverted {
+        background-color: #AAA;
+    }
+
+  </style>
+
   </head>
 
   {% load templatetags %}
@@ -204,32 +238,6 @@ The above copyright notice and this permission notice shall be included in all c
         toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist'
       });
 
-      $("#fileuploaded").on("change", function (changeEvent) {
-      for (var i = 0; i < changeEvent.target.files.length; ++i) {
-          (function (file) {               // Wrap current file in a closure.
-          var loader = new FileReader();
-          loader.onload = function (loadEvent) {
-              if (loadEvent.target.readyState != 2)
-              return;
-              if (loadEvent.target.error) {
-              alert("Error while reading file " + file.name + ": " + loadEvent.target.error);
-              return;
-              }
-              $("#GeoJSON").val(loadEvent.target.result);
-              $('#fileuploaded').val('');
-              setDrawnItems(JSON.parse(loadEvent.target.result));
-          };
-          loader.readAsText(file);
-          })(changeEvent.target.files[i]);
-      }
-      });
-
-      function gotoCurrentLocation() {
-        navigator.geolocation.getCurrentPosition((position) => {
-          map.flyTo({lng: position.coords.longitude, lat: position.coords.latitude}, 14, {animate: true});
-        });
-      }
-                      
       function gotoPostcode() {
         var postcode = $('input[name=postcode]').val().trim();
         if (postcode !== '') {
@@ -239,106 +247,549 @@ The above copyright notice and this permission notice shall be included in all c
                 url: '/locationposition', 
                 data: { location: postcode }, 
                 success: function (data) {
-                  map.setView(new L.LatLng(data.data['lat'], data.data['lng']), data.data['zoom']);
+                  map.jumpTo({center: [data.data['lng'], data.data['lat']], zoom: data.data['zoom']});
                 }
             });
           });
         }
-        return true;
+        return false;
       }
 
-      function centerPolygons() {
-        if (Object.keys(drawnItems._layers).length !== 0) {
-          map.fitBounds(drawnItems.getBounds());
-        }
+      function getRasterStyle(url, attribution, invert) {
+          var defaultColor = "black";
+          if (invert) defaultColor = "white";
+
+          return {
+              'version': 8,
+              'sources': {
+                  'background': {
+                      'type': 'raster',
+                      'tiles': [url],
+                      'tileSize': 256,
+                      'attribution': attribution
+                  },
+                  "inspire": {
+                      "type": "vector",
+                      "url": "https://tiles.positivefarms.org/data/inspire.json",
+                      "attribution": "INSPIRE polygons data subject to Crown Copyright and database rights 2023 and is reproduced with the permission of HM Land Registry and Ordnance Survey 100026316"
+                  },      
+              },
+              'layers': [
+                  {
+                      'id': 'background',
+                      'type': 'raster',
+                      'source': 'background',
+                      'minzoom': 0,
+                      'maxzoom': 22
+                  },
+                  {
+                      "id": "inspire_outlined",
+                      "type": "line",
+                      "source": "inspire",
+                      "source-layer": "inspire",
+                      "filter": [
+                          "all"
+                      ],
+                      "paint": {
+                          "line-color": defaultColor,
+                          "line-width": [
+                          "case",
+                          ["boolean", ["feature-state", "hover"], false],
+                          3,
+                          1
+                          ],
+                          "line-opacity": [
+                          "case",
+                          ["boolean", ["feature-state", "hover"], false],
+                          1,
+                          0.1
+                          ]          
+                      }
+                  },
+                  {
+                      "id": "inspire_filled",
+                      "type": "fill",
+                      "source": "inspire",
+                      "source-layer": "inspire",
+                      "filter": [
+                          "all"
+                      ],
+                      "paint": {
+                          "fill-color": 'white',
+                          "fill-opacity": 0                       
+                      }
+                  }
+              ]
+          };
       }
 
-      function setDrawnItems(GeoJSONContent) {
-          var geojsonLayer = L.geoJson(GeoJSONContent);
-          geojsonLayer.eachLayer(
-              function(l){
-                  drawnItems.addLayer(l);
-          });
-          map.fitBounds(drawnItems.getBounds());
-          layersUpdated();
-      }
+      class MapLibreStyleSwitcherControl {
 
-      function layersUpdated() {
-          var featurecollection = {'type': 'FeatureCollection', 'features': []}
-          for (const [key, value] of Object.entries(drawnItems._layers)) {
-              featurecollection.features.push(value.toGeoJSON());
+          constructor(styles, defaultStyle) {
+              this.styles = styles;
+              this.defaultStyle = defaultStyle;
+              this.onDocumentClick = this.onDocumentClick.bind(this);
           }
-          $('#id_GeoJSON').val(JSON.stringify(featurecollection, null, 2));
+
+          getDefaultPosition() {
+              const defaultPosition = "top-right";
+              return defaultPosition;
+          }
+
+          onAdd(map) {
+              this.map = map;
+              this.controlContainer = document.createElement("div");
+              this.controlContainer.title = "Change background layer";
+              this.controlContainer.classList.add("maplibregl-ctrl");
+              this.controlContainer.classList.add("maplibregl-ctrl-group");
+              this.mapStyleContainer = document.createElement("div");
+              this.styleButton = document.createElement("button");
+              this.styleButton.type = "button";
+              this.mapStyleContainer.classList.add("maplibregl-style-list");
+              for (const style of this.styles) {
+                  const styleElement = document.createElement("button");
+                  styleElement.type = "button";
+                  styleElement.innerText = style.title;
+                  styleElement.classList.add(
+                  style.title.replace(/[^a-z0-9-]/gi, "_")
+                  );
+                  styleElement.dataset.style = JSON.stringify(style.style);
+                  styleElement.addEventListener("click", (event) => {
+                  const srcElement = event.srcElement;
+                  if (srcElement.classList.contains("active")) {
+                      return;
+                  }
+                  this.map.setStyle(JSON.parse(srcElement.dataset.style));
+                  this.mapStyleContainer.style.display = "none";
+                  this.styleButton.style.display = "block";
+                  const elms =
+                      this.mapStyleContainer.getElementsByClassName("active");
+                  while (elms[0]) {
+                      elms[0].classList.remove("active");
+                  }
+                  srcElement.classList.add("active");
+                  });
+                  if (style.title === this.defaultStyle) {
+                  styleElement.classList.add("active");
+                  }
+                  this.mapStyleContainer.appendChild(styleElement);
+              }
+              this.styleButton.classList.add("maplibregl-ctrl-icon");
+              this.styleButton.classList.add("maplibregl-style-switcher");
+              this.styleButton.addEventListener("click", () => {
+                  this.styleButton.style.display = "none";
+                  this.mapStyleContainer.style.display = "block";
+              });
+              document.addEventListener("click", this.onDocumentClick);
+              this.controlContainer.appendChild(this.styleButton);
+              this.controlContainer.appendChild(this.mapStyleContainer);
+              return this.controlContainer;
+          }
+
+          onRemove() {
+              if (
+                  !this.controlContainer ||
+                  !this.controlContainer.parentNode ||
+                  !this.map ||
+                  !this.styleButton
+              ) {
+                  return;
+              }
+              this.styleButton.removeEventListener("click", this.onDocumentClick);
+              this.controlContainer.parentNode.removeChild(this.controlContainer);
+              document.removeEventListener("click", this.onDocumentClick);
+              this.map = undefined;
+          }
+
+          onDocumentClick(event) {
+              if (
+                  this.controlContainer &&
+                  !this.controlContainer.contains(event.target) &&
+                  this.mapStyleContainer &&
+                  this.styleButton
+              ) {
+                  this.mapStyleContainer.style.display = "none";
+                  this.styleButton.style.display = "block";
+              }
+          }
       }
+
+      class MapLibreUploadControl {
+
+          constructor() {
+              this.onDocumentClick = this.onDocumentClick.bind(this);
+          }
+
+          getDefaultPosition() {
+              const defaultPosition = "top-right";
+              return defaultPosition;
+          }
+
+          onAdd(map) {
+              this.map = map;
+              this.controlContainer = document.createElement("div");
+              this.controlContainer.title = "Upload GeoJSON file";
+              this.controlContainer.classList.add("maplibregl-ctrl");
+              this.controlContainer.classList.add("maplibregl-ctrl-group");
+              this.uploadButton = document.createElement("button");
+              this.uploadButton.type = "button";
+              this.uploadButton.classList.add("maplibregl-ctrl-icon");
+              this.uploadButton.classList.add("maplibregl-upload");
+              this.uploadButton.addEventListener("click", () => {
+                  $('input[type=file]').trigger('click');
+              });
+              document.addEventListener("click", this.onDocumentClick);
+              this.controlContainer.appendChild(this.uploadButton);
+              return this.controlContainer;
+          }
+
+          onRemove() {
+              if (
+                  !this.controlContainer ||
+                  !this.controlContainer.parentNode ||
+                  !this.map ||
+                  !this.uploadButton
+              ) {
+                  return;
+              }
+              this.uploadButton.removeEventListener("click", this.onDocumentClick);
+              this.controlContainer.parentNode.removeChild(this.controlContainer);
+              document.removeEventListener("click", this.onDocumentClick);
+              this.map = undefined;
+          }
+
+          onDocumentClick(event) {
+              if (
+                  this.controlContainer &&
+                  !this.controlContainer.contains(event.target) &&
+                  this.uploadButton
+              ) {
+                  this.uploadButton.style.display = "block";
+              }
+          }
+      }
+
+      $("#fileuploaded").on("change", function (changeEvent) {
+        const file = changeEvent.target.files[0]; 
+          const reader = new FileReader();
+
+          reader.onload = function (theFile) {
+              const geoJSONcontent = JSON.parse(theFile.target.result);
+              existingdata = draw.getAll();
+              var newfeaturecollection = {'type': 'FeatureCollection', 'features': []};
+              for (const [newkey, newvalue] of Object.entries(geoJSONcontent['features'])) {
+                  var notinexistence = true;
+                  newvalue['id'] = 0;
+                  for (const [existingkey, existingvalue] of Object.entries(existingdata['features'])) {
+                      existingvalue['id'] = 0;
+                      if (turf.booleanEqual(existingvalue, newvalue)) {
+                          console.log("Found existing identical feature, not adding");
+                          notinexistence = false;
+                          break;
+                      }
+                  }
+
+                  if (notinexistence === true) {
+                      newfeaturecollection['features'].push(newvalue);
+                  }
+              }
+
+              var featureIds = draw.add(newfeaturecollection);
+              data = draw.getAll();
+              map.fitBounds(turf.bbox(data), {duration: 0});
+              $('#GeoJSON').val(JSON.stringify(data, null, 2));
+              $('#fileuploaded').val('');
+          };
+
+          reader.readAsText(file, 'UTF-8');
+      });
+
+      class MapLibreSelectorControl {
+
+          constructor() {
+              this.onDocumentClick = this.onDocumentClick.bind(this);
+          }
+
+          getDefaultPosition() {
+              const defaultPosition = "top-right";
+              return defaultPosition;
+          }
+
+          onAdd(map) {
+              this.map = map;
+              this.controlContainer = document.createElement("div");
+              this.controlContainer.title = "Select existing map boundaries";
+              this.controlContainer.classList.add("maplibregl-ctrl");
+              this.controlContainer.classList.add("maplibregl-ctrl-group");
+              this.controlContainer.classList.add("mapselector");
+              this.uploadButton = document.createElement("button");
+              this.uploadButton.type = "button";
+              this.uploadButton.classList.add("maplibregl-ctrl-icon");
+              this.uploadButton.classList.add("maplibregl-selector");
+              this.uploadButton.addEventListener("click", (e) => {
+                  selectorEnabled = !selectorEnabled;
+                  if (selectorEnabled) {
+                      $('.mapselector').addClass('maplibregl-inverted');
+                      
+                      if (map.getZoom() < selectorMinZoom) {
+                          map.setZoom(selectorMinZoom);
+                          map.setMinZoom(selectorMinZoom);
+                      }
+                  } else {
+                      $('.mapselector').removeClass('maplibregl-inverted');
+                      removeCurrentHovered();
+                      map.setMinZoom(5);
+                  }
+              });
+              document.addEventListener("click", this.onDocumentClick);
+              this.controlContainer.appendChild(this.uploadButton);
+              return this.controlContainer;
+          }
+
+          onRemove() {
+              if (
+                  !this.controlContainer ||
+                  !this.controlContainer.parentNode ||
+                  !this.map ||
+                  !this.uploadButton
+              ) {
+                  return;
+              }
+              this.uploadButton.removeEventListener("click", this.onDocumentClick);
+              this.controlContainer.parentNode.removeChild(this.controlContainer);
+              document.removeEventListener("click", this.onDocumentClick);
+              this.map = undefined;
+          }
+
+          onDocumentClick(event) {
+              if (
+                  this.controlContainer &&
+                  !this.controlContainer.contains(event.target) &&
+                  this.uploadButton
+              ) {
+                  this.uploadButton.style.display = "block";
+              }
+          }
+      }        
+
+      class MapLibreFitBoundsControl {
+
+          constructor() {
+              this.onDocumentClick = this.onDocumentClick.bind(this);
+          }
+
+          getDefaultPosition() {
+              const defaultPosition = "top-right";
+              return defaultPosition;
+          }
+
+          onAdd(map) {
+              this.map = map;
+              this.controlContainer = document.createElement("div");
+              this.controlContainer.title = "Fit created objects to window";
+              this.controlContainer.classList.add("maplibregl-ctrl");
+              this.controlContainer.classList.add("maplibregl-ctrl-group");
+              this.fitBoundsButton = document.createElement("button");
+              this.fitBoundsButton.type = "button";
+              this.fitBoundsButton.classList.add("maplibregl-ctrl-icon");
+              this.fitBoundsButton.classList.add("maplibregl-fitbounds");
+              this.fitBoundsButton.addEventListener("click", (e) => {
+                  var elements = draw.getAll();
+                  if (elements.features.length > 0) {
+                      map.fitBounds(turf.bbox(elements), {duration: 0});
+                  }
+              });
+              document.addEventListener("click", this.onDocumentClick);
+              this.controlContainer.appendChild(this.fitBoundsButton);
+              return this.controlContainer;
+          }
+
+          onRemove() {
+              if (
+                  !this.controlContainer ||
+                  !this.controlContainer.parentNode ||
+                  !this.map ||
+                  !this.fitBoundsButton
+              ) {
+                  return;
+              }
+              this.fitBoundsButton.removeEventListener("click", this.onDocumentClick);
+              this.controlContainer.parentNode.removeChild(this.controlContainer);
+              document.removeEventListener("click", this.onDocumentClick);
+              this.map = undefined;
+          }
+
+          onDocumentClick(event) {
+              if (
+                  this.controlContainer &&
+                  !this.controlContainer.contains(event.target) &&
+                  this.fitBoundsButton
+              ) {
+                  this.fitBoundsButton.style.display = "block";
+              }
+          }
+      }    
+
+      var styles = (MapLibreStyleDefinition = [
+          {
+              title: "Open Street Map - Clean",
+              style: 'https://tiles.positivefarms.org/styles/inspire/style.json'
+          },
+          {
+              title: "Open Street Map - Detailed",
+              style: getRasterStyle(  'http://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                      'Open Street Map data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors', false)
+          },
+          {
+              title: "Google Satellite",
+              style: getRasterStyle(  'http://www.google.com/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}',
+                                      'Imagery ©2023 Google, Imagery ©2023 Bluesky, Getmapping plc, Infoterra Ltd & Bluesky, Maxar Technologies, Map data ©2023', true)
+          },
+      ]);
+
+      function merge (inputs) {
+
+          const output = {
+              id: inputs[0].id,
+              type: inputs[0].type,
+              geometry: {
+                  coordinates: polygonClipping.union(...inputs.map(i => i.geometry.coordinates)),
+                  type: 'MultiPolygon'
+              },
+              properties: inputs[0].properties
+          }
+          return output;
+      }
+
+      function initiateArea(geoJSON) {
+          draw.add(geoJSON);
+          map.fitBounds(turf.bbox(geoJSON), {duration: 0});
+      }
+
+      function updateArea(e) {
+          const data = draw.getAll();
+          $('#GeoJSON').val(JSON.stringify(data, null, 2));
+      }
+
+      const draw = new MapboxDraw({
+          class: 'draw', 
+          displayControlsDefault: false,
+          controls: {
+              polygon: true,
+              trash: true
+          },
+      });
+
+
+      var selectorEnabled = false;
+      var selectorMinZoom = 11;
+      var hoveredStateId = null;    
+      var map;
 
       if ($('#map').length) {
-        osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-        osmAttrib = '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-        osm = L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttrib});
 
         var field_location = document.getElementById('field_location');
         var field_featurecollection = document.getElementById('field_featurecollection');
+        var initPos = [-3.7140953311984504, 53.9299491635351];
+        var initZoom = 4.34;
 
-        if (JSON.stringify(field_location) === 'null') {
-          map = new L.Map('map', { scrollWheelZoom: false, center: new L.LatLng(55.69142309402058, -3.7832450866699223), zoom: 5 });
-        } else {
+        if (JSON.stringify(field_location) !== 'null') {
           field_location = JSON.parse(field_location.text);
-          map = new L.Map('map', {scrollWheelZoom: false, center: new L.LatLng(field_location[0], field_location[1]), zoom: 13 });
-        }
-        drawnItems = L.featureGroup().addTo(map);
-
-        if (JSON.stringify(field_featurecollection) !== 'null') {
-          var featurecollection = field_featurecollection.text.trim();
-          if (featurecollection !== '') {
-            featurecollection = JSON.parse(JSON.parse(featurecollection));
-            setDrawnItems(featurecollection);
-          }
+          initPos = [field_location[1], field_location[0]];
+          initZoom = 13;
         }
 
-        L.control.layers({
-          "OpenStreetMap": osm.addTo(map),
-          "Google Satellite": L.tileLayer('https://www.google.com/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}', {
-              attribution: 'Google'
-          })
-        }, {'Editing layer':drawnItems}, { position: 'topright', collapsed: false }).addTo(map);
+        map = new maplibregl.Map({
+            container: 'map',
+            style: styles[0].style, 
+            center: initPos, 
+            zoom: initZoom,
+            interactiveLayerIds: ['inspire_outlined']         
+        });
 
-        map.addControl(new L.Control.Draw({
-            position: 'topright',
-            edit: {
-                featureGroup: drawnItems,
-                poly : {
-                    allowIntersection : false
-                }
-            },
-            draw: {
-                polyline: false,
-                circle: false,
-                circlemarker: false,
-                rectangle: false,
-                marker: false,
-                polygon : {
-                    allowIntersection: false,
-                    showArea:true
-                }
+        map.on('load', function() {
+            map.dragRotate.disable();
+            map.touchZoomRotate.disableRotation();        
+            map.addControl(draw, 'top-right');
+            map.addControl(new MapLibreSelectorControl());
+            map.addControl(new MapLibreUploadControl());
+            map.addControl(new MapLibreFitBoundsControl());
+            map.addControl(new MapLibreStyleSwitcherControl(styles, styles[0]['title']));
+            map.addControl(new maplibregl.NavigationControl());        
+            map.addControl(
+            new maplibregl.GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: true
+                },
+                trackUserLocation: true
+            }));
+
+            map.on('draw.create', updateArea);
+            map.on('draw.delete', updateArea);
+            map.on('draw.update', updateArea);
+            $('.mapboxgl-ctrl-group').addClass('maplibregl-ctrl maplibregl-ctrl-group');
+
+            if (JSON.stringify(field_featurecollection) !== 'null') {
+              var featurecollection = field_featurecollection.text.trim();
+              if (featurecollection !== '') {
+                featurecollection = JSON.parse(JSON.parse(featurecollection));
+                draw.add(featurecollection);
+              }
             }
-        }));
 
-        // -----------------------------------------------
-        // Object change events
-        // -----------------------------------------------
+            map.on('mousemove', 'inspire_filled', (e) => {
+                if (!selectorEnabled) return;
 
-        map.on(L.Draw.Event.CREATED, function(event) {
-            var layer = event.layer;
-            drawnItems.addLayer(layer);
-            layersUpdated();
-        });
+                if (e.features.length > 0) {
+                    newHoveredStateId = e.features[0].id;
+                    if (newHoveredStateId != hoveredStateId) {
+                        if (hoveredStateId !== null) {
+                            removeCurrentHovered();
+                        }
 
-        map.on(L.Draw.Event.EDITED, function(event) {
-            layersUpdated();
-        });
+                        hoveredStateId = newHoveredStateId;
+                        map.setFeatureState(
+                            {source: 'inspire', sourceLayer: 'inspire', id: hoveredStateId},
+                            {hover: true}
+                        );
 
-        map.on(L.Draw.Event.DELETED, function(event) {
-            layersUpdated();
+                    }
+                }
+            });
+
+            removeCurrentHovered = () => {
+                map.setFeatureState(
+                    {source: 'inspire', sourceLayer: 'inspire', id: hoveredStateId},
+                    {hover: false}
+                );
+                hoveredStateId = null;
+            }
+
+            map.on('mouseleave', 'inspire_outlined', () => {
+                if (hoveredStateId) {
+                    removeCurrentHovered();
+                }
+            });
+
+            map.on('click', 'inspire_filled', (e) => {
+                // Thanks to https://github.com/mapbox/mapbox-gl-js/issues/5639
+                if (selectorEnabled) {
+                    const features = map.queryRenderedFeatures(e.point);
+                    if (features.length) {
+                        if (features[0].properties.INSPIREID !== undefined) {
+                            const sourceFeatures = map.querySourceFeatures(features[0].source, {
+                                sourceLayer: features[0].sourceLayer,
+                                filter: ["==", 'INSPIREID', features[0].properties.INSPIREID ]
+                            })
+                            const originalFeature = merge(sourceFeatures);
+                            draw.add(originalFeature);
+                            data = draw.getAll();
+                            $('#GeoJSON').val(JSON.stringify(data, null, 2)); 
+                        }
+                    }
+                }
+            });
+
         });
 
       }

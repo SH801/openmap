@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { global, search } from "../actions";
-import { Map, Popup, NavigationControl, GeolocateControl }  from 'react-map-gl/maplibre';
+import { Map, Popup, NavigationControl, GeolocateControl, IControl }  from 'react-map-gl/maplibre';
 import { centroid } from '@turf/turf';
 import queryString from "query-string";
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -20,6 +20,48 @@ import {
 } from "../constants";
 import { mapSelectEntity } from '../functions/map';
 
+export class PitchToggle extends Component{
+    
+  constructor(props) {
+    super(props);
+    this._pitch = props.pitch;
+    this._activated = false;
+  }
+
+  onAdd(map) {
+    this._map = map;
+    let _this = this; 
+    this._btn = document.createElement('button');
+    this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-3d';
+    this._btn.type = 'button';
+    this._btn['aria-label'] = 'Toggle Pitch';
+    this._btn.onclick = function() { 
+        this._activated = !this._activated;
+        if (this._activated) {
+            map.setStyle(require('../constants/terrainstyle.json'));
+            map.easeTo({pitch: _this._pitch});
+            _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-2d';
+        } else {
+            map.setStyle(require('../constants/mapstyle.json'), {diff: false});
+            // map.fire(new Event('style.load'));
+            map.easeTo({pitch: 0, bearing: 0});
+            _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-3d';
+        } 
+    };
+    
+    this._container = document.createElement('div');
+    this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group test';
+    this._container.appendChild(this._btn);
+
+    return this._container;
+  }
+
+  onRemove() {
+    this._container.parentNode.removeChild(this._container);
+    this._map = undefined;
+  }
+
+}
 
 export class MapContainer extends Component  {
 
@@ -104,6 +146,11 @@ export class MapContainer extends Component  {
     });
     var map = this.mapRef.current.getMap();
 
+    map.addControl(new PitchToggle({pitch: 80}), 'bottom-right'); 
+
+    var popup = this.popupRef.current;
+    popup.remove();  
+    
     if (this.props.global.context) {
       // If context set, filter out entities not in context
       map.setFilter('positivefarms_background', 
@@ -148,7 +195,6 @@ export class MapContainer extends Component  {
   onMouseEnter = (event) => {
 
     var map = this.mapRef.current.getMap();
-    var popup = this.popupRef.current;
 
     if (event.features.length > 0) {
       if (this.hoveredPolygonId === null) {
@@ -161,6 +207,8 @@ export class MapContainer extends Component  {
 
         var featurecentroid = centroid(event.features[0]);
         var description = event.features[0].properties.entityname;
+        this.setState({'showpopup': true});
+        var popup = this.popupRef.current;
         popup.setLngLat(featurecentroid.geometry.coordinates).setHTML(description).addTo(map);
       }  
     }
@@ -240,6 +288,8 @@ export class MapContainer extends Component  {
           onClick={this.onClick}
           minZoom={4}
           maxBounds={this.getMaxBounds()}
+          maxPitch={85}
+          terrain={{source: "terrainSource", exaggeration: 1.1 }}
           interactiveLayerIds={['positivefarms_background', 'positivefarms_active']}
           initialViewState={{
             longitude: this.state.lng,
@@ -250,6 +300,7 @@ export class MapContainer extends Component  {
           }}    
           mapStyle={require('../constants/mapstyle.json')}
         >
+
           {this.props.isMobile ? (
               <>
               <GeolocateControl position="bottom-right" />
@@ -267,6 +318,7 @@ export class MapContainer extends Component  {
           )}
 
           <Popup longitude={0} latitude={0} ref={this.popupRef} closeButton={false} closeOnClick={false} />
+
         </Map>
       ) : null};
       </>

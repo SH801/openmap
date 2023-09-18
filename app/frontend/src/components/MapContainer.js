@@ -46,7 +46,6 @@ export class PitchToggle extends Component{
             _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-2d';
         } else {
             map.setStyle(require('../constants/mapstyle.json'), {diff: false});
-            // map.fire(new Event('style.load'));
             map.easeTo({pitch: 0, bearing: 0});
             _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-3d';
         } 
@@ -89,6 +88,7 @@ export class MapContainer extends Component  {
     this.popupRef = React.createRef();
 
     this.props.fetchAllProperties();
+    this.pitchtoggle = new PitchToggle({pitch: 80});
 
     if (!this.props.global.mapinitialized) {
       let subdomain = getURLSubdomain();
@@ -149,7 +149,7 @@ export class MapContainer extends Component  {
     });
     var map = this.mapRef.current.getMap();
 
-    map.addControl(new PitchToggle({pitch: 80}), 'bottom-right'); 
+    map.addControl(this.pitchtoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
 
     var popup = this.popupRef.current;
     popup.remove();  
@@ -240,6 +240,12 @@ export class MapContainer extends Component  {
     }
   }
 
+  onResize = (event) => {
+    var map = this.mapRef.current.getMap();
+    map.removeControl(this.pitchtoggle);
+    map.addControl(this.pitchtoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
+  }
+
   onMoveEnd = (event) => {
 
       // Update search results and URL after moving map
@@ -288,6 +294,7 @@ export class MapContainer extends Component  {
           onMouseEnter={this.onMouseEnter}
           onMouseLeave={this.onMouseLeave}
           onMoveEnd={this.onMoveEnd}
+          onResize={this.onResize}
           onClick={this.onClick}
           minZoom={4}
           maxBounds={this.getMaxBounds()}

@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { global, search } from "../actions";
-import { Map, Popup, NavigationControl, GeolocateControl, IControl }  from 'react-map-gl/maplibre';
+// @ts-ignore
+import { Map, Popup, NavigationControl, GeolocateControl }  from 'react-map-gl/maplibre';
+// eslint-disable-next-line import/no-webpack-loader-syntax
+// maplibregl.workerClass = require('worker-loader!maplibre-gl/dist/maplibre-gl-csp-worker').default;
 import { centroid } from '@turf/turf';
 import queryString from "query-string";
 import 'maplibre-gl/dist/maplibre-gl.css';

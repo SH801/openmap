@@ -29,11 +29,26 @@
   margin-left: 2%;
   height: fit-content;
   overflow: hidden;
-  background-color: red;
+  background-color: white;
 }
+
+.search-suggestion-el-distance,
+.entity-distance {
+  font-size: 80%;
+  color: #333;
+  padding-bottom: 7px;
+}
+
+.search-suggestion-el-distance {
+  margin-top: 3px;
+}
+
 .search-suggestion-el {
+  padding-top: 7px;
   width: 100%;
+  font-size: 95%;
   cursor: pointer;
+  /* line-height: 150%; */
 }
 .search-suggestion-icon {
   width:          30px;

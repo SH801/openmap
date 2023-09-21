@@ -14,11 +14,12 @@ from .models import Context, ContextAdmin
 from .models import Location, LocationAdmin
 from .models import Geometry, GeometryAdmin 
 from .models import GeometryCode
-from .models import Property
+from .models import Property, PropertyAdmin
 from .models import Entity, EntityAdmin
 from .models import Post, PostAdmin
 from .models import Message, MessageAdmin
 from .models import ExportQueue, ExportQueueAdmin
+from .models import Postcode, PostcodeAdmin
 
 admin.site.register(Profile)
 admin.site.register(Context, ContextAdmin)
@@ -26,7 +27,8 @@ admin.site.register(Location, LocationAdmin)
 admin.site.register(Geometry, GeometryAdmin)
 admin.site.register(ExportQueue, ExportQueueAdmin)
 admin.site.register(GeometryCode)
-admin.site.register(Property)
+admin.site.register(Property, PropertyAdmin)
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Message, MessageAdmin)
+admin.site.register(Postcode, PostcodeAdmin)

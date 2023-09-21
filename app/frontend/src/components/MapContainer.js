@@ -23,6 +23,8 @@ import {
 } from "../constants";
 import { mapSelectEntity } from '../functions/map';
 
+export const isDev = () =>  !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+
 export class PitchToggle extends Component{
     
   constructor(props) {
@@ -41,11 +43,11 @@ export class PitchToggle extends Component{
     this._btn.onclick = function() { 
         this._activated = !this._activated;
         if (this._activated) {
-            map.setStyle(require('../constants/terrainstyle.json'));
+            map.setStyle(require(isDev() ? '../constants/terrainstyletest.json' : '../constants/terrainstyle.json'));
             map.easeTo({pitch: _this._pitch});
             _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-2d';
         } else {
-            map.setStyle(require('../constants/mapstyle.json'), {diff: false});
+            map.setStyle(require(isDev() ? '../constants/mapstyletest.json' : '../constants/mapstyle.json'), {diff: false});
             map.easeTo({pitch: 0, bearing: 0});
             _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-3d';
         } 
@@ -202,18 +204,40 @@ export class MapContainer extends Component  {
     if (event.features.length > 0) {
       if (this.hoveredPolygonId === null) {
         map.getCanvas().style.cursor = 'pointer';
+        var properties = event.features[0].properties;
+        // Note unique numberical ID required for setFeatureState
+        // OSM ids, eg 'way/12345' don't work
         this.hoveredPolygonId = event.features[0].id;
         map.setFeatureState(
           { source: 'positivefarms', sourceLayer: 'positivefarms', id: this.hoveredPolygonId },
           { hover: true }
         );
+        map.setFeatureState(
+          { source: 'renewables', sourceLayer: 'renewables', id: this.hoveredPolygonId },
+          { hover: true }
+        );
 
         var featurecentroid = centroid(event.features[0]);
-        var description = event.features[0].properties.entityname;
+        var description = properties.name;
+        if (description === undefined) {
+          description = "No name available";
+          var source = "";
+          if (properties['plant:source'] !== undefined) source = properties['plant:source'];
+          if (properties['generator:source'] !== undefined) source = properties['generator:source'];
+          if (source === "solar") description = "Solar Farm";
+          if (source === "wind") description = "Wind Farm";
+        }
         this.setState({'showpopup': true});
         var popup = this.popupRef.current;
         popup.setLngLat(featurecentroid.geometry.coordinates).setHTML(description).addTo(map);
       }  
+    }
+  }
+
+  onMouseMove = (event) => {
+    if (this.hoveredPolygonId) {
+      var popup = this.popupRef.current;
+      popup.setLngLat(event.lngLat);
     }
   }
 
@@ -227,6 +251,10 @@ export class MapContainer extends Component  {
         { source: 'positivefarms', sourceLayer: 'positivefarms', id: this.hoveredPolygonId },
         { hover: false }
       );
+      map.setFeatureState(
+        { source: 'renewables', sourceLayer: 'renewables', id: this.hoveredPolygonId },
+        { hover: false }
+      );
       this.hoveredPolygonId = null;
       map.getCanvas().style.cursor = '';
       popup.remove();  
@@ -235,7 +263,7 @@ export class MapContainer extends Component  {
 
   onClick = (event) => {
     if (event.features.length > 0) {
-      var entityid = event.features[0].properties.entityid;
+      var entityid = event.features[0].properties.id;
       this.selectEntity(entityid);
     }
   }
@@ -292,6 +320,7 @@ export class MapContainer extends Component  {
           <Map ref={this.mapRef}
           onLoad={this.onLoad}
           onMouseEnter={this.onMouseEnter}
+          onMouseMove={this.onMouseMove}
           onMouseLeave={this.onMouseLeave}
           onMoveEnd={this.onMoveEnd}
           onResize={this.onResize}
@@ -300,7 +329,12 @@ export class MapContainer extends Component  {
           maxBounds={this.getMaxBounds()}
           maxPitch={85}
           terrain={{source: "terrainSource", exaggeration: 1.1 }}
-          interactiveLayerIds={['positivefarms_background', 'positivefarms_active']}
+          interactiveLayerIds={[
+            'positivefarms_background', 
+            'positivefarms_active', 
+            'renewables_background',
+            'renewables_active'
+          ]}
           initialViewState={{
             longitude: this.state.lng,
             latitude: this.state.lat,
@@ -308,7 +342,7 @@ export class MapContainer extends Component  {
             pitch: this.state.pitch,
             bearing: this.state.bearing
           }}    
-          mapStyle={require('../constants/mapstyle.json')}
+          mapStyle={require(isDev() ? '../constants/mapstyletest.json' : '../constants/mapstyle.json')}
         >
 
           {this.props.isMobile ? (

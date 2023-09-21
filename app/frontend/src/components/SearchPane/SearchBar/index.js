@@ -186,7 +186,10 @@ export class SearchBar extends Component {
                   <IonItem className="search-suggestion-el">
                     <IonIcon className="search-suggestion-icon" icon={this.selectIcon(result.type)}/>
                     <IonText style={{width:"100%"}}>
-                      {result.name}
+                      {result.name} 
+                      {result.distance ? (
+                        <div className="search-suggestion-el-distance">{result.distance} {result.distance === 1 ? ("mile"):("miles")}</div>
+                      ) : null}
                     </IonText>
                   </IonItem>
                 </div>

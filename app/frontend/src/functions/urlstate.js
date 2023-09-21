@@ -86,7 +86,7 @@ export const getURLSubdomain = () => {
  * 
  */
 export const getExternalReference = () => {
-    let path = window.location.pathname.replace('/', '');
+    let path = window.location.pathname.replaceAll('/', '');
     if (path === "") return null;
     return path;
 }

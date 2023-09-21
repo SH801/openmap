@@ -31,3 +31,5 @@ django-jsonform
 django-localflavor==2.1
 trafilatura
 area
+fiona
+pyproj

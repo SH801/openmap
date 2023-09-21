@@ -149,6 +149,7 @@ div.item-native {
 .entity-business-types {
   padding-bottom: 10px; 
 }
+
 .entity-business-type,
 .entity-geometrycode,
 .entity-property {
@@ -166,6 +167,17 @@ div.item-native {
   /* text-wrap: nowrap;
   white-space: nowrap; */
 }
+
+.entity-extraproperties {
+  font-size: 90%;
+  line-height: 120%;
+}
+
+.entity-solar-farm,
+.entity-wind-farm {
+  background-color: #580B7E;
+}
+
 .entity-action {
   cursor: pointer;
 }

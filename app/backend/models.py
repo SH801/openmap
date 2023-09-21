@@ -26,7 +26,6 @@ from django_json_widget.widgets import JSONEditorWidget
 from django_jsonform.models.fields import JSONField
 from urllib.parse import urlparse
 from .functions import usewebsiteshortcode
-from .gis import get_postcode_point
 
 # Range of possible geographical geometries
 
@@ -42,6 +41,11 @@ class PropertyTypes(models.IntegerChoices):
     PROPERTY_ACTION         = 1, 'Regenerative Action'
     PROPERTY_AFFILIATION    = 2, 'Affiliation'
     PROPERTY_CUSTOMER       = 3, 'Customer'
+
+class EntitySourceType(models.IntegerChoices):
+    ENTITYSOURCE_INTERNAL   = 0, 'Internal'
+    ENTITYSOURCE_OSM        = 1, 'Open Street Map'
+    ENTITYSOURCE_GOVERNMENT = 2, 'Government'
 
 class EditTypes(models.IntegerChoices):
     EDIT_DRAFT          = 0, 'Draft'
@@ -70,6 +74,30 @@ def update_user_profile(sender, instance, created, **kwargs):
             Profile.objects.create(user=instance)
         instance.profile.save()
     
+class Postcode(models.Model):
+    """
+    Stores all postcodes
+    """
+
+    code = models.CharField(max_length=8)
+    location = models.PointField(null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['code', ])
+        ]
+
+    def __str__(self):
+        return self.code
+    
+class PostcodeAdmin(OSMGeoAdmin):
+    """
+    Admin class for managing postcodes through admin interface
+    """
+    search_fields = (
+        'code',
+    )
+
 class Location(models.Model):
     """
     Stores location lookup for when user queries on specific location
@@ -186,6 +214,20 @@ class Property(models.Model):
     def __str__(self):
         return self.name
 
+class PropertyAdmin(admin.ModelAdmin):
+    list_display = ['type', 'name', 'icon', 'link']
+
+    list_filter = (
+        'type',
+    )
+
+    search_fields = (
+        'name',
+        'type',
+        'icon'
+    )
+
+
 class ExportQueue(models.Model):
     """
     Tracks status of vector map exports
@@ -248,6 +290,7 @@ class Entity(models.Model):
     }
 
     status = models.IntegerField(default=0, choices=EditTypes.choices)
+    source = models.IntegerField(default=0, choices=EntitySourceType.choices)
     name = models.CharField(max_length=255)
     email = models.CharField(max_length=255, blank=True)
     external_id = models.CharField(max_length=255, blank=True)
@@ -259,19 +302,20 @@ class Entity(models.Model):
     desc = models.TextField(blank=True, verbose_name='Description')
     website = models.CharField(max_length=1000, blank=True)
     properties = models.ManyToManyField(Property, related_name="properties", blank=True)
+    extraproperties = models.TextField(blank=True, null=True, verbose_name="Extra properties")
     geometrycodes = models.ManyToManyField(GeometryCode, related_name="geometrycodes", blank=True)
     centre = models.PointField(null=True, blank=True)
     bbox = models.GeometryField(null=True, blank=True)
     # data = models.JSONField(blank=True, default=list)
-    data = JSONField(schema=ITEMS_SCHEMA, blank=True, verbose_name="Datasets")
+    data = JSONField(schema=ITEMS_SCHEMA, null=True, blank=True, verbose_name="Datasets")
 
     class Meta:
         ordering = ('id', ) 
         indexes = [
-            models.Index(fields=['name',]),
+            models.Index(fields=['name', 'status', 'source', 'external_id', 'location', 'centre']),
         ]
-        verbose_name = "Farm"
-        verbose_name_plural = "Farms"
+        verbose_name = "Entity"
+        verbose_name_plural = "Entities"
     
     def __str__(self):
         return self.name
@@ -295,7 +339,9 @@ def update_entity(sender, instance, *args, **kwargs):
         instance.external_id = shortcode
 
     if instance.postcode != '':
-        instance.location = get_postcode_point(instance.postcode)
+        postcode = Postcode.objects.filter(code=instance.postcode).first()
+        if postcode is not None:
+            instance.location = postcode.location
 
     if instance.centre is None:
         instance.centre = instance.location
@@ -314,15 +360,12 @@ def entity_post_save(sender, **kwargs):
             ExportQueue(type=ExportQueueTypes.EXPORTQUEUE_ENTITY, exportdue=True).save()
 
     # Add permissions to entity
-    try:
-        if instance.user is not None:
-            if instance.user.is_superuser is False:
-                assign_perm("change_entity", instance.user, instance)
-                assign_perm("delete_entity", instance.user, instance)
-                assign_perm("view_entity", instance.user, instance)
-                assign_perm("add_entity", instance.user, instance)
-    except AttributeError:
-        pass
+    if hasattr(instance, 'user'):
+        if instance.user.is_superuser is False:
+            assign_perm("change_entity", instance.user, instance)
+            assign_perm("delete_entity", instance.user, instance)
+            assign_perm("view_entity", instance.user, instance)
+            assign_perm("add_entity", instance.user, instance)
 
 @receiver(pre_delete, sender=Entity)
 def delete_entity(sender, instance, *args, **kwargs):
@@ -397,10 +440,11 @@ def post_post_save(sender, **kwargs):
     """
 
     instance = kwargs["instance"]
-    assign_perm("change_post", instance.user, instance)
-    assign_perm("delete_post", instance.user, instance)
-    assign_perm("view_post", instance.user, instance)
-    assign_perm("add_post", instance.user, instance)
+    if hasattr(instance, 'user'):
+        assign_perm("change_post", instance.user, instance)
+        assign_perm("delete_post", instance.user, instance)
+        assign_perm("view_post", instance.user, instance)
+        assign_perm("add_post", instance.user, instance)
 
 class PostAdmin(GuardedModelAdmin):
     """
@@ -507,9 +551,10 @@ class EntityAdmin(GuardedModelAdmin, OSMGeoAdmin):
     """
 
     form = EntityAdminForm
-    list_filter = ['status']
+    list_filter = ['status', 'source']
     search_fields = (
         'name',
+        'external_id',
         'email',
         'address',
         'postcode',
@@ -536,13 +581,13 @@ class EntityAdmin(GuardedModelAdmin, OSMGeoAdmin):
     def get_list_display(self, request):
         fields = ['name', 'website']
         if request.user.is_superuser:
-            fields = ['status', 'name', 'external_id', 'featured', 'website']
+            fields = ['status', 'source', 'name', 'external_id', 'featured', 'website']
         return fields
     
     def get_fields(self, request, obj=None):
         fields = ['name','email', 'address', 'postcode', 'location', 'website', 'desc', 'properties', 'data']
         if request.user.is_superuser:
-            fields = ['status', 'name', 'email', 'external_id', 'featured', 'properties', 'img', 'website', 'address', 'postcode', 'location', 'geometrycodes', 'centre', 'bbox', 'desc', 'data']
+            fields = ['status', 'source', 'name', 'email', 'external_id', 'featured', 'properties', 'extraproperties', 'img', 'website', 'address', 'postcode', 'location', 'geometrycodes', 'centre', 'bbox', 'desc', 'data']
         return fields
     
     def get_inlines(self, request, obj=None):

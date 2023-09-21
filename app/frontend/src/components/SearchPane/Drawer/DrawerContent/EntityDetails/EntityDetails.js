@@ -44,7 +44,12 @@ export class EntityDetails extends Component {
           {this.props.global.entities.entities ? (
             <>
             {this.props.global.entities.list ? (
-              <h1 style={{color: "orange"}}>{this.getResultsSummary(this.props.global.entities.entities.length)}</h1>
+              <>
+              <h1 style={{color: "orange"}}>{this.getResultsSummary(this.props.global.entities.numresults)}</h1>
+              {this.props.global.entities.numresults > 25 ? (
+                <h2>Showing nearest 25</h2>
+              ) : null}
+              </>
             ) : null }
 
             {this.props.global.entities.entities.map((entity, index) => {

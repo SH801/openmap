@@ -14,6 +14,7 @@ import requests
 import math
 
 from django.contrib.gis.geos import Point
+from .models import Postcode
 
 def get_meters_per_pixel(zoom):
     """
@@ -59,12 +60,18 @@ def get_postcode_point(postcode):
     if postcode is None: return None
     if postcode == '': return None    
 
-    url = 'http://api.getthedata.com/postcode/' + urllib.parse.quote_plus(postcode)
-    req =  urllib.request.Request(url)
-    response = urllib.request.urlopen(req)
-    result = json.loads(response.read().decode())
-
-    if result['status'] and result['status'] == 'match':
-        return Point(float(result['data']['longitude']), float(result['data']['latitude']))
-    else:
+    dbpostcode = Postcode.objects.filter(code=postcode).first()
+    if dbpostcode is None:
         return None
+    else:
+        return dbpostcode.location
+    
+    # url = 'http://api.getthedata.com/postcode/' + urllib.parse.quote_plus(postcode)
+    # req =  urllib.request.Request(url)
+    # response = urllib.request.urlopen(req)
+    # result = json.loads(response.read().decode())
+
+    # if result['status'] and result['status'] == 'match':
+    #     return Point(float(result['data']['longitude']), float(result['data']['latitude']))
+    # else:
+    #     return None

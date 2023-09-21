@@ -12,6 +12,10 @@
         "positivefarms": {
             "type": "vector",
             "url": "http://localhost:8080/data/positivefarms.json"
+        },
+        "renewables": {
+          "type": "vector",
+          "url": "http://localhost:8080/data/renewables.json"
         }
     },
     "glyphs": "http://localhost:8080/fonts/{fontstack}/{range}.pbf",
@@ -1774,6 +1778,58 @@
         },
         "source": "positivefarms",
         "source-layer": "positivefarms",
+        "type": "line"
+      },
+      {
+        "filter": [
+          "all",
+          [
+            "==",
+            "$type",
+            "Polygon"
+          ]
+        ],
+        "id": "renewables_background",
+        "paint": {
+          "fill-color": "#580B7E",
+          "fill-opacity": 0.6          
+        },
+        "source": "renewables",
+        "source-layer": "renewables",
+        "type": "fill"
+      },
+      {
+        "filter": [
+            "in",
+            "id",
+            ""
+        ],
+        "id": "renewables_active",
+        "paint": {
+          "fill-color": "orange",
+          "fill-opacity": 0.6
+        },
+        "source": "renewables",
+        "source-layer": "renewables",
+        "type": "fill"
+      },
+      {
+        "filter": [
+            "all"
+        ],
+        "id": "renewables_outlined",
+        "paint": {
+          "line-color": "orange",
+          "line-width": 3,
+          "line-opacity": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            1,
+            0
+            ]          
+        },
+        "source": "renewables",
+        "source-layer": "renewables",
         "type": "line"
       }
     ],

@@ -16,6 +16,7 @@ importdata: Imports data for specific area scale and year range (assuming BEIS d
 from os import walk
 import math
 import os
+import numpy as np
 import pandas
 import json
 import topojson as tp
@@ -24,11 +25,14 @@ import csv
 import re
 import trafilatura
 import requests
-import pandas as pd
-from googlesearch import search
 import time
+import pandas as pd
+import fiona
+from pyproj import Transformer, Geod
+from googlesearch import search
 from shapely.geometry import Polygon
 from area import area as calculatearea
+from geojson import MultiPolygon
 
 if __name__ == '__main__':
     import sys
@@ -47,14 +51,26 @@ from django.db import connection, transaction
 from django.contrib.gis.db.models import Extent
 from backend.gis import get_degrees_per_pixel, get_postcode_point
 
-from backend.models import Entity, EditTypes, Location, Geometry, Context, Property, PropertyTypes, GeometryCode
-from backend.views import calculateCentreBBox
+from backend.models import \
+    Entity, \
+    EditTypes, \
+    Location, \
+    Geometry, \
+    Context, \
+    Property, \
+    PropertyTypes, \
+    GeometryCode, \
+    Postcode, \
+    EntitySourceType
+from backend.views import creategeometriesforentity, calculateCentreBBox
 
 # Number of zoom levels to cache geometries for
 # We generate a target-resolution-dependent simplification for each geometry object to minimize download size
 zoomrange = 15
 
 AREA_ACRESCUTOFF = 15
+
+POSTCODES_GEOPACKAGE = '../../codepo_gpkg_gb/Data/codepo_gb.gpkg'
 
 # Paths to subregion geojson files
 
@@ -80,6 +96,14 @@ properties = [
 
 data = [
     'data/*'
+]
+
+renewables = [
+    'renewables/*'
+]
+
+osm = [
+    'osm/*'
 ]
 
 subregion_scotland_correction = "subregions/Counties_and_Unitary_Authorities_GB_2018.json"
@@ -862,6 +886,196 @@ def contextualizedata():
                         row['website'] = getURL(row['org_name'], county)
                         writer.writerow(row)
 
+def updatepostcodes():
+    """
+    Updates all postcodes using OS data
+    """
+
+    # Convert from National Grid (EPSG:27700 - OSGB36) to EPSG:4326 - WGS84
+    transformer = Transformer.from_crs("EPSG:27700", "EPSG:4326")
+
+    Postcode.objects.all().delete()
+
+    # No need to pass "layer='etc'" if there's only one layer
+    count = 0
+    with fiona.open(POSTCODES_GEOPACKAGE) as layer:
+        for feature in layer:
+            count += 1
+            postcode = feature['properties']['postcode'].replace(' ', '')
+            location = transformer.transform(*feature['geometry'].coordinates)
+            Postcode(code=postcode, location=Point(location[1], location[0])).save()    
+            if count % 1000 == 0:
+                print(count, postcode, location)
+
+def get_bounding_box(geometry):
+    coords = np.array(list(geojson.utils.coords(geometry)))
+    return coords[:,0].min(), coords[:,1].min(), coords[:,0].max(), coords[:,1].max()
+    
+def processrenewables():
+    """
+    Process renewables data from BEIS and import solar farms from OSM
+    """
+
+    # Convert from National Grid (EPSG:27700 - OSGB36) to EPSG:4326 - WGS84
+    transformer = Transformer.from_crs("EPSG:27700", "EPSG:4326")
+
+    # Focus on mainstream, non-controversial renewables
+    renewables_list = [
+        # "Anaerobic Digestion", 
+        # "Large Hydro", 
+        # "Small Hydro", 
+        # "Solar Photovoltaics", 
+        # "Sewage Sludge Digestion", 
+        # "Tidal Stream", 
+        # "Tidal Lagoon", 
+        # "Shoreline Wave", 
+        "Wind Offshore", 
+        "Wind Onshore", 
+        # "Pumped Storage Hydroelectricity", 
+        # "Geothermal" 
+    ]
+
+    retrieve_landarea = [
+        "Anaerobic Digestion", 
+        "Solar Photovoltaics", 
+        "Sewage Sludge Digestion", 
+    ]
+
+    useful_fields_repd = [
+        "Site Name",
+        "Technology Type",
+        "Operator (or Applicant)",
+        "Installed Capacity (MWelec)", 
+        "Turbine Capacity (MW)", 
+        "No. of Turbines",
+        "Address", 
+        "County", 
+        "Region",
+        "Country",
+        "Post Code",
+        "Planning Authority",
+        "Planning Application Reference",
+        "Operational"        
+    ]
+
+    useful_fields_osm = [
+        "operator",
+        "owner",
+        "manufacturer",
+        "plant:output:electricity",
+        "generator:output:electricity",
+        "seamark:information",
+        "seamark:name",
+        "website",
+        "description",
+    ]
+    renewables_files = replacefilewildcards(renewables)
+    osm_files = replacefilewildcards(osm)
+    windfarm_propertyid = Property.objects.filter(name="Wind Farm").first().pk
+    solarfarm_propertyid = Property.objects.filter(name="Solar Farm").first().pk
+    all_government = list(Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_GOVERNMENT).values_list('external_id', flat=True))
+    all_osm = list(Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_OSM).values_list('external_id', flat=True))
+
+    # for renewables_file in renewables_files:
+    #     with open(renewables_file, "r", encoding='ISO-8859-1') as readerfileobj:
+    #         reader = csv.DictReader(readerfileobj)
+    #         fields = reader.fieldnames
+    #         for row in reader:
+    #             if  (row['Technology Type'] in renewables_list) and \
+    #                 (row['Development Status'] == 'Operational'):
+    #                 if row['X-coordinate'] == '' or row['Y-coordinate'] == '': continue
+    #                 location = transformer.transform(row['X-coordinate'], row['Y-coordinate'])
+    #                 external_id = "REPD:" + str(row['Ref ID'])
+    #                 print("Adding/updating", external_id)
+    #                 if external_id in all_government:
+    #                     all_government.remove(external_id)
+    #                 entity = Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_GOVERNMENT, external_id=external_id).first()
+    #                 if entity is None:
+    #                     entity = Entity(source=EntitySourceType.ENTITYSOURCE_GOVERNMENT, external_id=external_id)
+    #                 entity.status = EditTypes.EDIT_LIVE
+    #                 entity.name = row['Site Name'] + " - Wind"
+    #                 entity.address = row['Address'] + " \n" + row['County'] 
+    #                 entity.postcode = row['Post Code']
+    #                 entity.centre = Point(location[1], location[0])
+    #                 extraproperties = {}
+    #                 for fieldname in useful_fields_repd:
+    #                     extraproperties[fieldname] = row[fieldname]
+    #                 entity.extraproperties = json.dumps(extraproperties)
+    #                 entity.save()
+    #                 entity.properties.set([windfarm_propertyid])
+
+    Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_GOVERNMENT, external_id__in=all_government).delete()
+
+    # Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_OSM).delete()
+
+    g = Geod(ellps='WGS84')
+    point_width = 50
+
+    for osm_file in osm_files:
+        with open(osm_file, "r", encoding='UTF-8') as readerfileobj:
+            geojson = json.loads(readerfileobj.read())
+            for feature in geojson['features']:
+                external_id = feature['properties']['id']
+                print("Adding/updating", external_id)
+                if external_id in all_osm:
+                    all_osm.remove(external_id)
+                entity = Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_OSM, external_id=external_id).first()
+                if entity is None:
+                    entity = Entity(source=EntitySourceType.ENTITYSOURCE_OSM, external_id=external_id)
+                entity.status = EditTypes.EDIT_LIVE
+                isSolar, isWind = False, False
+                if 'generator:source' in feature['properties']:
+                    if feature['properties']["generator:source"] == "solar": isSolar = True
+                    if feature['properties']["generator:source"] == "wind": isWind = True
+                if 'plant:source' in feature['properties']:
+                    if feature['properties']["plant:source"] == "solar": isSolar = True
+                    if feature['properties']["plant:source"] == "wind": isWind = True
+                if isSolar: entity.name = 'Solar farm'
+                if isWind: entity.name = 'Wind farm'
+                if 'name' in feature['properties']:
+                    entity.name = feature['properties']['name']
+                extraproperties = {}
+                extrapropertiesexist = False
+                for fieldname in useful_fields_osm:
+                    if fieldname in feature['properties']:
+                        if ((fieldname != 'plant:output:electricity') and \
+                            (fieldname != 'generator:output:electricity')) \
+                            or (feature['properties'][fieldname] != 'yes'):
+                            extraproperties[fieldname] = feature['properties'][fieldname]
+                            extrapropertiesexist = True
+                if extrapropertiesexist:
+                    entity.extraproperties = json.dumps(extraproperties)
+                else:
+                    entity.extraproperties = None
+                # Create comfortable bounding box for point features so we don't zoom too close
+                if feature['geometry']['type'] == 'Point':
+                    lon = feature['geometry']['coordinates'][0]
+                    lat = feature['geometry']['coordinates'][1]
+                    top_right_corner = g.fwd(lon, lat, 45, point_width)
+                    bottom_right_corner = g.fwd(lon, lat, 135, point_width)
+                    bottom_left_corner = g.fwd(lon, lat, 225, point_width)
+                    top_left_corner = g.fwd(lon, lat, 315, point_width)
+                    max_lon = top_right_corner[0]
+                    max_lat = bottom_right_corner[1]
+                    min_lon = bottom_left_corner[0]
+                    min_lat = top_left_corner[1]
+                    bbox = (max_lon, max_lat, min_lon, min_lat)
+                    entity.bbox = Polygon.from_bbox(bbox)
+                    entity.centre = Point(lon, lat)
+                else:
+                    multipolygon = MultiPolygon(feature['geometry']['coordinates'])
+                    bounds = get_bounding_box(multipolygon)
+                    entity.bbox = Polygon.from_bbox(bounds)
+                    entity.centre = Point(((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2))
+                entity.save()
+                if isSolar: entity.properties.set([solarfarm_propertyid])
+                if isWind: entity.properties.set([windfarm_propertyid])
+
+    delentities = Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_OSM, external_id__in=all_osm)
+    for delentity in delentities:
+        print("Deleting geometry for entity", delentity.pk)
+        Geometry.objects.filter(entity=delentity).delete()
+    delentities.delete()
 
 
 if len(sys.argv) == 1:
@@ -908,7 +1122,13 @@ importproperties
 
 contextualizedata
   Adds context to data spreadsheet based on its 'lat' and 'lng' column values
-                         
+
+updatepostcodes
+  Updates postcodes database using OS data
+
+processrenewables
+  Process BEIS renewables locations data
+                                              
 importdata [lsoa/msoa/lau1] [yearstart] [yearend]
   Imports data for specific area scale and year range (assuming BEIS data)
   Leaving off [yearend] will only import for [yearstart]
@@ -943,6 +1163,10 @@ else:
         importproperties()
     if primaryargument == "contextualizedata":
         contextualizedata()
+    if primaryargument == "updatepostcodes":
+        updatepostcodes()        
+    if primaryargument == "processrenewables":
+        processrenewables()        
     if primaryargument == "importdata":
         if len(sys.argv) >= 4:
             yearstart = sys.argv[3]

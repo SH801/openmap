@@ -69,6 +69,18 @@ export class EntityInfo extends Component {
     this.props.setGlobalState({showcontactmodal: true})
   }
 
+  propertyClassName = (propertyText) => {
+    propertyText = propertyText.toLowerCase();
+    propertyText = propertyText.replaceAll(" ", "-");
+    return "entity-" + propertyText;
+  }
+
+  extrapropertyPrettify = (extrapropertyText) => {
+    extrapropertyText = extrapropertyText.replaceAll(":", " ");
+    extrapropertyText = extrapropertyText[0].toUpperCase() + extrapropertyText.slice(1)
+    return extrapropertyText;
+  }
+
   render() {
 
     let isEmpty = false;
@@ -110,6 +122,7 @@ export class EntityInfo extends Component {
                         onClick={() => this.nameGo(this.props.entity.id)}
                       >
                         {this.props.entity.name} 
+
                         {this.props.global.entities.list ? (
                           <IonIcon icon={arrowForwardOutline} className="entity-activate"/>
                         ) : null}
@@ -117,9 +130,17 @@ export class EntityInfo extends Component {
 
                     </div>
 
-                    <IonText className="ion-text-capitalize entity-address">
-                      {this.props.entity.address}
-                    </IonText>                      
+                    <div>
+                        {this.props.entity.distance ? (
+                        <IonText className="entity-distance">{this.props.entity.distance} {this.props.entity.distance === 1 ? ("mile"):("miles")}</IonText>
+                        ) : null }
+                    </div>
+                    
+                    {this.props.entity.address ? (
+                      <IonText className="ion-text-capitalize entity-address">
+                        {this.props.entity.address}
+                      </IonText>                      
+                    ) : null }
 
                   </div>
                 </div>
@@ -130,7 +151,7 @@ export class EntityInfo extends Component {
                         <div key={index} className="tablist-container">
                         <IonText 
                           onClick={() => this.props.selectProperty(property)}
-                          className="ion-text-capitalize entity-business-type"
+                          className={"ion-text-capitalize entity-business-type " + this.propertyClassName(property.name)}
                         >
                           <span className="tablist-tab">
                           {property.name}
@@ -138,15 +159,30 @@ export class EntityInfo extends Component {
                         </IonText>  
                         </div>  
                       )
-                      })}
-                    </div>
-                    {this.props.global.entities.list ? (
-                      <EntityActionsList 
-                        actions={getEntityActions(this.props.entity)} 
-                        singlerow={true} 
-                        selectProperty={this.props.selectProperty} 
-                      />
-                    ) : null}
+                    })}
+                </div>
+
+                {(!this.props.global.entities.list && this.props.entity.extraproperties) ? (
+                  <>
+                    {Object.keys(this.props.entity.extraproperties).map((extraproperty, index) => {
+                      return (
+                        <div key={index}>
+                          <IonText className="entity-extraproperties">
+                            <b>{this.extrapropertyPrettify(extraproperty)}</b>: {this.props.entity.extraproperties[extraproperty]}
+                          </IonText>                      
+                        </div>
+                      )
+                    })}
+                  </>
+                ) : null }
+
+                {this.props.global.entities.list ? (
+                  <EntityActionsList 
+                    actions={getEntityActions(this.props.entity)} 
+                    singlerow={true} 
+                    selectProperty={this.props.selectProperty} 
+                  />
+                ) : null}
 
 
                 {!this.props.global.entities.list ? (
@@ -169,6 +205,7 @@ export class EntityInfo extends Component {
                       ) : null} 
                     </div>  
                 ) : null}
+
               </div>
             </div>
             {this.props.global.entities.list ? (

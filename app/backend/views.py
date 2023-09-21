@@ -67,6 +67,7 @@ from .models import \
     GeometryTypes, \
     GeometryCode, \
     Entity, \
+    EntitySourceType, \
     EditTypes, \
     Post, \
     Message
@@ -99,6 +100,16 @@ def OutputJson(json_array={'result': 'failure'}):
 def OutputError():
     return OutputJson()
 
+def getAbsoluteID(entity):
+    """
+    Gets absolute ID for entity
+    """
+
+    if entity.source == EntitySourceType.ENTITYSOURCE_INTERNAL:
+        return "INTERNAL:" + str(entity.id)
+    else:
+        return entity.external_id
+    
 def home(request):
     """
     Shows default home page or other frontend-specific pages to be rendered by frontend React app
@@ -200,7 +211,15 @@ def Search(request):
         entities = entities[:10]
 
         for entity in entities:
-            searchresults.append({'type': 'entity', 'name': entity.name, 'id': entity.id, 'external_id': entity.external_id})
+            outputentity = {\
+                'type': 'entity', \
+                'name': entity.name, \
+                'id': getAbsoluteID(entity), \
+                'external_id': entity.external_id
+            }
+            if entity.distance is not None:
+                outputentity['distance'] = round((entity.distance.km * 5 / 8), 1)
+            searchresults.append(outputentity)
 
         return OutputJson({'searchtext': searchtext, 'results': searchresults})
 
@@ -213,8 +232,9 @@ def Search(request):
         # UK postcodes always have three characters in second half
         postcodetext_formatted = postcodetext[:-3] + ' ' + postcodetext[-3:]
         location = get_postcode_point(postcodetext)
-        if (context is None) or location.intersects(context.geometry):
-            searchresults = [{'type': 'postcode', 'name': postcodetext_formatted, 'lat': location[1], 'lng': location[0], 'zoom': defaultzoom}]
+        if location is not None:
+            if (context is None) or location.intersects(context.geometry):
+                searchresults = [{'type': 'postcode', 'name': postcodetext_formatted, 'lat': location[1], 'lng': location[0], 'zoom': defaultzoom}]
     else:
     
         # If not postcode, do text search on business type, all contexts, geographies and entities
@@ -225,12 +245,26 @@ def Search(request):
             searchresults.append({'type': 'selection', 'name': property.name, 'id': property.id})
 
         # Context-dependent entities
-        entities = Entity.objects.filter(status=EditTypes.EDIT_LIVE, name__icontains=searchtext).order_by('name')
+        entities = Entity.objects.filter(status=EditTypes.EDIT_LIVE, name__icontains=searchtext)
         if context is not None:
             entities = entities.filter(centre__intersects=context.geometry)
 
-        for entity in entities:
-            searchresults.append({'type': 'entity', 'name': entity.name, 'id': entity.id, 'external_id': entity.external_id})
+        if mapcentre is None:
+            entities = entities.order_by('name')
+        else:          
+            entities = entities.annotate(distance=Distance('centre' , mapcentre )).order_by('distance')
+
+        for entity in entities[:10]:
+            outputentity = {\
+                'type': 'entity', \
+                'name': entity.name, \
+                'id': getAbsoluteID(entity), \
+                'external_id': entity.external_id
+            }
+            if entity.distance is not None:
+                outputentity['distance'] = round((entity.distance.km * 5 / 8), 1)
+            searchresults.append(outputentity)
+
 
         # Context-dependent locations
         locations = None
@@ -289,7 +323,12 @@ def Entities(request):
     entities = None
 
     if 'id' in searchcriteria:
-        entities = Entity.objects.filter(status=EditTypes.EDIT_LIVE).filter(pk=searchcriteria['id'])
+        if searchcriteria['id'].startswith("INTERNAL:"):
+            internalid = int(searchcriteria['id'][9:])
+            entities = Entity.objects.filter(status=EditTypes.EDIT_LIVE).filter(pk=internalid)
+        else:
+            entities = Entity.objects.filter(status=EditTypes.EDIT_LIVE).filter(external_id=searchcriteria['id'])
+
     elif searchcriteria['list'] is False:
         print("list=False but no entity id specified")
         return OutputError()
@@ -314,10 +353,11 @@ def Entities(request):
         entities = entities.filter(centre__intersects=context.geometry)
 
     outputentities = []
-    for entity in entities:
+    results['numresults'] = entities.count()
+    for entity in entities[:25]:
 
         outputentity = {\
-            'id': entity.id,\
+            'id': getAbsoluteID(entity),\
             'name': entity.name,\
             'external_id': entity.external_id,\
             'img': entity.img,\
@@ -327,7 +367,13 @@ def Entities(request):
             'properties': list(Property.objects.filter(pk__in=entity.properties_list).order_by('name').values()),\
             'bounds': entity.bbox_extent,\
             'geometrycodes': []\
-            }
+        }
+
+        if (entity.extraproperties is not None) and (entity.extraproperties.strip() != ''):
+            outputentity['extraproperties'] = json.loads(entity.extraproperties)
+            
+        if entity.distance is not None:
+            outputentity['distance'] = round((entity.distance.km * 5 / 8), 1)
 
         if entity.email.strip() != '':
             outputentity['contactable'] = True

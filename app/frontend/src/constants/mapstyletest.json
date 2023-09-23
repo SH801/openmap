@@ -19,6 +19,7 @@
         }
     },
     "glyphs": "http://localhost:8080/fonts/{fontstack}/{range}.pbf",
+    "sprite": "http://localhost:8080/styles/basic/sprite",
     "layers": [
       {
         "id": "background",
@@ -1831,6 +1832,40 @@
         "source": "renewables",
         "source-layer": "renewables",
         "type": "line"
+      },
+      {
+        "id": "renewables_windturbine",
+        "type": "symbol",
+        "source": "renewables",
+        "source-layer": "renewables",
+        "layout": {
+            "icon-image": "windturbine", 
+            "icon-size": ["interpolate", ["exponential", 2], ["zoom"], 
+              0, 0.000007, 
+              20, 8
+            ],
+            "icon-anchor": "bottom",
+            "icon-allow-overlap": [
+              "step",
+              ["zoom"],
+              false,
+              11,
+              true
+            ]            
+        },
+        "filter": [
+          "all",
+          [
+            "==",
+            "$type",
+            "Point"
+          ],
+          [
+            "==",
+            "entityproperties",
+            "[\"'110'\"]"
+          ]
+        ]
       }
     ],
     "id": "basic-preview"

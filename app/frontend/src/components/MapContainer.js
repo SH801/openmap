@@ -326,6 +326,7 @@ export class MapContainer extends Component  {
           onResize={this.onResize}
           onClick={this.onClick}
           minZoom={4}
+          maxZoom={19}
           maxBounds={this.getMaxBounds()}
           maxPitch={85}
           terrain={{source: "terrainSource", exaggeration: 1.1 }}
@@ -333,7 +334,8 @@ export class MapContainer extends Component  {
             'positivefarms_background', 
             'positivefarms_active', 
             'renewables_background',
-            'renewables_active'
+            'renewables_active',
+            'renewables_windturbine'
           ]}
           initialViewState={{
             longitude: this.state.lng,

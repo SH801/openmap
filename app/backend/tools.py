@@ -103,7 +103,7 @@ renewables = [
 ]
 
 osm = [
-    'osm/*'
+    'osm/renewables.geojson'
 ]
 
 subregion_scotland_correction = "subregions/Counties_and_Unitary_Authorities_GB_2018.json"
@@ -1006,7 +1006,7 @@ def processrenewables():
 
     Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_GOVERNMENT, external_id__in=all_government).delete()
 
-    # Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_OSM).delete()
+    Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_OSM).delete()
 
     g = Geod(ellps='WGS84')
     point_width = 50
@@ -1014,68 +1014,99 @@ def processrenewables():
     for osm_file in osm_files:
         with open(osm_file, "r", encoding='UTF-8') as readerfileobj:
             geojson = json.loads(readerfileobj.read())
-            for feature in geojson['features']:
-                external_id = feature['properties']['id']
-                print("Adding/updating", external_id)
-                if external_id in all_osm:
-                    all_osm.remove(external_id)
-                entity = Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_OSM, external_id=external_id).first()
-                if entity is None:
-                    entity = Entity(source=EntitySourceType.ENTITYSOURCE_OSM, external_id=external_id)
-                entity.status = EditTypes.EDIT_LIVE
-                isSolar, isWind = False, False
-                if 'generator:source' in feature['properties']:
-                    if feature['properties']["generator:source"] == "solar": isSolar = True
-                    if feature['properties']["generator:source"] == "wind": isWind = True
-                if 'plant:source' in feature['properties']:
-                    if feature['properties']["plant:source"] == "solar": isSolar = True
-                    if feature['properties']["plant:source"] == "wind": isWind = True
-                if isSolar: entity.name = 'Solar farm'
-                if isWind: entity.name = 'Wind farm'
-                if 'name' in feature['properties']:
-                    entity.name = feature['properties']['name']
-                extraproperties = {}
-                extrapropertiesexist = False
-                for fieldname in useful_fields_osm:
-                    if fieldname in feature['properties']:
-                        if ((fieldname != 'plant:output:electricity') and \
-                            (fieldname != 'generator:output:electricity')) \
-                            or (feature['properties'][fieldname] != 'yes'):
-                            extraproperties[fieldname] = feature['properties'][fieldname]
-                            extrapropertiesexist = True
-                if extrapropertiesexist:
-                    entity.extraproperties = json.dumps(extraproperties)
-                else:
-                    entity.extraproperties = None
-                # Create comfortable bounding box for point features so we don't zoom too close
-                if feature['geometry']['type'] == 'Point':
-                    lon = feature['geometry']['coordinates'][0]
-                    lat = feature['geometry']['coordinates'][1]
-                    top_right_corner = g.fwd(lon, lat, 45, point_width)
-                    bottom_right_corner = g.fwd(lon, lat, 135, point_width)
-                    bottom_left_corner = g.fwd(lon, lat, 225, point_width)
-                    top_left_corner = g.fwd(lon, lat, 315, point_width)
-                    max_lon = top_right_corner[0]
-                    max_lat = bottom_right_corner[1]
-                    min_lon = bottom_left_corner[0]
-                    min_lat = top_left_corner[1]
-                    bbox = (max_lon, max_lat, min_lon, min_lat)
-                    entity.bbox = Polygon.from_bbox(bbox)
-                    entity.centre = Point(lon, lat)
-                else:
-                    multipolygon = MultiPolygon(feature['geometry']['coordinates'])
-                    bounds = get_bounding_box(multipolygon)
-                    entity.bbox = Polygon.from_bbox(bounds)
-                    entity.centre = Point(((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2))
-                entity.save()
-                if isSolar: entity.properties.set([solarfarm_propertyid])
-                if isWind: entity.properties.set([windfarm_propertyid])
 
-    delentities = Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_OSM, external_id__in=all_osm)
-    for delentity in delentities:
-        print("Deleting geometry for entity", delentity.pk)
-        Geometry.objects.filter(entity=delentity).delete()
-    delentities.delete()
+            relations, groups = {}, {}
+            # Get all existing relations
+            for feature in geojson['features']:
+                if feature['properties']['type'] == 'relation':
+                    relationid = feature['properties']['id']
+                    relations[relationid] = feature
+
+            # Find relations that are referred to but where relation not explicitly defined
+            for feature in geojson['features']:
+                if feature['properties']['type'] != 'relation':
+                    if len(feature['properties']['relations']) > 0:
+                        relationid = feature['properties']['relations'][0]['rel']
+                        properties = feature['properties']['relations'][0]['reltags']
+                        properties['id'] = relationid
+                        if relationid not in groups: groups[relationid] = {'properties': properties, 'elements': []}
+                        groups[relationid]['elements'].append(feature)
+
+            for group in groups.keys():
+                print(groups[group]['properties'], "Num of elements", len(groups[group]['elements']))
+            # print(groups)
+
+
+        #     for feature in geojson['features']:
+        #         external_id = feature['properties']['id']
+        #         print("Adding/updating", external_id)
+        #         if external_id in all_osm:
+        #             all_osm.remove(external_id)
+        #         entity = Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_OSM, external_id=external_id).first()
+        #         if entity is None:
+        #             entity = Entity(source=EntitySourceType.ENTITYSOURCE_OSM, external_id=external_id)
+        #         entity.status = EditTypes.EDIT_LIVE
+        #         isSolar, isWind = False, False
+        #         if 'generator:source' in feature['properties']:
+        #             if feature['properties']["generator:source"] == "solar": isSolar = True
+        #             if feature['properties']["generator:source"] == "wind": isWind = True
+        #         if 'plant:source' in feature['properties']:
+        #             if feature['properties']["plant:source"] == "solar": isSolar = True
+        #             if feature['properties']["plant:source"] == "wind": isWind = True
+        #         if isSolar: entity.name = 'Solar farm'
+        #         if isWind: entity.name = 'Wind farm'
+        #         if 'name' in feature['properties']:
+        #             entity.name = feature['properties']['name']
+        #         extraproperties = {}
+        #         extrapropertiesexist = False
+        #         for fieldname in useful_fields_osm:
+        #             if fieldname in feature['properties']:
+        #                 if ((fieldname != 'plant:output:electricity') and \
+        #                     (fieldname != 'generator:output:electricity')) \
+        #                     or (feature['properties'][fieldname] != 'yes'):
+        #                     extraproperties[fieldname] = feature['properties'][fieldname]
+        #                     extrapropertiesexist = True
+        #         if extrapropertiesexist:
+        #             entity.extraproperties = json.dumps(extraproperties)
+        #         else:
+        #             entity.extraproperties = None
+        #         # Create comfortable bounding box for point features so we don't zoom too close
+        #         if feature['geometry']['type'] == 'Point':
+        #             lon = feature['geometry']['coordinates'][0]
+        #             lat = feature['geometry']['coordinates'][1]
+        #             top_right_corner = g.fwd(lon, lat, 45, point_width)
+        #             bottom_right_corner = g.fwd(lon, lat, 135, point_width)
+        #             bottom_left_corner = g.fwd(lon, lat, 225, point_width)
+        #             top_left_corner = g.fwd(lon, lat, 315, point_width)
+        #             max_lon = top_right_corner[0]
+        #             max_lat = bottom_right_corner[1]
+        #             min_lon = bottom_left_corner[0]
+        #             min_lat = top_left_corner[1]
+        #             bbox = (max_lon, max_lat, min_lon, min_lat)
+        #             entity.bbox = Polygon.from_bbox(bbox)
+        #             entity.centre = Point(lon, lat)
+        #         else:
+        #             multipolygon = MultiPolygon(feature['geometry']['coordinates'])
+        #             bounds = get_bounding_box(multipolygon)
+        #             entity.bbox = Polygon.from_bbox(bounds)
+        #             entity.centre = Point(((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2))
+        #         entity.save()
+        #         if isSolar: entity.properties.set([solarfarm_propertyid])
+        #         if isWind: entity.properties.set([windfarm_propertyid])
+
+        # # Finally copy file for backup purposes
+        # directory = os.path.dirname(osm_file)
+        # basename = os.path.basename(osm_file)
+        # backup_osm_file = os.path.join(directory, basename[:-8] + "_backup.geojson")
+        # os.popen('cp ' + osm_file + ' ' + backup_osm_file)
+
+    # delentities = Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_OSM, external_id__in=all_osm)
+    # for delentity in delentities:
+    #     print("Deleting geometry for entity", delentity.pk)
+    #     Geometry.objects.filter(entity=delentity).delete()
+    # delentities.delete()
+
+
 
 
 if len(sys.argv) == 1:

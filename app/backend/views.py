@@ -475,7 +475,7 @@ def ExternalRef(request, externalref):
     if len(entity) == 0:
         return OutputJson(None)
     else:
-        return OutputJson(entity[0])
+        return OutputJson('INTERNAL:' + str(entity[0]))
 
 class Organisations(APIView):
     """
@@ -488,9 +488,9 @@ class Organisations(APIView):
     @csrf_exempt
     def get(self, request, format=None):
         if 'name' in request.GET:
-            organisations = Entity.objects.filter(status=EditTypes.EDIT_LIVE, name__icontains=request.GET['name']).order_by('external_id')
+            organisations = Entity.objects.filter(status=EditTypes.EDIT_LIVE, source=EntitySourceType.ENTITYSOURCE_INTERNAL, name__icontains=request.GET['name']).order_by('external_id')
         else:
-            organisations = Entity.objects.filter(status=EditTypes.EDIT_LIVE).order_by('external_id')
+            organisations = Entity.objects.filter(status=EditTypes.EDIT_LIVE, source=EntitySourceType.ENTITYSOURCE_INTERNAL).order_by('external_id')
         serializer = OrganisationSerializer(organisations, many=True)
         return Response(serializer.data)
 

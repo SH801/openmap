@@ -1062,7 +1062,7 @@ def processrenewables():
             for feature in geojson['features']:
                 featurecopy = copy(feature)
                 if feature['properties']['type'] == 'relation':
-                    relationid = str(feature['properties']['id'])
+                    relationid = feature['properties']['type'] + str(feature['properties']['id'])
                     featurecopy['properties'] = feature['properties']['tags']
                     featurecopy['properties']['id'] = relationid
                     featurecopy['properties'] = addrenewablesproperties(featurecopy['properties'], renewables_ids)
@@ -1073,17 +1073,17 @@ def processrenewables():
                 featurecopy = copy(feature)
                 if feature['properties']['type'] != 'relation':
                     if len(feature['properties']['relations']) == 0:
-                        individualid = feature['properties']['id']
+                        individualid = feature['properties']['type'] + str(feature['properties']['id'])
                         properties = featurecopy['properties']['tags']
-                        properties['id'] = str(individualid)
+                        properties['id'] = individualid
                         properties = addrenewablesproperties(properties, renewables_ids)
                         # Don't include proposed sites
                         if properties['name'].startswith("Proposed "): continue
                         individuals.append({"type": "Feature", "properties": properties, "geometry": featurecopy['geometry']})
                     else:
-                        relationid = feature['properties']['relations'][0]['rel']
+                        relationid = "relation" + str(feature['properties']['relations'][0]['rel'])
                         properties = featurecopy['properties']['relations'][0]['reltags']
-                        properties['id'] = str(relationid)
+                        properties['id'] = relationid
                         properties = addrenewablesproperties(properties, renewables_ids)
 
                         # Check whether feature should be in group

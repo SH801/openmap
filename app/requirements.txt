@@ -33,3 +33,4 @@ trafilatura
 area
 fiona
 pyproj
+overpass==0.7

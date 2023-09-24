@@ -217,7 +217,7 @@ def Search(request):
                 'id': getAbsoluteID(entity), \
                 'external_id': entity.external_id
             }
-            if entity.distance is not None:
+            if hasattr(entity, 'distance'):
                 outputentity['distance'] = round((entity.distance.km * 5 / 8), 1)
             searchresults.append(outputentity)
 
@@ -261,7 +261,7 @@ def Search(request):
                 'id': getAbsoluteID(entity), \
                 'external_id': entity.external_id
             }
-            if entity.distance is not None:
+            if hasattr(entity, 'distance'):
                 outputentity['distance'] = round((entity.distance.km * 5 / 8), 1)
             searchresults.append(outputentity)
 
@@ -372,7 +372,7 @@ def Entities(request):
         if (entity.extraproperties is not None) and (entity.extraproperties.strip() != ''):
             outputentity['extraproperties'] = json.loads(entity.extraproperties)
             
-        if entity.distance is not None:
+        if hasattr(entity, 'distance'):
             outputentity['distance'] = round((entity.distance.km * 5 / 8), 1)
 
         if entity.email.strip() != '':

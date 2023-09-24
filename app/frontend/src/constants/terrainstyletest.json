@@ -165,17 +165,17 @@
                 ]            
             },
             "filter": [
-              "all",
-              [
-                "==",
-                "$type",
-                "Point"
-              ],
-              [
-                "==",
-                "entityproperties",
-                "[\"'110'\"]"
-              ]
+                "all",
+                [
+                    "==",
+                    "$type",
+                    "Point"
+                ],
+                [
+                    "==",
+                    "renewabletype",
+                    "wind"
+                ]
             ]
         }           
     ],

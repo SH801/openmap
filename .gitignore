@@ -23,10 +23,13 @@ app/frontend/build/
 app/subregions/
 app/contexts/
 app/data/
-app/osm/
 app/data.zip
 app/frontend/node_modules/
 app/frontend/upload.sh
 app/backend/googlesearch.py
 app/backend/googlesearch_test.py
+app/osm/renewables.geojson
+app/osm/renewables_output.geojson
+app/osm/renewables.mbtiles
+app/osm/restarttileserver.sh
 updaterenewables/

@@ -160,6 +160,11 @@ export class MapContainer extends Component  {
       // If context set, filter out entities not in context
       map.setFilter('positivefarms_background', 
         ["all", ["in", "'" + this.props.global.context.id.toString() + "'", ["get", "contexts"]]]);
+      map.setFilter('renewables_background', 
+        ["all", ["in", "'" + this.props.global.context.id.toString() + "'", ["get", "contexts"]]]);
+      map.setFilter('renewables_windturbine', 
+        ["all", ["in", "'" + this.props.global.context.id.toString() + "'", ["get", "contexts"]]]);
+
       map.addSource('context', {
         'type': 'geojson',
         'data': this.props.global.context.geojson

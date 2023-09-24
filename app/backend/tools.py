@@ -1107,7 +1107,7 @@ def processrenewables():
                 entity = Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_OSM, external_id=relationid).first()
                 if entity is None:
                     entity = Entity(source=EntitySourceType.ENTITYSOURCE_OSM, external_id=relationid)
-                all_osm.remove(relationid)
+                if relationid in all_osm: all_osm.remove(relationid)
                 entity.status = EditTypes.EDIT_LIVE
                 entity.name = relations[relationid]['properties']['name']
                 entity.bbox = Polygon.from_bbox(bounds)
@@ -1140,7 +1140,7 @@ def processrenewables():
                 entity = Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_OSM, external_id=relationid).first()
                 if entity is None:
                     entity = Entity(source=EntitySourceType.ENTITYSOURCE_OSM, external_id=relationid)
-                all_osm.remove(relationid)
+                if relationid in all_osm: all_osm.remove(relationid)
                 entity.status = EditTypes.EDIT_LIVE
                 entity.name = groups[relationid]['properties']['name']
                 entity.bbox = Polygon.from_bbox(bounds)
@@ -1181,7 +1181,7 @@ def processrenewables():
                 entity = Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_OSM, external_id=id).first()
                 if entity is None:
                     entity = Entity(source=EntitySourceType.ENTITYSOURCE_OSM, external_id=id)
-                all_osm.remove(id)
+                if id in all_osm: all_osm.remove(id)
                 entity.status = EditTypes.EDIT_LIVE
                 entity.name = properties['name']
                 entity.bbox = Polygon.from_bbox(bounds)

@@ -72,6 +72,8 @@ zoomrange = 15
 
 AREA_ACRESCUTOFF = 15
 
+TURBINE_PADDING = 395 # Length of diagonal padding for 280m high wind turbine
+
 POSTCODES_GEOPACKAGE = '../../codepo_gpkg_gb/Data/codepo_gb.gpkg'
 
 # Paths to subregion geojson files
@@ -991,6 +993,18 @@ def extractviewableproperties(properties):
     if viewablepropertiesexist: return json.dumps(viewableproperties, indent=2)
     return None
 
+def addwindpadding(bounds):
+    g = Geod(ellps='WGS84')
+    bottom_left_corner = g.fwd(bounds[0], bounds[1], 225, (TURBINE_PADDING))
+    top_right_corner = g.fwd(bounds[2], bounds[3], 45, (TURBINE_PADDING))
+    top_right_corner = g.fwd(top_right_corner[0], top_right_corner[1], 0, (TURBINE_PADDING / 4.5))
+    min_lon = bottom_left_corner[0]
+    min_lat = bottom_left_corner[1]
+    max_lon = top_right_corner[0]
+    max_lat = top_right_corner[1]
+    newbounds = (min_lon, min_lat, max_lon, max_lat)
+    # print("Old bounds", bounds, "New bounds", newbounds)
+    return newbounds
 
 def processrenewables():
     """
@@ -1050,7 +1064,6 @@ def processrenewables():
     Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_GOVERNMENT, external_id__in=all_government).delete()
 
     g = Geod(ellps='WGS84')
-    point_width = 100 # Width in metres to extend renewables point by for viewable bounding box
 
     outputfeatures = []
     for osm_file in osm_files:
@@ -1143,6 +1156,8 @@ def processrenewables():
                 if relationid in all_osm: all_osm.remove(relationid)
                 entity.status = EditTypes.EDIT_LIVE
                 entity.name = groups[relationid]['properties']['name']
+                # Add padding to bounding box for wind as based on point coordinates and not width of turbine
+                if groups[relationid]['properties']['renewabletype'] == 'wind': bounds = addwindpadding(bounds)
                 entity.bbox = Polygon.from_bbox(bounds)
                 entity.centre = Point(((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2))
                 entity.location = entity.centre
@@ -1167,10 +1182,10 @@ def processrenewables():
                 if feature['geometry']["type"] == 'Point':
                     lon = feature['geometry']['coordinates'][0]
                     lat = feature['geometry']['coordinates'][1]
-                    top_right_corner = g.fwd(lon, lat, 45, point_width)
-                    bottom_right_corner = g.fwd(lon, lat, 135, point_width)
-                    bottom_left_corner = g.fwd(lon, lat, 225, point_width)
-                    top_left_corner = g.fwd(lon, lat, 315, point_width)
+                    top_right_corner = g.fwd(lon, lat, 45, TURBINE_PADDING)
+                    bottom_right_corner = g.fwd(lon, lat, 135, TURBINE_PADDING)
+                    bottom_left_corner = g.fwd(lon, lat, 225, TURBINE_PADDING)
+                    top_left_corner = g.fwd(lon, lat, 315, TURBINE_PADDING)
                     max_lon = top_right_corner[0]
                     max_lat = bottom_right_corner[1]
                     min_lon = bottom_left_corner[0]

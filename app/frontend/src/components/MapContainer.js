@@ -61,9 +61,7 @@ export class PitchToggle extends Component{
   }
 
   onRemove() {
-    if (this._container !== undefined) {
-      this._container.parentNode.removeChild(this._container);
-    }
+    this._container.parentNode.removeChild(this._container);
     this._map = undefined;
   }
 

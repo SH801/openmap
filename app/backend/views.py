@@ -218,7 +218,8 @@ def Search(request):
                 'external_id': entity.external_id
             }
             if hasattr(entity, 'distance'):
-                outputentity['distance'] = round((entity.distance.km * 5 / 8), 1)
+                if entity.distance is not None:
+                    outputentity['distance'] = round((entity.distance.km * 5 / 8), 1)
             searchresults.append(outputentity)
 
         return OutputJson({'searchtext': searchtext, 'results': searchresults})
@@ -262,7 +263,8 @@ def Search(request):
                 'external_id': entity.external_id
             }
             if hasattr(entity, 'distance'):
-                outputentity['distance'] = round((entity.distance.km * 5 / 8), 1)
+                if entity.distance is not None:
+                    outputentity['distance'] = round((entity.distance.km * 5 / 8), 1)
             searchresults.append(outputentity)
 
 
@@ -373,7 +375,8 @@ def Entities(request):
             outputentity['extraproperties'] = json.loads(entity.extraproperties)
             
         if hasattr(entity, 'distance'):
-            outputentity['distance'] = round((entity.distance.km * 5 / 8), 1)
+            if entity.distance is not None:
+                outputentity['distance'] = round((entity.distance.km * 5 / 8), 1)
 
         if entity.email.strip() != '':
             outputentity['contactable'] = True

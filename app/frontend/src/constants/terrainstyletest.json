@@ -116,8 +116,8 @@
             ],
             "id": "renewables_active",
             "paint": {
-              "fill-color": "orange",
-              "fill-opacity": 0.6
+              "fill-color": "white",
+              "fill-opacity": 0.1
             },
             "source": "renewables",
             "source-layer": "renewables",

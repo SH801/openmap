@@ -11,7 +11,7 @@
  * Actions for global redux object
  */ 
 
-import { API_URL, MOBILE_PADDING, DESKTOP_PADDING } from "../constants";
+import { API_URL } from "../constants";
 import { setURLState } from "../functions/urlstate";
 
 /**
@@ -216,6 +216,7 @@ export const fetchEntities = (searchcriteria, isMobile) => {
       })
       .then(res => {
         if (res.status === 200) {
+          var centre = null;
           if (res.data.bounds !== undefined) {
             // Only fitbounds if not list, ie. single entity
             if (searchcriteria['list'] === false) {
@@ -223,15 +224,16 @@ export const fetchEntities = (searchcriteria, isMobile) => {
                 var map = mapref.current.getMap();
                 const southWest = [res.data.bounds[0], res.data.bounds[1]]
                 const northEast = [res.data.bounds[2], res.data.bounds[3]]
+                centre = [(res.data.bounds[0] + res.data.bounds[2]) / 2, 
+                          (res.data.bounds[1] + res.data.bounds[3]) / 2];
                 map.fitBounds([southWest, northEast], {
-                  padding: isMobile ? MOBILE_PADDING : DESKTOP_PADDING,
-                  animate: true,
-                });   
+                  animate: true
+                }); 
               }
             }
           }
 
-          return dispatch({type: 'FETCH_ENTITIES', entities: res.data});
+          return dispatch({type: 'FETCH_ENTITIES', entities: res.data, centre: centre});
         }         
       })
   }

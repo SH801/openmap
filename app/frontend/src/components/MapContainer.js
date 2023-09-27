@@ -2,10 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { global, search } from "../actions";
-// @ts-ignore
+import { Tooltip } from 'react-tooltip';
 import { Map, Popup, NavigationControl, GeolocateControl }  from 'react-map-gl/maplibre';
-// eslint-disable-next-line import/no-webpack-loader-syntax
-// maplibregl.workerClass = require('worker-loader!maplibre-gl/dist/maplibre-gl-csp-worker').default;
 import { centroid } from '@turf/turf';
 import queryString from "query-string";
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -19,6 +17,8 @@ import {
   DEFAULT_PITCH,
   DEFAULT_BEARING,
   AREA_STYLE_CONTEXT,
+  MOBILE_PADDING,
+  DESKTOP_PADDING,
   DEFAULT_MAXBOUNDS
 } from "../constants";
 import { mapSelectEntity } from '../functions/map';
@@ -30,31 +30,107 @@ export class PitchToggle extends Component{
   constructor(props) {
     super(props);
     this._pitch = props.pitch;
-    this._activated = false;
+    this._mapcontainer = props.mapcontainer;
   }
 
   onAdd(map) {
     this._map = map;
     let _this = this; 
     this._btn = document.createElement('button');
-    this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-3d';
+    if (this._mapcontainer.state.satellite) {
+      this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-2d';
+    }   
+    else {
+      this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-3d';
+    }
     this._btn.type = 'button';
-    this._btn['aria-label'] = 'Toggle Pitch';
+    this._btn.setAttribute('data-tooltip-id', 'ctrlpanel-tooltip');
+    this._btn.setAttribute('data-tooltip-content', 'Toggle between 2D and 3D view');
     this._btn.onclick = function() { 
-        this._activated = !this._activated;
-        if (this._activated) {
-            map.setStyle(require(isDev() ? '../constants/terrainstyletest.json' : '../constants/terrainstyle.json'));
-            map.easeTo({pitch: _this._pitch});
-            _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-2d';
-        } else {
-            map.setStyle(require(isDev() ? '../constants/mapstyletest.json' : '../constants/mapstyle.json'), {diff: false});
-            map.easeTo({pitch: 0, bearing: 0});
-            _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-3d';
-        } 
+      var currsatellite = _this._mapcontainer.state.satellite;
+      var newsatellite = !currsatellite;
+      _this._mapcontainer.setState({satellite: newsatellite});
+      if (newsatellite) {
+          map.easeTo({pitch: _this._pitch});
+          _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-2d';
+      } else {
+          map.easeTo({pitch: 0, bearing: 0});
+          _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-3d';
+      } 
     };
     
     this._container = document.createElement('div');
-    this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group test';
+    this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+    this._container.appendChild(this._btn);
+
+    return this._container;
+  }
+
+  onRemove() {
+    this._container.parentNode.removeChild(this._container);
+    this._map = undefined;
+  }
+
+}
+
+
+export function FlyingStart() {
+
+}
+
+export function FlyingStop() {
+
+}
+
+var flyingInterval = null;
+
+export class FlyToggle extends Component{
+    
+  constructor(props) {
+    super(props);
+    this._mapcontainer = props.mapcontainer;
+  }
+
+  onAdd(map) {
+    var interval = 4000;
+    this._map = map;
+    this._timer = null;
+    let _this = this; 
+    this._btn = document.createElement('button');
+    if (this._mapcontainer.state.flying) {
+      this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-flytoggle-landing';
+    } else {
+      this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-flytoggle-takeoff';
+    }
+    this._btn.type = 'button';
+    this._btn.setAttribute('data-tooltip-id', 'ctrlpanel-tooltip');
+    this._btn.setAttribute('data-tooltip-content', 'Go for a zero-carbon flight');
+    this._btn.onclick = function() { 
+      var currflying = _this._mapcontainer.state.flying;
+      var newflying = !currflying;
+      _this._mapcontainer.setState({flying: newflying});
+      if (newflying) {
+        var centre = map.getCenter();
+        flyingInterval = setInterval(() => {
+          map.rotateTo(map.getBearing() + 10, { 
+            around: centre,
+            easing(t) {
+              return t;
+            }, 
+            duration: interval });
+        }, interval)
+        _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-flytoggle-landing';
+      } else {
+        if (flyingInterval) {
+          clearInterval(flyingInterval);
+          flyingInterval = null;
+        }
+        _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-flytoggle-takeoff';
+      } 
+    };
+    
+    this._container = document.createElement('div');
+    this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
     this._container.appendChild(this._btn);
 
     return this._container;
@@ -71,6 +147,8 @@ export class MapContainer extends Component  {
 
   state = {
     context: 0,
+    satellite: false,
+    flying: false,
     lat: null,
     lng: null,
     zoom: null,
@@ -90,7 +168,25 @@ export class MapContainer extends Component  {
     this.popupRef = React.createRef();
 
     this.props.fetchAllProperties();
-    this.pitchtoggle = new PitchToggle({pitch: 80});
+
+    this.state.lat = props.lat;
+    this.state.lng = props.lng;
+    this.state.zoom = props.zoom;  
+    this.state.pitch = props.pitch;
+    this.state.bearing = props.bearing;
+
+    let params = queryString.parse(this.props.location.search);
+    if (params.lat !== undefined) this.state.lat = params.lat;
+    if (params.lng !== undefined) this.state.lng = params.lng;
+    if (params.zoom !== undefined) this.state.zoom = params.zoom;  
+    if (params.pitch !== undefined) this.state.pitch = params.pitch;  
+    if (params.bearing !== undefined) this.state.bearing = params.bearing;  
+    if (params.satellite !== undefined) {
+      if (params.satellite === "yes") this.state.satellite = true;
+    }
+
+    this.pitchtoggle = new PitchToggle({mapcontainer: this, pitch: 80});
+    this.flytoggle = new FlyToggle({mapcontainer: this});
 
     if (!this.props.global.mapinitialized) {
       let subdomain = getURLSubdomain();
@@ -116,19 +212,7 @@ export class MapContainer extends Component  {
       }  
     }
 
-    this.state.lat = props.lat;
-    this.state.lng = props.lng;
-    this.state.zoom = props.zoom;  
-    this.state.pitch = props.pitch;
-    this.state.bearing = props.bearing;
-
-    let params = queryString.parse(this.props.location.search);
-    if (params.lat !== undefined) this.state.lat = params.lat;
-    if (params.lng !== undefined) this.state.lng = params.lng;
-    if (params.zoom !== undefined) this.state.zoom = params.zoom;  
-    if (params.pitch !== undefined) this.state.pitch = params.pitch;  
-    if (params.bearing !== undefined) this.state.bearing = params.bearing;  
-  }
+ }
 
   selectEntity = (entityid) => {
     mapSelectEntity(this.props.global.context, this.mapRef.current.getMap(), entityid);
@@ -152,6 +236,8 @@ export class MapContainer extends Component  {
     var map = this.mapRef.current.getMap();
 
     map.addControl(this.pitchtoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
+    map.addControl(this.flytoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
+    map.setPadding(this.props.isMobile ? MOBILE_PADDING : DESKTOP_PADDING);
 
     var popup = this.popupRef.current;
     popup.remove();  
@@ -275,8 +361,11 @@ export class MapContainer extends Component  {
 
   onResize = (event) => {
     var map = this.mapRef.current.getMap();
+    map.setPadding(this.props.isMobile ? MOBILE_PADDING : DESKTOP_PADDING);
     map.removeControl(this.pitchtoggle);
     map.addControl(this.pitchtoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
+    map.removeControl(this.flytoggle);
+    map.addControl(this.flytoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
   }
 
   onMoveEnd = (event) => {
@@ -288,6 +377,7 @@ export class MapContainer extends Component  {
       let center = map.getCenter();
       let pitch = map.getPitch();
       let bearing = map.getBearing();
+      let satellite = this.state.satellite ? "yes" : "no";
 
       // Refresh search results if geosearch on
       if (this.props.search.geosearch) {
@@ -304,7 +394,8 @@ export class MapContainer extends Component  {
                     'lng': center.lng, 
                     'zoom': zoom,
                     'pitch': pitch,
-                    'bearing': bearing
+                    'bearing': bearing,
+                    'satellite': satellite
                   }, this.props.history, this.props.location);
   }
 
@@ -349,8 +440,12 @@ export class MapContainer extends Component  {
             pitch: this.state.pitch,
             bearing: this.state.bearing
           }}    
-          mapStyle={require(isDev() ? '../constants/mapstyletest.json' : '../constants/mapstyle.json')}
+          mapStyle={this.state.satellite ? 
+            (require(isDev() ? '../constants/terrainstyletest.json' : '../constants/terrainstyle.json')) : 
+            (require(isDev() ? '../constants/mapstyletest.json' : '../constants/mapstyle.json'))
+          }
         >
+          <Tooltip id="ctrlpanel-tooltip" place="right" variant="light" style={{fontSize: "120%"}} />
 
           {this.props.isMobile ? (
               <>

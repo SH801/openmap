@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { global, search } from "../../../actions";
 import { IonIcon, IonItem, IonText, IonToast } from '@ionic/react';
 import { arrowBack, listOutline, searchOutline, close, locationOutline, mapOutline, storefrontOutline } from 'ionicons/icons';
-import { MOBILE_PADDING, DESKTOP_PADDING } from "../../../constants";
 import { mapReset, mapSelectEntity, mapSelectProperty } from '../../../functions/map';
 import './searchBar.css';
 
@@ -97,22 +96,19 @@ export class SearchBar extends Component {
       case 'location':
         this.props.resetGeosearch();
         this.props.setGlobalState({'drawer': false});
-        if (map) {
-          map.flyTo({center: [item.lng, item.lat], zoom: item.zoom}, {
-            padding: this.props.isMobile ? MOBILE_PADDING : DESKTOP_PADDING,
-            animate: false
-          });
-        }
+        if (map) map.flyTo({center: [item.lng, item.lat], zoom: item.zoom}, {animate: false});
         break;  
       case 'context':
         this.props.resetGeosearch();
         this.props.setGlobalState({'drawer': false});
-        const southWest = [item.bounds[0], item.bounds[1]]
-        const northEast = [item.bounds[2], item.bounds[3]]
-        if (map) map.fitBounds([southWest, northEast], {
-          padding: this.props.isMobile ? MOBILE_PADDING : DESKTOP_PADDING,
-          animate: false,
-        });  
+        const southWest = [item.bounds[0], item.bounds[1]];
+        const northEast = [item.bounds[2], item.bounds[3]];
+        if (map) {
+          var centre = [(item.bounds[0] + item.bounds[2]) / 2, 
+                        (item.bounds[1] + item.bounds[3]) / 2];
+          map.fitBounds([southWest, northEast], {animate: false}); 
+          this.setState({centre: centre});
+        } 
         break;  
       case 'selection':
         this.props.setGeosearch(item['id']);

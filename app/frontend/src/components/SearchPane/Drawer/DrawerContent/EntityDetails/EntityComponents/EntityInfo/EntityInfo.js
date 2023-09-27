@@ -7,7 +7,6 @@ import { getEntityActions, getEntityBusinessTypes } from  "../../../../../../../
 import ContactLink from "./ContactLink/ContactLink";
 import EntityContact from "../../EntityContact";
 import EntityActionsList from '../EntityRelated/BottomViews/EntityActions/EntityActionsList';
-import { MOBILE_PADDING, DESKTOP_PADDING } from '../../../../../../../constants';
 import { mapSelectEntity } from '../../../../../../../functions/map';
 
 export class EntityInfo extends Component {
@@ -29,24 +28,6 @@ export class EntityInfo extends Component {
     }
   };
 
-  nameClicked = (id) => {
-    // User clicked on entity name
-    for(let i = 0; i < this.props.global.entities.entities.length; i++) {
-      let entity = this.props.global.entities.entities[i];
-      if ((entity.id === id) && (entity.bounds !== undefined)) {    
-        const southWest = [entity.bounds[1], entity.bounds[0]]
-        const northEast = [entity.bounds[3], entity.bounds[2]]
-        if (this.props.global.mapref) {
-          const map = this.props.global.mapref.current.getMap();
-          map.fitBounds([southWest, northEast], {
-            padding: this.props.isMobile ? MOBILE_PADDING : DESKTOP_PADDING,
-            animate: false,
-          });  
-        }
-      }
-    }
-  }
-
   nameGo = (id) => {
     for(let i = 0; i < this.props.global.entities.entities.length; i++) {
       let entity = this.props.global.entities.entities[i];
@@ -59,7 +40,6 @@ export class EntityInfo extends Component {
           var map = this.props.global.mapref.current.getMap();
           mapSelectEntity(this.props.global.context, map, id);
         }       
-
         break;
       }
     }

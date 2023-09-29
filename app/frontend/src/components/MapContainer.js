@@ -7,6 +7,11 @@ import { Map, Popup, NavigationControl, GeolocateControl }  from 'react-map-gl/m
 import { centroid } from '@turf/turf';
 import queryString from "query-string";
 import 'maplibre-gl/dist/maplibre-gl.css';
+// import loadEncoder from 'https://unpkg.com/mp4-h264@1.0.7/build/mp4-encoder.js';
+// import { Muxer, ArrayBufferTarget, FileSystemWritableFileStreamTarget } from 'mp4-muxer';
+import toast from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
+import { initShaders, initVertexBuffers, renderImage } from './webgl';
 // import './map.css';
 
 import { setURLState, getURLSubdomain, getExternalReference } from "../functions/urlstate";
@@ -24,6 +29,7 @@ import {
 import { mapSelectEntity } from '../functions/map';
 
 export const isDev = () =>  !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+
 
 export class PitchToggle extends Component{
     
@@ -46,10 +52,11 @@ export class PitchToggle extends Component{
     this._btn.type = 'button';
     this._btn.setAttribute('data-tooltip-id', 'ctrlpanel-tooltip');
     this._btn.setAttribute('data-tooltip-content', 'Toggle between 2D and 3D view');
+    this._btn.onmouseleave = function() {_this._mapcontainer.setState({showtooltip: true});}
     this._btn.onclick = function() { 
       var currsatellite = _this._mapcontainer.state.satellite;
       var newsatellite = !currsatellite;
-      _this._mapcontainer.setState({satellite: newsatellite});
+      _this._mapcontainer.setState({showtooltip: false, satellite: newsatellite});
       if (newsatellite) {
           map.easeTo({pitch: _this._pitch});
           _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-2d';
@@ -70,19 +77,7 @@ export class PitchToggle extends Component{
     this._container.parentNode.removeChild(this._container);
     this._map = undefined;
   }
-
 }
-
-
-export function FlyingStart() {
-
-}
-
-export function FlyingStop() {
-
-}
-
-var flyingInterval = null;
 
 export class FlyToggle extends Component{
     
@@ -92,40 +87,44 @@ export class FlyToggle extends Component{
   }
 
   onAdd(map) {
-    var interval = 4000;
     this._map = map;
     this._timer = null;
     let _this = this; 
     this._btn = document.createElement('button');
-    if (this._mapcontainer.state.flying) {
-      this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-flytoggle-landing';
-    } else {
-      this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-flytoggle-takeoff';
-    }
     this._btn.type = 'button';
     this._btn.setAttribute('data-tooltip-id', 'ctrlpanel-tooltip');
-    this._btn.setAttribute('data-tooltip-content', 'Go for a zero-carbon flight');
+    if (this._mapcontainer.state.flying) {
+      this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-flytoggle-landing';
+      this._btn.setAttribute('data-tooltip-content', 'Stop flying');
+    } else {
+      this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-flytoggle-takeoff';
+      this._btn.setAttribute('data-tooltip-content', 'Go for a zero-carbon flight');
+    }
+    this._btn.onmouseleave = function() {_this._mapcontainer.setState({showtooltip: true});}
     this._btn.onclick = function() { 
       var currflying = _this._mapcontainer.state.flying;
       var newflying = !currflying;
-      _this._mapcontainer.setState({flying: newflying});
+      _this._mapcontainer.setState({showtooltip: false, flying: newflying});
+      _this._mapcontainer.props.setGlobalState({flying: newflying, flyingindex: 0});
       if (newflying) {
-        var centre = map.getCenter();
-        flyingInterval = setInterval(() => {
-          map.rotateTo(map.getBearing() + 10, { 
-            around: centre,
-            easing(t) {
-              return t;
-            }, 
-            duration: interval });
-        }, interval)
+        var entities = _this._mapcontainer.props.global.entities;
+        var flyingtour = false;
+        if (entities) {
+          if (entities['list']) {
+            _this._mapcontainer.props.startFlyingTour(entities);
+            flyingtour = true;
+          }
+        }
+        if (!flyingtour) {
+          toast.success('Now flying!');
+          _this._mapcontainer.flyingStart();
+        }
+        this.setAttribute('data-tooltip-content', 'Stop flying');
         _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-flytoggle-landing';
       } else {
-        if (flyingInterval) {
-          clearInterval(flyingInterval);
-          flyingInterval = null;
-        }
+        this.setAttribute('data-tooltip-content', 'Go for a zero-carbon flight');
         _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-flytoggle-takeoff';
+        _this._mapcontainer.flyingStop();
       } 
     };
     
@@ -140,15 +139,169 @@ export class FlyToggle extends Component{
     this._container.parentNode.removeChild(this._container);
     this._map = undefined;
   }
+}
 
+export class RecordVideo extends Component{
+    
+  constructor(props) {
+    super(props);
+    this._mapcontainer = props.mapcontainer;
+    this._encoder = null;
+    this._frame = null;
+    this._framerate = 30;
+    this._timer = null;
+  }
+
+  onAdd(map) {
+    this._map = map;
+    let _this = this; 
+    this._btn = document.createElement('button');
+    this._btn.type = 'button';
+    this._btn.setAttribute('data-tooltip-id', 'ctrlpanel-tooltip');
+    if (this._mapcontainer.state.recording) {
+      this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-recordvideo-stop';
+      this._btn.setAttribute('data-tooltip-content', 'Stop recording video');
+    } else {
+      this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-recordvideo-start';
+      this._btn.setAttribute('data-tooltip-content', 'Start recording video');
+    }
+    this._btn.onmouseleave = function() {_this._mapcontainer.setState({showtooltip: true});}
+    this._btn.onclick = function() { 
+      var recording = _this._mapcontainer.state.recording;
+      recording = !recording;
+      _this._mapcontainer.setState({showtooltip: false, recording: recording})
+      // We trigger render after starting/stopping recording in order to show/hide logo
+      _this._map._render();
+      if (recording) {
+        this.setAttribute('data-tooltip-content', 'Stop recording video');
+        _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-recordvideo-stop';
+
+        // Use MediaRecorder to record video as it's most efficient
+        // Tried using MP4 conversion but too CPU intensive when main app is already working hard
+        const canvas = _this._map.getCanvas();
+        const data = []; 
+        const stream = canvas.captureStream(25); 
+        const mediaRecorder = new MediaRecorder(stream);
+        _this._mapcontainer.setState({mediarecorder: mediaRecorder});
+        mediaRecorder.ondataavailable = (e) => data.push(e.data);
+        mediaRecorder.onstop = (e) => {
+    
+          const anchor = document.createElement("a");
+          anchor.href =  URL.createObjectURL(new Blob(data, {type: "video/webm;codecs=h264"}));
+          const now = new Date();
+          const timesuffix = now.toISOString().substring(0,19).replaceAll('T', ' ').replaceAll(':', '-');
+          anchor.download = "positivefarms - " + timesuffix;
+          anchor.click();
+
+          // Ideally would like to get post-record-finish MP4 conversion working
+          // window.showSaveFilePicker({
+          //     suggestedName: `video.mp4`,
+          //     types: [{
+          //         description: 'Video File',
+          //         accept: { 'video/mp4': ['.mp4'] }
+          //     }],
+          // }).then((fileHandle) => {
+          //   fileHandle.createWritable().then((fileStream) => {
+          //     let muxer = new Muxer({
+          //       target: new FileSystemWritableFileStreamTarget(fileStream),
+          //       video: {
+          //         codec: 'avc',
+          //         width: canvas.width,
+          //         height: canvas.height
+          //       },
+          //     });  
+          //     console.log("No of frames", data.length);          
+          //     // muxer.addVideoChunkRaw(data, 'delta', 0, 10000, {type: "video/webm;codecs=h264"});
+          //     muxer.addVideoChunk(fileBlob); 
+          //     muxer.finalize();
+          //     fileStream.close().then(() => {
+          //       console.log("Finished saving file");
+          //     })
+          //   });
+          // });
+        }
+
+        mediaRecorder.start();
+        toast.success('Recording started');
+
+        // loadEncoder({ simd: false }).then(Encoder => {
+        //   const gl = _this._map.painter.context.gl;
+        //   const width = gl.drawingBufferWidth + (gl.drawingBufferWidth % 2 === 0 ? 0: -1);
+        //   const height = gl.drawingBufferHeight + (gl.drawingBufferHeight % 2 === 0 ? 0: -1);
+  
+        //   _this._encoder = Encoder.create({
+        //     width,
+        //     height,
+        //     fps: 5,
+        //     kbps: 64000,
+        //     speed: 0,
+        //     rgbFlipY: true
+        //   });
+          
+        //   const ptr = _this._encoder.getRGBPointer();
+        //   let lasttime = performance.now();
+        //   let timer = null;
+
+        //   _this._frame = () => {    
+        //     const pixels = _this._encoder.memory().subarray(ptr); 
+        //     gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels); 
+        //     _this._encoder.encodeRGBPointer(); 
+        //     // setTimeout(() => {_this._map._render();}, 1000 / _this._encoder.fps);
+        //   }
+      
+        //   _this._map.on('render', _this._frame); 
+        //   _this._map._render();
+
+        // });
+      } else {
+        this.setAttribute('data-tooltip-content', 'Start recording video');
+        _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-recordvideo-start';
+
+        if (_this._mapcontainer.state.mediarecorder) {
+          _this._mapcontainer.state.mediarecorder.stop();
+          _this._mapcontainer.setState({mediarecorder: null});
+        }
+          
+        toast.success('Recording finished - saved to your downloads');
+
+        // if (_this._encoder) {
+        //   _this._map._render();
+        //   _this._map.off('render', _this._frame);
+        //   const mp4 = _this._encoder.end();
+        //   const anchor = document.createElement("a");
+        //   anchor.href =  URL.createObjectURL(new Blob([mp4], {type: "video/mp4"}));
+        //   const now = new Date();
+        //   const timesuffix = now.toISOString().substring(0,19).replaceAll('T', ' ').replaceAll(':', '-');
+        //   anchor.download = "positivefarms - " + timesuffix;
+        //   anchor.click();
+        //   _this._encoder = null;
+        //   _this._frame = null;
+        // }
+      } 
+    };
+    
+    this._container = document.createElement('div');
+    this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+    this._container.appendChild(this._btn);
+
+    return this._container;
+  }
+
+  onRemove() {
+    this._container.parentNode.removeChild(this._container);
+    this._map = undefined;
+  }
 }
 
 export class MapContainer extends Component  {
 
   state = {
+    maploaded: false,
     context: 0,
     satellite: false,
     flying: false,
+    flyingcentre: null,
+    recording: false,
     lat: null,
     lng: null,
     zoom: null,
@@ -158,6 +311,9 @@ export class MapContainer extends Component  {
     scrollWheelZoom: true,	
     area: '',		
     bounds: null,
+    showtooltip: true,
+    mediarecorder: null,
+    logo: null
   }
 
   hoveredPolygonId = null;
@@ -175,6 +331,10 @@ export class MapContainer extends Component  {
     this.state.pitch = props.pitch;
     this.state.bearing = props.bearing;
 
+    var logo = new Image();
+    logo.src = "/static/assets/media/positive-farms-glow.png";
+    this.state.logo = logo;
+
     let params = queryString.parse(this.props.location.search);
     if (params.lat !== undefined) this.state.lat = params.lat;
     if (params.lng !== undefined) this.state.lng = params.lng;
@@ -187,6 +347,7 @@ export class MapContainer extends Component  {
 
     this.pitchtoggle = new PitchToggle({mapcontainer: this, pitch: 80});
     this.flytoggle = new FlyToggle({mapcontainer: this});
+    this.recordvideo = new RecordVideo({mapcontainer: this});
 
     if (!this.props.global.mapinitialized) {
       let subdomain = getURLSubdomain();
@@ -211,8 +372,40 @@ export class MapContainer extends Component  {
         this.props.setGlobalState({"mapinitialized": true});
       }  
     }
+  }
 
- }
+  flyingStart = () => {
+    var interval = 4000;
+    var degreespersecond = 2.5;
+
+    if (this.mapRef) {
+      var map = this.mapRef.current.getMap();
+      var centre = map.getCenter();
+      var zoom = map.getZoom();
+      if (this.props.global.centre) centre = this.props.global.centre;
+      else {
+        console.log("Centre is not set - using map's center");
+      }
+      if (this.props.global.zoom) zoom = this.props.global.zoom;
+      else this.props.setGlobalState({zoom: zoom});        
+      map.jumpTo({center: centre, zoom: zoom});
+      map.rotateTo(map.getBearing() + degreespersecond * (interval / 1000), { 
+        around: centre, easing(t) {return t;}, duration: interval 
+      });  
+    }
+  }
+
+  flyingStop = () => {
+    if (this.props.global.flyingtimer) {
+      clearTimeout(this.props.global.flyingtimer);
+      this.props.setGlobalState({flyingtimer: null});
+    }
+    if (this.mapRef) {
+      // var map = this.mapRef.current.getMap();
+      // map.setZoom(map.getZoom() + 0.01);
+      // map.rotateTo(map.getBearing(), {duration: 0});
+    }
+  }
 
   selectEntity = (entityid) => {
     mapSelectEntity(this.props.global.context, this.mapRef.current.getMap(), entityid);
@@ -229,6 +422,37 @@ export class MapContainer extends Component  {
     this.props.fetchLastExport();
   }
 
+  
+  onRender = (event) => {
+
+    var gl = event.target.painter.context.gl;
+    var canvas = event.target.getCanvas();
+
+    // Have to do some involved gl drawing to set background colour on transparency
+    gl.viewport(0,0,canvas.width,canvas.height);
+    gl.enable( gl.BLEND );
+    gl.blendEquation( gl.FUNC_ADD );
+    gl.blendFunc( gl.ONE_MINUS_DST_ALPHA, gl.DST_ALPHA );
+    if (!initShaders(gl)) {
+      console.log('Failed to intialize shaders.');
+      return;
+    }
+
+    var n = initVertexBuffers(gl);
+    if (n < 0) {
+      console.log('Failed to set the positions of the vertices');
+      return;
+    }
+
+    gl.drawArrays(gl.TRIANGLES, 0, n);
+
+    if (this.state.recording) {
+      if (this.state.logo) {
+        renderImage(gl, this.state.logo);
+      }  
+    }
+  }
+
   onLoad = (event) => {
     this.props.setGlobalState({"mapref": this.mapRef}).then(() => {
       setInterval(this.fetchLastExport, 15000);
@@ -237,11 +461,12 @@ export class MapContainer extends Component  {
 
     map.addControl(this.pitchtoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
     map.addControl(this.flytoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
+    map.addControl(this.recordvideo, this.props.isMobile ? 'bottom-right' : 'top-left'); 
     map.setPadding(this.props.isMobile ? MOBILE_PADDING : DESKTOP_PADDING);
 
     var popup = this.popupRef.current;
     popup.remove();  
-    
+
     if (this.props.global.context) {
       // If context set, filter out entities not in context
       map.setFilter('positivefarms_background', 
@@ -286,6 +511,7 @@ export class MapContainer extends Component  {
       mapSelectEntity(this.props.global.context, map, this.props.global.externalreferencedid);
     }
 
+    this.setState({maploaded: true});
   }
 
   onMouseEnter = (event) => {
@@ -360,12 +586,38 @@ export class MapContainer extends Component  {
   }
 
   onResize = (event) => {
-    var map = this.mapRef.current.getMap();
-    map.setPadding(this.props.isMobile ? MOBILE_PADDING : DESKTOP_PADDING);
-    map.removeControl(this.pitchtoggle);
-    map.addControl(this.pitchtoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
-    map.removeControl(this.flytoggle);
-    map.addControl(this.flytoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
+    if (this.state.maploaded) {
+      var map = this.mapRef.current.getMap();
+      map.setPadding(this.props.isMobile ? MOBILE_PADDING : DESKTOP_PADDING);
+      map.removeControl(this.pitchtoggle);
+      map.addControl(this.pitchtoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
+      map.removeControl(this.flytoggle);
+      map.addControl(this.flytoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
+      map.removeControl(this.recordvideo);
+      map.addControl(this.recordvideo, this.props.isMobile ? 'bottom-right' : 'top-left'); 
+    }
+  }
+
+  onZoomEnd = (event) => {
+
+    if (this.props.global.fittingbounds) {
+      var map = this.mapRef.current.getMap();
+      this.props.setGlobalState({zoom: map.getZoom(), fittingbounds: false});
+      if (this.state.flying) this.flyingStart();
+    }
+
+    // Allow user to change flying zoom when not flying
+    if (!this.state.flying) {
+      var map = this.mapRef.current.getMap();
+      if (map) this.props.setGlobalState({zoom: map.getZoom()});
+    }
+
+  }
+
+  onRotateEnd = (event) => {
+    if (this.state.flying) {
+      this.flyingStart();
+    }
   }
 
   onMoveEnd = (event) => {
@@ -379,8 +631,8 @@ export class MapContainer extends Component  {
       let bearing = map.getBearing();
       let satellite = this.state.satellite ? "yes" : "no";
 
-      // Refresh search results if geosearch on
-      if (this.props.search.geosearch) {
+      // Refresh search results if geosearch on and flying off
+      if ((this.props.search.geosearch) && (!this.state.flying)) {
         if ((this.props.search.geosearch !== null) && (this.props.isMobile !== null)) {
           this.props.fetchEntitiesByProperty(this.props.search.geosearch, this.props.isMobile);
         }          
@@ -391,12 +643,12 @@ export class MapContainer extends Component  {
       }
 
       setURLState({ 'lat': center.lat, 
-                    'lng': center.lng, 
-                    'zoom': zoom,
-                    'pitch': pitch,
-                    'bearing': bearing,
-                    'satellite': satellite
-                  }, this.props.history, this.props.location);
+        'lng': center.lng, 
+        'zoom': zoom,
+        'pitch': pitch,
+        'bearing': bearing,
+        'satellite': satellite
+      }, this.props.history, this.props.location);
   }
 
   getMaxBounds = () => {
@@ -415,16 +667,20 @@ export class MapContainer extends Component  {
         {this.props.global.mapinitialized ? (
           <Map ref={this.mapRef}
           onLoad={this.onLoad}
+          onRender={this.onRender}
           onMouseEnter={this.onMouseEnter}
           onMouseMove={this.onMouseMove}
           onMouseLeave={this.onMouseLeave}
           onMoveEnd={this.onMoveEnd}
+          onRotateEnd={this.onRotateEnd}
           onResize={this.onResize}
           onClick={this.onClick}
+          onZoomEnd={this.onZoomEnd}
           minZoom={4}
           maxZoom={19}
           maxBounds={this.getMaxBounds()}
           maxPitch={85}
+          preserveDrawingBuffer={true} 
           terrain={{source: "terrainSource", exaggeration: 1.1 }}
           interactiveLayerIds={[
             'positivefarms_background', 
@@ -445,7 +701,12 @@ export class MapContainer extends Component  {
             (require(isDev() ? '../constants/mapstyletest.json' : '../constants/mapstyle.json'))
           }
         >
-          <Tooltip id="ctrlpanel-tooltip" place="right" variant="light" style={{fontSize: "120%"}} />
+
+          <Toaster position="top-center"  containerStyle={{top: 20}}/>
+
+          {this.state.showtooltip ? (
+            <Tooltip id="ctrlpanel-tooltip" place="right" variant="light" style={{fontSize: "120%"}} />
+          ) : null}
 
           {this.props.isMobile ? (
               <>
@@ -498,6 +759,9 @@ export const mapDispatchToProps = dispatch => {
       setSearchText: (searchtext) => {
         return dispatch(search.setSearchText(searchtext));
       },      
+      startFlyingTour: (entities) => {
+        return dispatch(global.startFlyingTour(entities));
+      },  
       fetchLastExport: () => {
         return dispatch(global.fetchLastExport());
       },  

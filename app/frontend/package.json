@@ -13,6 +13,8 @@
     "chart.js": "^3.5.1",
     "isomorphic-fetch": "^3.0.0",
     "maplibre-gl": "^3.3.1",
+    "mp4-muxer": "^2.2.2",
+    "path": "^0.12.7",
     "query-string": "^8.1.0",
     "react": "^17.0.1",
     "react-chartjs-2": "^3.3.0",
@@ -27,11 +29,18 @@
     "react-tooltip": "^5.21.1",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
+    "stream": "^0.0.2",
+    "suncalc": "^1.9.0",
     "web-vitals": "^2.1.4",
+    "webgl-utils.js": "^1.1.0",
     "worker-loader": "^3.0.8"
   },
+  "browser": {
+    "crypto": false,
+    "fs": false
+  },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts start -s ASSERTIONS=1",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

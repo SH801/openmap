@@ -15,7 +15,8 @@
         },
         "renewables": {
           "type": "vector",
-          "url": "http://localhost:8080/data/renewables.json"
+          "url": "http://localhost:8080/data/renewables.json",
+          "attribution": "Renewables data from © OpenStreetMap contributors"
         }
     },
     "glyphs": "http://localhost:8080/fonts/{fontstack}/{range}.pbf",

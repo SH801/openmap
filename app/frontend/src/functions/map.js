@@ -26,7 +26,7 @@ export function mapSelectEntity(context, map, entityid) {
 } 
 
 export function mapSelectProperty(context, map, propertyid) {
-    const layer = map.getStyle().layers.find((layer) => layer.id === 'renewables_windturbine');
+    // const layer = map.getStyle().layers.find((layer) => layer.id === 'renewables_windturbine');
     // layer.layout['icon-image'] = 'windturbine_orange';
     var activeFilter = ['in', "'" + propertyid.toString() + "'", ['get', 'entityproperties']];
     var backgroundFilter = ['!', ['in', "'" + propertyid.toString() + "'", ['get', 'entityproperties']]];

@@ -13,7 +13,8 @@
         },  
         "renewables": {
             "type": "vector",
-            "url": "http://localhost:8080/data/renewables.json"
+            "url": "http://localhost:8080/data/renewables.json",
+            "attribution": "Renewables data from © OpenStreetMap contributors"
         },  
         "terrainSource": {
             "type": "raster-dem",
@@ -38,7 +39,7 @@
             "maxzoom": 24,
             "paint": {
                 "raster-saturation": 0,
-                "raster-brightness-min": 0.1 
+                "raster-brightness-min": 0.1
             }
         },
         {

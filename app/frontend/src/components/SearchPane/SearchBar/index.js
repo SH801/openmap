@@ -60,7 +60,7 @@ export class SearchBar extends Component {
       mapReset(this.props.global.context, this.props.global.mapref.current.getMap());
     }
     this.props.resetSearch();
-    this.props.setGlobalState({'searching': false, 'drawer': false});
+    this.props.setGlobalState({'searching': false, 'drawer': false, 'centre': null});
     this.props.resetEntities();
     
   }

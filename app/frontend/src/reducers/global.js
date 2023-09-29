@@ -67,7 +67,7 @@ export default function selector(state=initialStateGlobal, action) {
                     }
                 }
             }
-            newState = {...newState, centre: action.centre, entities: action.entities, entitygeometries: entitygeometries};
+            newState = {...newState, fittingbounds: action.fittingbounds, zoom: action.zoom, centre: action.centre, entities: action.entities, entitygeometries: entitygeometries};
             return newState;
     
         case 'RESET_ENTITIES':

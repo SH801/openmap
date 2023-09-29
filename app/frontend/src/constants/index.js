@@ -17,6 +17,9 @@ console.log("Development machine", isDev());
 // URL of backend system
 export const API_URL = isDev() ? "http://localhost:80" : "";
 
+// Number of milliseconds to stay at each entity during flying tour
+export const FLYINGTOUR_LINGERTIME = 25000;
+
 // Default year start
 export const periodstart = 2010; 
 

@@ -11,8 +11,10 @@
  * Actions for global redux object
  */ 
 
-import { API_URL } from "../constants";
+import { API_URL, FLYINGTOUR_LINGERTIME } from "../constants";
 import { setURLState } from "../functions/urlstate";
+import { mapSelectEntity } from '../functions/map';
+import toast from 'react-hot-toast';
 
 /**
  * setGlobalState
@@ -217,6 +219,8 @@ export const fetchEntities = (searchcriteria, isMobile) => {
       .then(res => {
         if (res.status === 200) {
           var centre = null;
+          var zoom = null;
+          var fittingbounds = false;
           if (res.data.bounds !== undefined) {
             // Only fitbounds if not list, ie. single entity
             if (searchcriteria['list'] === false) {
@@ -226,14 +230,21 @@ export const fetchEntities = (searchcriteria, isMobile) => {
                 const northEast = [res.data.bounds[2], res.data.bounds[3]]
                 centre = [(res.data.bounds[0] + res.data.bounds[2]) / 2, 
                           (res.data.bounds[1] + res.data.bounds[3]) / 2];
+                if (map.getZoom() > 15) {
+                  map.setZoom(15);
+                }
                 map.fitBounds([southWest, northEast], {
                   animate: true
                 }); 
+                fittingbounds = true;
               }
+            } else {
+              const flying = getState().global.flying;
+              if (flying) startFlyingTourAction(false, dispatch, getState, res.data);          
             }
           }
 
-          return dispatch({type: 'FETCH_ENTITIES', entities: res.data, centre: centre});
+          return dispatch({type: 'FETCH_ENTITIES', entities: res.data, centre: centre, zoom: zoom, fittingbounds: fittingbounds});
         }         
       })
   }
@@ -263,6 +274,104 @@ export const fetchEntitiesByProperty = (propertyid, isMobile) => {
   return fetchEntities({list: true, properties: [propertyid]}, isMobile);
 }
 
+/**
+ * nextstepFlyingTour
+ * 
+ * Performs first step of flying tour and then calls setTimeout to run next step
+ * 
+ * @param {*} dispatch
+ * @param {*} getstate
+ * @param {*} entities
+ */
+export const nextstepFlyingTour = (initial, dispatch, getState, entities) => {
+  var flyingtimer = getState().global.flyingtimer;
+  if (flyingtimer) {
+    clearTimeout(flyingtimer);
+    setGlobalState({'flyingtimer': null});
+  }
+
+  if (!(getState().global.flying) && (!initial)) {
+    console.log("Not flying and not initial - quitting");
+    return;
+  }
+
+  var flyingindex = getState().global.flyingindex;
+  console.log("Moving to next item in search results", flyingindex);
+
+  const { mapref } = getState().global;
+  var centre = null;
+  var zoom = null;
+  if (mapref) {
+    const map = mapref.current.getMap();
+    if (flyingindex > (entities['entities'].length - 1)) {
+      toast.success('Flying tour has completed');          
+      clearTimeout(flyingtimer);
+      setGlobalState({'flyingtimer': null});  
+      return;
+    }
+
+    if (!initial) toast.success('Moving to next location...');
+
+    const entity = entities['entities'][flyingindex];
+    const entityid = entity['id'];
+    mapSelectEntity(getState().global.context, map, entityid);
+    const southWest = [entity.bounds[0], entity.bounds[1]]
+    const northEast = [entity.bounds[2], entity.bounds[3]]
+    centre = [(entity.bounds[0] + entity.bounds[2]) / 2, 
+              (entity.bounds[1] + entity.bounds[3]) / 2];
+    if (map.getZoom() > 15) map.setZoom(15);
+    map.fitBounds([southWest, northEast], {animate: true}); 
+    // zoom = map.getZoom();
+    // As we're now at entity, make distance zero
+    entity['distance'] = null;
+
+    flyingindex++;
+    dispatch({type: 'RESET_GEOSEARCH'});
+    dispatch({type: 'GLOBAL_SET_STATE', object: {
+      'centre': centre,
+      'zoom': zoom,
+      'fittingbounds': true,
+      'drawer': true, 
+      'searching': false, 
+      'flyingindex': flyingindex,
+      'entities': {'list': false, 'entities': [entity]}
+    }});  
+
+    flyingtimer = setTimeout(() => {nextstepFlyingTour(false, dispatch, getState, entities)}, FLYINGTOUR_LINGERTIME);
+    dispatch({type: 'GLOBAL_SET_STATE', object: {flyingtimer: flyingtimer}});
+  }
+}
+
+/**
+ * startFlyingTourAction
+ * 
+ * Go on tour of provided entities
+ * 
+ * @param {*} entities
+ */
+export const startFlyingTourAction = (initial, dispatch, getState, entities) => {
+
+  toast.success('Starting flying tour of search results');
+
+  var flyingtimer = getState().global.flyingtimer;
+  if (flyingtimer) clearTimeout(flyingtimer);
+  flyingtimer = setTimeout(() => {nextstepFlyingTour(initial, dispatch, getState, entities)}, 500);
+  dispatch({type: 'GLOBAL_SET_STATE', object: {flyingtimer: flyingtimer, flyingindex: 0}});
+}
+
+/**
+ * startFlyingTour
+ * 
+ * Go on tour of provided entities
+ * 
+ * @param {*} entities
+ */
+export const startFlyingTour = (entities) => {
+  return (dispatch, getState) => {
+    startFlyingTourAction(true, dispatch, getState, entities);
+    return Promise.resolve(true);
+  }
+}
 
 /**
  * fetchEntity

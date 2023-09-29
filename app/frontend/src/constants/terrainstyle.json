@@ -13,7 +13,8 @@
         },  
         "renewables": {
             "type": "vector",
-            "url": "https://tiles.positivefarms.org/data/renewables.json"
+            "url": "https://tiles.positivefarms.org/data/renewables.json",
+            "attribution": "Renewables data from © OpenStreetMap contributors"
         },  
         "terrainSource": {
             "type": "raster-dem",

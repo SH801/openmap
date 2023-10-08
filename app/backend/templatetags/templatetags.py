@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from guardian.shortcuts import get_objects_for_user
-from backend.models import Entity, Post, EditTypes, Property, PropertyTypes, ExportQueue, ExportQueueTypes
+from backend.models import Entity, Plan, Post, EditTypes, Property, PropertyTypes, ExportQueue, ExportQueueTypes
 
 import re
 import markdown
@@ -108,6 +108,14 @@ def get_farms(context):
         farm.types = Property.objects.filter(pk__in=farm.properties_list).filter(type=PropertyTypes.PROPERTY_ENTITYTYPE).order_by('name').values_list('name', flat=True)
 
     return {'farms': farms}
+
+@register.simple_tag(takes_context=True)
+def get_plans(context):
+    '''
+    Get plans for current user
+    '''
+    plans = get_objects_for_user(context['request'].user, ['backend.change_plan'], Plan.objects.all().order_by('name'))
+    return {'plans': plans}
 
 @register.simple_tag(takes_context=True)
 def get_posts(context):

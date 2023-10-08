@@ -16,6 +16,7 @@ from .models import Geometry, GeometryAdmin
 from .models import GeometryCode
 from .models import Property, PropertyAdmin
 from .models import Entity, EntityAdmin
+from .models import Plan, PlanAdmin
 from .models import Post, PostAdmin
 from .models import Message, MessageAdmin
 from .models import ExportQueue, ExportQueueAdmin
@@ -29,6 +30,7 @@ admin.site.register(ExportQueue, ExportQueueAdmin)
 admin.site.register(GeometryCode)
 admin.site.register(Property, PropertyAdmin)
 admin.site.register(Entity, EntityAdmin)
+admin.site.register(Plan, PlanAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Message, MessageAdmin)
 admin.site.register(Postcode, PostcodeAdmin)

@@ -22,6 +22,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import path, include, re_path
 from rest_framework.urlpatterns import format_suffix_patterns
 
+from .settings import STATIC_ROOT
 from backend import views
 from backend import endpoints
 
@@ -33,6 +34,10 @@ urlpatterns = [
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='/accounts/login/'), name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('account/', views.account, name='account'),
+    path('account/entities/', views.accountentities, name='accountentities'),
+    path('account/entity/<id>', views.accountentity, name='accountentity'),
+    path('account/plan/<id>', views.accountplan, name='accountplan'),
+    path('account/plan/save/', views.accountplansave, name='accountplansave'),
     path('signup/', views.signup, name='signup'),
     path('email_sent/', views.email_sent, name='email_sent'),
     path('email_confirmed/', views.email_confirmed, name='email_confirmed'),
@@ -42,7 +47,7 @@ urlpatterns = [
     path('deactivate_confirm/', views.deactivate_confirm, name='deactivate_confirm'),
     re_path(r'^farm/(?P<farmid>[\w\-]+)$', views.farm, name='farm'),
     re_path(r'^post/(?P<postid>[\w\-]+)$', views.post, name='post'),
-    re_path(r'^delete/(?P<type>(farm|post))/(?P<id>[\w\-]+)$', views.delete, name='delete'),
+    re_path(r'^delete/(?P<type>(farm|post|plan))/(?P<id>[\w\-]+)$', views.delete, name='delete'),
     path('admin/', admin.site.urls),
     path('api/', include(endpoints)),
     path('api/auth/', include('knox.urls')),

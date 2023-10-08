@@ -69,6 +69,7 @@ from .models import \
     Entity, \
     EntitySourceType, \
     EditTypes, \
+    Plan, \
     Post, \
     Message
 from .gis import get_postcode_point
@@ -882,9 +883,11 @@ def delete(request, type, id):
 
     if request.method == 'POST':
         if type == 'post':
-            get_objects_for_user(request.user, ['backend.change_post'], Post.objects.filter(pk=id)).delete()
+            get_objects_for_user(request.user, ['backend.delete_post'], Post.objects.filter(pk=id)).delete()
+        if type == 'plan':
+            get_objects_for_user(request.user, ['backend.delete_plan'], Plan.objects.filter(pk=id)).delete()
         if type == 'farm':
-            get_objects_for_user(request.user, ['backend.change_entity'], Entity.objects.filter(pk=id)).delete()
+            get_objects_for_user(request.user, ['backend.delete_entity'], Entity.objects.filter(pk=id)).delete()
         return redirect('account')
     
     context = {
@@ -893,4 +896,73 @@ def delete(request, type, id):
     }
 
     return render(request, 'backend/delete.html', context)
+
+TEST_USER = 31
+def getuser(request):
+    user = request.user
+    # user = User.objects.filter(pk=TEST_USER).first()
+    return user
+
+# @csrf_exempt
+def accountentities(request):
+    user = getuser(request)
+    entities = get_objects_for_user(user, ['backend.change_entity'], Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_INTERNAL))
+    output = []
+    for entity in entities:
+        output.append({'id': entity.id, 'name': entity.name})
+    return OutputJson(output)
+
+# @csrf_exempt
+def accountentity(request, id):
+    user = getuser(request)
+    entity = get_objects_for_user(user, ['backend.change_entity'], \
+                                    Entity.objects.filter(pk=int(id), source=EntitySourceType.ENTITYSOURCE_INTERNAL))\
+                                    .annotate(geometrycodes_codes=ArrayAgg('geometrycodes__code'))\
+                                    .values('name', 'geometrycodes_codes').first()
+    if entity is None: return OutputError()
+    geometries = Geometry.objects.filter(code__in=entity['geometrycodes_codes']).annotate(json=AsGeoJSON('geometry'))
+    featurecollection = {'type': 'FeatureCollection', 'features': []}
+    for geometry in geometries:
+        feature = {'type': 'Feature', 'geometry': json.loads(geometry.json)}
+        featurecollection['features'].append(feature)
+    outputentity = {'name': entity['name'], 'id': int(id), 'geojson': featurecollection}
+    return OutputJson(outputentity)
+
+# @csrf_exempt
+def accountplan(request, id):
+    user = getuser(request)
+    plan = get_objects_for_user(user, ['backend.change_plan'], Plan.objects.filter(pk=int(id)))\
+                .values('name', 'entity', 'public', 'data').first()
+    if plan is None: return OutputError()
+    plan['id'] = int(id)
+    plan['entityid'] = plan['entity']
+    del plan['entity']
+    plan['data'] = json.loads(plan['data'])
+    return OutputJson(plan)
+
+# @csrf_exempt
+def accountplansave(request):
+    user = getuser(request)
+
+    try:
+        plandata = json.loads(request.body)
+    except ValueError:
+        return OutputError()
+
+    if plandata['id'] is None: 
+        plan = Plan()        
+    else: 
+        plan = get_objects_for_user(user, ['backend.change_plan'], Plan.objects.filter(pk=int(plandata['id']))).first()        
+    plan.name = plandata['name']
+    if plandata['entityid'] is not None: plan.entity = Entity.objects.filter(pk=plandata['entityid']).first()
+    plan.public = plandata['public']
+    plan.data = json.dumps(plandata['data'], cls=DjangoJSONEncoder, indent=2)
+    plan.save()
+    if user.is_superuser is False:
+        assign_perm("change_plan", user, plan)
+        assign_perm("delete_plan", user, plan)
+        assign_perm("view_plan", user, plan)
+        assign_perm("add_plan", user, plan)
+
+    return OutputJson({'id': plan.pk})
 

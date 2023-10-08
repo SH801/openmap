@@ -181,7 +181,7 @@ export class RecordVideo extends Component{
         const canvas = _this._map.getCanvas();
         const data = []; 
         const stream = canvas.captureStream(25); 
-        const mediaRecorder = new MediaRecorder(stream);
+        const mediaRecorder = new MediaRecorder(stream);        
         _this._mapcontainer.setState({mediarecorder: mediaRecorder});
         mediaRecorder.ondataavailable = (e) => data.push(e.data);
         mediaRecorder.onstop = (e) => {
@@ -331,8 +331,18 @@ export class MapContainer extends Component  {
     this.state.pitch = props.pitch;
     this.state.bearing = props.bearing;
 
+    var devicePixelRatio = parseInt(window.devicePixelRatio || 1);
     var logo = new Image();
-    logo.src = "/static/assets/media/positive-farms-glow.png";
+    if (devicePixelRatio === 1) {
+      logo.src = "/static/assets/media/positive-farms-glow.png";
+    } else if (devicePixelRatio === 2) {
+      logo.src = "/static/assets/media/positive-farms-glowx2.png";
+    } else if (devicePixelRatio === 3) {
+      logo.src = "/static/assets/media/positive-farms-glowx3.png";
+    } else if (devicePixelRatio === 4) {
+      logo.src = "/static/assets/media/positive-farms-glowx4.png";
+    }
+
     this.state.logo = logo;
 
     let params = queryString.parse(this.props.location.search);
@@ -385,6 +395,7 @@ export class MapContainer extends Component  {
       if (this.props.global.centre) centre = this.props.global.centre;
       else {
         console.log("Centre is not set - using map's center");
+        this.props.setGlobalState({centre: centre});
       }
       if (this.props.global.zoom) zoom = this.props.global.zoom;
       else this.props.setGlobalState({zoom: zoom});        
@@ -600,18 +611,19 @@ export class MapContainer extends Component  {
 
   onZoomEnd = (event) => {
 
-    if (this.props.global.fittingbounds) {
-      var map = this.mapRef.current.getMap();
-      this.props.setGlobalState({zoom: map.getZoom(), fittingbounds: false});
-      if (this.state.flying) this.flyingStart();
-    }
+    var map = this.mapRef.current.getMap();
 
-    // Allow user to change flying zoom when not flying
-    if (!this.state.flying) {
-      var map = this.mapRef.current.getMap();
-      if (map) this.props.setGlobalState({zoom: map.getZoom()});
-    }
+    if (map) {
+      if (this.props.global.fittingbounds) {
+        this.props.setGlobalState({zoom: map.getZoom(), fittingbounds: false});
+        if (this.state.flying) this.flyingStart();
+      }
 
+      // Allow user to change flying zoom when not flying
+      if (!this.state.flying) {
+        this.props.setGlobalState({zoom: map.getZoom()});
+      }
+    }
   }
 
   onRotateEnd = (event) => {

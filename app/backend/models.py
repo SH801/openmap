@@ -375,6 +375,22 @@ def delete_entity(sender, instance, *args, **kwargs):
     geometrycodes = list(Entity.objects.filter(pk=instance.id).values_list('geometrycodes__id', flat=True))
     GeometryCode.objects.filter(pk__in=geometrycodes, code__startswith="INTERNAL:").delete()
 
+class Plan(models.Model):
+    """
+    Stores plans within map system
+    """
+    name = models.CharField(max_length = 200)
+    entity = models.ForeignKey(Entity, on_delete=models.SET_NULL, \
+                               null=True, blank=True, limit_choices_to={"source": EntitySourceType.ENTITYSOURCE_INTERNAL},)
+    public = models.BooleanField(default=False, blank=True)
+    data = models.TextField(null=True, blank=True, default="{}")
+
+class PlanAdmin(GuardedModelAdmin):
+    """
+    Admin class for managing plan objects through admin interface
+    """
+    list_display = ['name', 'entity', 'public']
+
 class Geometry(models.Model):
     """
     Stores geographical geometries, eg. LAU1, MSOA, IG, LSOA, DZ polygons

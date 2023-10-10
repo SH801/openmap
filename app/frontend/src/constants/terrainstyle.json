@@ -102,8 +102,8 @@
             ], 
             "id": "renewables_background",
             "paint": {
-              "fill-color": "#580B7E",
-              "fill-opacity": 0.6          
+              "fill-color": "#ffffff",
+              "fill-opacity": 0.3          
             },
             "source": "renewables",
             "source-layer": "renewables",
@@ -117,8 +117,8 @@
             ],
             "id": "renewables_active",
             "paint": {
-              "fill-color": "white",
-              "fill-opacity": 0.1
+              "fill-color": "orange",
+              "fill-opacity": 0.5
             },
             "source": "renewables",
             "source-layer": "renewables",

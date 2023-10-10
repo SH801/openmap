@@ -1793,7 +1793,7 @@
       ],
       "id": "renewables_background",
       "paint": {
-        "fill-color": "#580B7E",
+        "fill-color": "#666666",
         "fill-opacity": 0.6          
       },
       "source": "renewables",
@@ -1840,7 +1840,7 @@
       "source": "renewables",
       "source-layer": "renewables",
       "layout": {
-          "icon-image": "windturbine", 
+          "icon-image": "windturbine_grey", 
           "icon-size": [
             "interpolate", ["exponential", 2], ["zoom"], 
             12, 0.03125,

@@ -314,9 +314,10 @@ export class MapContainer extends Component  {
     showtooltip: true,
     mediarecorder: null,
     logo: null,
-    icons: [],
-    iconsloaded: false,
-    animatedimagecounter: 0,
+    icons_white: [],
+    iconsloaded_white: false,
+    icons_grey: [],
+    iconsloaded_grey: false,
     animationinterval: 0,
   }
 
@@ -468,41 +469,63 @@ export class MapContainer extends Component  {
     }
   }
 
+  animateIcons = () => {
+    const intervalmsecs = 250;
+    const speedup = 2;
+    const totalduration = 50 * intervalmsecs;
+  
+    if ((this.state.iconsloaded_white) && (this.state.iconsloaded_grey)) {
+      const currentDate = new Date();
+      const milliseconds = speedup * currentDate.getTime(); 
+      const deltamsecs = milliseconds % totalduration;
+      const animationindex = parseInt((deltamsecs + 1) / intervalmsecs);
+      var map = this.mapRef.current.getMap();
+      if (this.state.satellite) {
+        if (this.state.icons_white[animationindex] !== undefined) {
+          map.removeImage('windturbine_white');
+          map.addImage('windturbine_white', this.state.icons_white[animationindex]);    
+        }
+      } else {
+        if (this.state.icons_grey[animationindex] !== undefined) {
+          map.removeImage('windturbine_grey');
+          map.addImage('windturbine_grey', this.state.icons_grey[animationindex]);    
+        }
+      }
+    }  
+
+    setTimeout(this.animateIcons, intervalmsecs);
+  }
+
   onLoad = (event) => {
     this.props.setGlobalState({"mapref": this.mapRef}).then(() => {
       setInterval(this.fetchLastExport, 15000);
     });
     var map = this.mapRef.current.getMap();
 
+    var url = null;
     for(let i = 1; i < 51; i++) {
-      var url = process.env.PUBLIC_URL + "/static/icons/windturbine_white_animated_" + i.toString() + ".png";
+      url = process.env.PUBLIC_URL + "/static/icons/windturbine_white_animated_" + i.toString() + ".png";
       map.loadImage(url, (error, image) => {
           if (error) throw error;
-          var icons = this.state.icons;
-          icons[i] = image;
-          this.setState({icons: icons});
-          if (i === 50) this.setState({iconsloaded: true});
+          var icons_white = this.state.icons_white;
+          icons_white[i] = image;
+          this.setState({icons_white: icons_white});
+          if (i === 50) this.setState({iconsloaded_white: true});
+      });            
+    }
+
+    for(let i = 1; i < 51; i++) {
+      url = process.env.PUBLIC_URL + "/static/icons/windturbine_grey_animated_" + i.toString() + ".png";
+      map.loadImage(url, (error, image) => {
+          if (error) throw error;
+          var icons_grey = this.state.icons_grey;
+          icons_grey[i] = image;
+          this.setState({icons_grey: icons_grey});
+          if (i === 50) this.setState({iconsloaded_grey: true});
       });            
     }
     
-    const intervalmsecs = 250;
-    const speedup = 2;
-    const totalduration = 50 * intervalmsecs;
-    if (this.state.animationinterval !== 0) clearInterval(this.state.animationinterval);
-    var animationinterval = setInterval(() => {
-      if (this.state.iconsloaded) {
-        const currentDate = new Date();
-        const milliseconds = speedup * currentDate.getTime(); 
-        const deltamsecs = milliseconds % totalduration;
-        const animationindex = parseInt((deltamsecs + 1) / intervalmsecs);
-        if (this.state.icons[animationindex] !== undefined) {
-          var map = this.mapRef.current.getMap();
-          map.removeImage('windturbine_white');
-          map.addImage('windturbine_white', this.state.icons[animationindex]);  
-        }
-      }  
-    }, intervalmsecs);
-    this.setState({animationinterval: animationinterval});
+    setTimeout(this.animateIcons, 100);
     
     map.addControl(this.pitchtoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
     map.addControl(this.flytoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 

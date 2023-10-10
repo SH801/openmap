@@ -900,7 +900,7 @@ def delete(request, type, id):
 TEST_USER = 1
 def getuser(request):
     user = request.user
-    # user = User.objects.filter(pk=TEST_USER).first()
+    user = User.objects.filter(pk=TEST_USER).first()
     return user
 
 # @csrf_exempt

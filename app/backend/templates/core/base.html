@@ -714,10 +714,6 @@ The above copyright notice and this permission notice shall be included in all c
                 selectedfeatures.features.forEach((feature) => {featureids.push(feature.id)});
                 draw.delete(featureids);
                 draw.add(mergedfeature);
-                // var elements = draw.getAll();
-                // if (elements.features.length > 0) {
-                //     map.fitBounds(turf.bbox(elements), {duration: 0});
-                // }
             });
             document.addEventListener("click", this.onDocumentClick);
             this.controlContainer.appendChild(this.consolidateButton);

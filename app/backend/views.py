@@ -897,7 +897,7 @@ def delete(request, type, id):
 
     return render(request, 'backend/delete.html', context)
 
-TEST_USER = 31
+TEST_USER = 1
 def getuser(request):
     user = request.user
     # user = User.objects.filter(pk=TEST_USER).first()

@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { IonTitle, IonToolbar } from '@ionic/react';
+import { POSITIVE_SITE } from '../../constants';
 import { global } from "../../actions";
 import Share from './share';
 import LoginPopover from './LoginPopover/LoginPopover';
@@ -15,7 +16,7 @@ export class Toolbar extends Component {
                 <div className="toolbar-content">
                     <IonTitle className="toolbar-title">
                         <div className="toolbar-icon-name">
-                            <a href="/"><img width="120" alt="Positive Farms" title="Positive Farms" className="positivefarms-logo" src="/static/assets/media/logo-positivefarms-black.png"/></a>
+                            <a href="/"><img width="120" alt={POSITIVE_SITE.name} title={POSITIVE_SITE.name} className="positive-logo" src={ "/static/assets/media/" + POSITIVE_SITE.shortcode + ".png"} /></a>
                             <span className="toolbar-icon-title">
                                 {this.props.global.context ? this.props.global.context.name: null}
                             </span>

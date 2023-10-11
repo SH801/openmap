@@ -412,9 +412,10 @@ def GetContext(request, context_shortcode):
         .annotate(Extent('geometry'))\
         .annotate(geojson=AsGeoJSON('geometry'))\
         .values('id', 'name', 'shortcode', 'geometry__extent', 'geojson').first()
-    context['geojson'] = json.loads(context['geojson'])
-    context['bounds'] = context['geometry__extent']
-    del context['geometry__extent']
+    if context is not None:
+        context['geojson'] = json.loads(context['geojson'])
+        context['bounds'] = context['geometry__extent']
+        del context['geometry__extent']
     return OutputJson(context)
 
 @csrf_exempt

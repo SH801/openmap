@@ -16,6 +16,8 @@ import { initShaders, initVertexBuffers, renderImage } from './webgl';
 
 import { setURLState, getURLSubdomain, getExternalReference } from "../functions/urlstate";
 import { 
+  POSITIVE_SITE,
+  POSITIVE_SITES,
   DEFAULT_LAT, 
   DEFAULT_LNG, 
   DEFAULT_ZOOM,
@@ -190,7 +192,7 @@ export class RecordVideo extends Component{
           anchor.href =  URL.createObjectURL(new Blob(data, {type: "video/webm;codecs=h264"}));
           const now = new Date();
           const timesuffix = now.toISOString().substring(0,19).replaceAll('T', ' ').replaceAll(':', '-');
-          anchor.download = "positivefarms - " + timesuffix;
+          anchor.download = POSITIVE_SITE.shortcode + " - " + timesuffix;
           anchor.click();
 
           // Ideally would like to get post-record-finish MP4 conversion working
@@ -328,6 +330,14 @@ export class MapContainer extends Component  {
     this.mapRef = React.createRef();
     this.popupRef = React.createRef();
 
+    this.satellitelayer = require(isDev() ? '../constants/terrainstyletest.json' : '../constants/terrainstyle.json');
+    this.positiveplaceslayer = require(isDev() ? '../constants/positiveplacestest.json' : '../constants/positiveplaces.json');
+    this.positivefarmslayer = require(isDev() ? '../constants/positivefarmstest.json' : '../constants/positivefarms.json');
+    
+    this.nonsatellitelayer = this.positiveplaceslayer
+    if (POSITIVE_SITE.shortcode === 'positivefarms') this.nonsatellitelayer = this.positivefarmslayer;
+    // Add other explicit conditionals as 'require' requires explicit filenames during build
+
     this.props.fetchAllProperties();
 
     this.state.lat = props.lat;
@@ -335,6 +345,11 @@ export class MapContainer extends Component  {
     this.state.zoom = props.zoom;  
     this.state.pitch = props.pitch;
     this.state.bearing = props.bearing;
+
+    var fulldomains = Object.keys(POSITIVE_SITES);
+    var ignoredomains = ['localhost'];
+    for(let i = 0; i < fulldomains.length; i++) ignoredomains.push(fulldomains[i].split('.')[0]);
+    this.ignoredomains = ignoredomains;
 
     var devicePixelRatio = parseInt(window.devicePixelRatio || 1);
     var logo = new Image();
@@ -369,7 +384,7 @@ export class MapContainer extends Component  {
       let externalreference = getExternalReference();
       if (externalreference) {
         this.props.fetchExternalReference(externalreference).then(() => {
-          if ((subdomain !== 'localhost') && (subdomain !== 'positivefarms')) {
+          if (!(this.ignoredomains.includes(subdomain))) {
             this.state.subdomain = subdomain;
             this.props.fetchContext(this.state.subdomain, this.props.isMobile).then(() => {
               this.props.setGlobalState({"mapinitialized": true});
@@ -378,7 +393,7 @@ export class MapContainer extends Component  {
             this.props.setGlobalState({"mapinitialized": true});
           }      
         })
-      } else if ((subdomain !== 'localhost') && (subdomain !== 'positivefarms')) {
+      } else if (!(this.ignoredomains.includes(subdomain))) {
         this.state.subdomain = subdomain;
         this.props.fetchContext(this.state.subdomain, this.props.isMobile).then(() => {
           this.props.setGlobalState({"mapinitialized": true});
@@ -537,8 +552,10 @@ export class MapContainer extends Component  {
 
     if (this.props.global.context) {
       // If context set, filter out entities not in context
-      map.setFilter('positivefarms_background', 
-        ["all", ["in", "'" + this.props.global.context.id.toString() + "'", ["get", "contexts"]]]);
+      if (POSITIVE_SITE.shortcode === "positivefarms") {
+        map.setFilter('positivefarms_background', 
+          ["all", ["in", "'" + this.props.global.context.id.toString() + "'", ["get", "contexts"]]]);
+      }
       map.setFilter('renewables_background', 
         ["all", ["in", "'" + this.props.global.context.id.toString() + "'", ["get", "contexts"]]]);
       map.setFilter('renewables_windturbine', 
@@ -593,10 +610,12 @@ export class MapContainer extends Component  {
         // Note unique numberical ID required for setFeatureState
         // OSM ids, eg 'way/12345' don't work
         this.hoveredPolygonId = event.features[0].id;
-        map.setFeatureState(
-          { source: 'positivefarms', sourceLayer: 'positivefarms', id: this.hoveredPolygonId },
-          { hover: true }
-        );
+        if (POSITIVE_SITE.shortcode === "positivefarms") {
+          map.setFeatureState(
+            { source: 'positivefarms', sourceLayer: 'positivefarms', id: this.hoveredPolygonId },
+            { hover: true }
+          );
+        }
         map.setFeatureState(
           { source: 'renewables', sourceLayer: 'renewables', id: this.hoveredPolygonId },
           { hover: true }
@@ -632,10 +651,12 @@ export class MapContainer extends Component  {
     var popup = this.popupRef.current;
 
     if (this.hoveredPolygonId) {
-      map.setFeatureState(
-        { source: 'positivefarms', sourceLayer: 'positivefarms', id: this.hoveredPolygonId },
-        { hover: false }
-      );
+      if (POSITIVE_SITE.shortcode === "positivefarms") {
+        map.setFeatureState(
+          { source: 'positivefarms', sourceLayer: 'positivefarms', id: this.hoveredPolygonId },
+          { hover: false }
+        );
+      }
       map.setFeatureState(
         { source: 'renewables', sourceLayer: 'renewables', id: this.hoveredPolygonId },
         { hover: false }
@@ -765,10 +786,7 @@ export class MapContainer extends Component  {
             pitch: this.state.pitch,
             bearing: this.state.bearing
           }}    
-          mapStyle={this.state.satellite ? 
-            (require(isDev() ? '../constants/terrainstyletest.json' : '../constants/terrainstyle.json')) : 
-            (require(isDev() ? '../constants/mapstyletest.json' : '../constants/mapstyle.json'))
-          }
+          mapStyle={this.state.satellite ? this.satellitelayer : this.nonsatellitelayer}
         >
 
           <Toaster position="top-center"  containerStyle={{top: 20}}/>

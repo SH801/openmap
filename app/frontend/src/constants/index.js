@@ -14,6 +14,20 @@
 export const isDev = () =>  !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 console.log("Development machine", isDev());
 
+// Array of possible sites
+export const POSITIVE_SITES = {
+    "positiveplaces.org": {name: "Positive Places", shortcode: "positiveplaces"},
+    "positivefarms.org": {name: "Positive Farms", shortcode: "positivefarms"}
+};
+
+// Get current domain
+const domain = window.location.host.split(":")[0];
+const domainelements = domain.split(".");
+export const BASEDOMAIN = domainelements[domainelements.length - 2] + "." + domainelements[domainelements.length - 1];
+
+// Determine site details based on domain
+export const POSITIVE_SITE = (BASEDOMAIN in POSITIVE_SITES) ? POSITIVE_SITES[BASEDOMAIN] : POSITIVE_SITES["positiveplaces.org"];
+
 // URL of backend system
 export const API_URL = isDev() ? "http://localhost:80" : "";
 

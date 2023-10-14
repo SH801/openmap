@@ -330,12 +330,17 @@ export class MapContainer extends Component  {
     this.mapRef = React.createRef();
     this.popupRef = React.createRef();
 
-    this.satellitelayer = require(isDev() ? '../constants/terrainstyletest.json' : '../constants/terrainstyle.json');
+    this.placessatellitelayer = require(isDev() ? '../constants/placesterrainstyletest.json' : '../constants/placesterrainstyle.json');
+    this.farmssatellitelayer = require(isDev() ? '../constants/farmsterrainstyletest.json' : '../constants/farmsterrainstyle.json');    
     this.positiveplaceslayer = require(isDev() ? '../constants/positiveplacestest.json' : '../constants/positiveplaces.json');
     this.positivefarmslayer = require(isDev() ? '../constants/positivefarmstest.json' : '../constants/positivefarms.json');
-    
-    this.nonsatellitelayer = this.positiveplaceslayer
-    if (POSITIVE_SITE.shortcode === 'positivefarms') this.nonsatellitelayer = this.positivefarmslayer;
+
+    this.satellitelayer = this.placessatellitelayer;
+    this.nonsatellitelayer = this.positiveplaceslayer;
+    if (POSITIVE_SITE.shortcode === 'positivefarms') {
+      this.satellitelayer = this.farmssatellitelayer;
+      this.nonsatellitelayer = this.positivefarmslayer;
+    }
     // Add other explicit conditionals as 'require' requires explicit filenames during build
 
     this.props.fetchAllProperties();
@@ -353,14 +358,26 @@ export class MapContainer extends Component  {
 
     var devicePixelRatio = parseInt(window.devicePixelRatio || 1);
     var logo = new Image();
-    if (devicePixelRatio === 1) {
-      logo.src = "/static/assets/media/positive-farms-glow.png";
-    } else if (devicePixelRatio === 2) {
-      logo.src = "/static/assets/media/positive-farms-glowx2.png";
-    } else if (devicePixelRatio === 3) {
-      logo.src = "/static/assets/media/positive-farms-glowx3.png";
-    } else if (devicePixelRatio === 4) {
-      logo.src = "/static/assets/media/positive-farms-glowx4.png";
+    if (POSITIVE_SITE.shortcode === "positivefarms") {
+      if (devicePixelRatio === 1) {
+        logo.src = "/static/assets/media/positivefarms-glow.png";
+      } else if (devicePixelRatio === 2) {
+        logo.src = "/static/assets/media/positivefarms-glowx2.png";
+      } else if (devicePixelRatio === 3) {
+        logo.src = "/static/assets/media/positivefarms-glowx3.png";
+      } else if (devicePixelRatio === 4) {
+        logo.src = "/static/assets/media/positivefarms-glowx4.png";
+      }
+    } else {
+      if (devicePixelRatio === 1) {
+        logo.src = "/static/assets/media/positiveplaces-glow.png";
+      } else if (devicePixelRatio === 2) {
+        logo.src = "/static/assets/media/positiveplaces-glowx2.png";
+      } else if (devicePixelRatio === 3) {
+        logo.src = "/static/assets/media/positiveplaces-glowx3.png";
+      } else if (devicePixelRatio === 4) {
+        logo.src = "/static/assets/media/positiveplaces-glowx4.png";
+      }
     }
 
     this.state.logo = logo;

@@ -41,6 +41,7 @@ import BasicPage from "./views/BasicPage/BasicPage";
 import { loadReCaptcha } from 'react-recaptcha-google'
 
 import { setupIonicReact } from '@ionic/react';
+import { POSITIVE_SITE } from './constants';
 
 require('./App.css');
 
@@ -77,6 +78,7 @@ class App extends Component {
   }  
 
   render() {
+    document.title = POSITIVE_SITE.name;
     return (
       <Provider store={store}>
         <BrowserRouter>

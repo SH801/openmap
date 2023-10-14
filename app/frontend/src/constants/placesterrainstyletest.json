@@ -1,0 +1,136 @@
+{
+    "version": 8,
+    "sources": {
+        "background": {
+            "type": "raster",
+            "tiles": ["https://www.google.com/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}"],
+            "tileSize": 256,
+            "attribution": "Imagery ©2023 Google, Imagery ©2023 Bluesky, Getmapping plc, Infoterra Ltd & Bluesky, Maxar Technologies, Map data ©2023"
+        },
+        "renewables": {
+            "type": "vector",
+            "url": "http://localhost:8080/data/renewables.json",
+            "attribution": "Renewables data from © OpenStreetMap contributors"
+        },  
+        "terrainSource": {
+            "type": "raster-dem",
+            "url": "https://tiles.positiveplaces.org/data/terrain.json",
+            "tileSize": 256,
+            "attribution": "PR data by Japan Aerospace Exploration Agency."
+        },
+        "hillshadeSource": {
+            "type": "raster-dem",
+            "url": "https://tiles.positiveplaces.org/data/terrain.json",
+            "attribution": "PR data by Japan Aerospace Exploration Agency."
+        }
+    },
+    "glyphs": "https://tiles.positiveplaces.org/fonts/{fontstack}/{range}.pbf",
+    "sprite": "http://localhost:8080/styles/basic/sprite",
+    "layers": [
+        {
+            "id": "background",
+            "type": "raster",
+            "source": "background",
+            "minzoom": 5,
+            "maxzoom": 24,
+            "paint": {
+                "raster-saturation": 0,
+                "raster-brightness-min": 0.1
+            }
+        },
+        {
+            "id": "hills",
+            "type": "hillshade",
+            "source": "hillshadeSource",
+            "layout": { "visibility": "visible" },
+            "paint": { "hillshade-shadow-color": "#473B24" }
+        },
+        {
+            "filter": [
+              "all"
+            ], 
+            "id": "renewables_background",
+            "paint": {
+              "fill-color": "#ffffff",
+              "fill-opacity": 0.3          
+            },
+            "source": "renewables",
+            "source-layer": "renewables",
+            "type": "fill"
+        },
+        {
+            "filter": [
+                "in",
+                "id",
+                ""
+            ],
+            "id": "renewables_active",
+            "paint": {
+              "fill-color": "orange",
+              "fill-opacity": 0.5
+            },
+            "source": "renewables",
+            "source-layer": "renewables",
+            "type": "fill"
+        },
+        {
+            "filter": [
+                "all"
+            ],
+            "id": "renewables_outlined",
+            "paint": {
+              "line-color": "orange",
+              "line-width": 3,
+              "line-opacity": [
+                "case",
+                ["boolean", ["feature-state", "hover"], false],
+                1,
+                0
+                ]          
+            },
+            "source": "renewables",
+            "source-layer": "renewables",
+            "type": "line"
+        },
+        {
+            "id": "renewables_windturbine",
+            "type": "symbol",
+            "source": "renewables",
+            "source-layer": "renewables",
+            "layout": {
+                "icon-image": "windturbine_white", 
+                "icon-size": ["interpolate", ["exponential", 2], ["zoom"], 
+                    0, 0.000007, 
+                    20, 8
+                ],
+                "icon-anchor": "bottom",
+                "icon-allow-overlap": [
+    
+                  "step",
+                  ["zoom"],
+                  false,
+                  11,
+                  true
+    
+                ]            
+            },
+            "filter": [
+                "all",
+                [
+                    "==",
+                    "$type",
+                    "Point"
+                ],
+                [
+                    "==",
+                    "renewabletype",
+                    "wind"
+                ]
+            ]
+        }           
+    ],
+    "terrain": {
+        "source": "terrainSource",
+        "exaggeration": 1
+    }
+}

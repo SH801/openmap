@@ -60,6 +60,18 @@ class UserEditTypes(models.IntegerChoices):
 class ExportQueueTypes(models.IntegerChoices):
     EXPORTQUEUE_ENTITY  = 0, 'Entities'
 
+class FundingPeriodTypes(models.IntegerChoices):
+    FUNDINGPERIOD_ANNUAL    = 0, 'Annual',
+    FUNDINGPERIOD_PERVISIT  = 1, 'Per visit'
+
+class FundingTypeTypes(models.IntegerChoices):
+    FUNDINGTYPE_MAIN        = 0, 'Main payment',
+    FUNDINGTYPE_SUPPLEMENT  = 1, 'Supplement payment'
+
+class FundingSubtypeTypes(models.IntegerChoices):
+    FUNDINGSUBTYPE_SFI      = 0, 'Sustainable Farming Incentive',
+    FUNDINGSUBTYPE_CS       = 1, 'Countryside Stewardship'
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email_is_confirmed = models.BooleanField(default=False)
@@ -390,6 +402,34 @@ class PlanAdmin(GuardedModelAdmin):
     Admin class for managing plan objects through admin interface
     """
     list_display = ['name', 'entity', 'public']
+
+class Funding(models.Model):
+    """
+    Stores information about funding options, eg. SFI
+    """
+
+    period = models.IntegerField(default=0, choices=FundingPeriodTypes.choices)
+    type = models.IntegerField(default=0, choices=FundingTypeTypes.choices)
+    subtype = models.IntegerField(default=0, choices=FundingSubtypeTypes.choices)
+    area = models.CharField(default='', max_length=255)
+    code = models.CharField(default='', max_length=50)
+    description = models.CharField(default='', max_length=255)
+    peragreement = models.FloatField(default=0.0)
+    peryear = models.FloatField(default=0.0)
+    perplot = models.FloatField(default=0.0)
+    perhectare = models.FloatField(default=0.0)
+    permetre = models.FloatField(default=0.0)
+    peritem = models.FloatField(default=0.0)
+    extra = models.TextField(default='')
+    
+class FundingAdmin(admin.ModelAdmin):
+    list_display = ['period', 'type', 'subtype', 'area', 'code', 'description', 'peragreement', 'peryear', 'perplot', 'perhectare', 'permetre', 'peritem', 'extra']
+
+    search_fields = (
+        'area',
+        'code',
+        'description'
+    )
 
 class Geometry(models.Model):
     """

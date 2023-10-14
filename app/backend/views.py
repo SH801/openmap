@@ -71,7 +71,8 @@ from .models import \
     EditTypes, \
     Plan, \
     Post, \
-    Message
+    Message, \
+    Funding
 from .gis import get_postcode_point
 from .serializers import OrganisationSerializer
 from .functions import format_address, remove_html_tags
@@ -901,7 +902,7 @@ def delete(request, type, id):
 TEST_USER = 1
 def getuser(request):
     user = request.user
-    user = User.objects.filter(pk=TEST_USER).first()
+    # user = User.objects.filter(pk=TEST_USER).first()
     return user
 
 # @csrf_exempt
@@ -912,6 +913,12 @@ def accountentities(request):
     for entity in entities:
         output.append({'id': entity.id, 'name': entity.name})
     return OutputJson(output)
+
+# @csrf_exempt
+def accountfunding(request):
+    user = getuser(request)
+    funding = list(Funding.objects.order_by('code').values())    
+    return OutputJson(funding)
 
 # @csrf_exempt
 def accountentity(request, id):

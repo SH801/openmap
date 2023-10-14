@@ -38,6 +38,7 @@ urlpatterns = [
     path('account/entity/<id>', views.accountentity, name='accountentity'),
     path('account/plan/<id>', views.accountplan, name='accountplan'),
     path('account/plan/save/', views.accountplansave, name='accountplansave'),
+    path('account/funding/', views.accountfunding, name='accountfunding'),
     path('signup/', views.signup, name='signup'),
     path('email_sent/', views.email_sent, name='email_sent'),
     path('email_confirmed/', views.email_confirmed, name='email_confirmed'),

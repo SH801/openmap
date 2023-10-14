@@ -63,7 +63,12 @@ from backend.models import \
     PropertyTypes, \
     GeometryCode, \
     Postcode, \
-    EntitySourceType
+    EntitySourceType, \
+    Funding, \
+    FundingPeriodTypes, \
+    FundingTypeTypes, \
+    FundingSubtypeTypes
+
 from backend.views import creategeometriesforentity, calculateCentreBBox
 
 # Number of zoom levels to cache geometries for
@@ -96,6 +101,10 @@ entities = [
 
 properties = [
     'properties/*'
+]
+
+funding = [
+    'funding/*'
 ]
 
 data = [
@@ -754,6 +763,44 @@ def importproperties():
                     #     property.icon += "_" + row['Colour']
                     property.save()
 
+def importfunding():
+    """
+    Imports funding data from list of files
+    """
+
+    fundingfiles = replacefilewildcards(funding)
+
+    for fundingfile in fundingfiles:
+        if os.path.isfile(fundingfile):
+            with open(fundingfile, 'r', encoding="utf-8-sig") as fileobj:
+                reader = csv.DictReader(fileobj)
+                count = 0
+                for row in reader:
+                    count += 1
+                    print("Importing line", count, ":", row['Description'])
+                    fundingobj = Funding.objects.filter(code=row['Code']).first()
+                    if fundingobj is None:
+                        fundingobj = Funding()   
+
+                    if row['Period']    == 'Annual': fundingobj.period = FundingPeriodTypes.FUNDINGPERIOD_ANNUAL
+                    if row['Period']    == 'Per visit': fundingobj.period = FundingPeriodTypes.FUNDINGPERIOD_PERVISIT
+                    if row['Type']      == 'Main payment': fundingobj.type = FundingTypeTypes.FUNDINGTYPE_MAIN
+                    if row['Type']      == 'Supplement payment': fundingobj.type = FundingTypeTypes.FUNDINGTYPE_SUPPLEMENT
+                    if row['Subtype']   == 'SFI': fundingobj.subtype = FundingSubtypeTypes.FUNDINGSUBTYPE_SFI
+                    if row['Subtype']   == 'CS': fundingobj.subtype = FundingSubtypeTypes.FUNDINGSUBTYPE_CS
+
+                    fundingobj.area = row['Area']
+                    fundingobj.code = row['Code']
+                    fundingobj.description = row['Description']
+                    fundingobj.peragreement = 0 if row['PerAgreement'] =='' else float(row['PerAgreement'])
+                    fundingobj.peryear = 0 if row['PerYear'] =='' else float(row['PerYear'])
+                    fundingobj.perplot = 0 if row['PerPlot'] =='' else float(row['PerPlot'])
+                    fundingobj.perhectare = 0 if row['PerHectare'] =='' else float(row['PerHectare'])
+                    fundingobj.permetre = 0 if row['PerMetre'] =='' else float(row['PerMetre'])
+                    fundingobj.peritem = 0 if row['PerItem'] =='' else float(row['PerItem'])
+                    fundingobj.extra = row['Extra']
+                    fundingobj.save()
+
 def importdata(geometrytype, yearstart, yearend):
     """
     Import data for specify geometry type and year range
@@ -1265,6 +1312,9 @@ updateentities
 importproperties
   Imports properties data from 'properties' folder
 
+importfunding
+  Imports funding data from 'funding' folder
+          
 contextualizedata
   Adds context to data spreadsheet based on its 'lat' and 'lng' column values
 
@@ -1306,6 +1356,8 @@ else:
         updateentities()
     if primaryargument == "importproperties":
         importproperties()
+    if primaryargument == "importfunding":
+        importfunding()
     if primaryargument == "contextualizedata":
         contextualizedata()
     if primaryargument == "updatepostcodes":

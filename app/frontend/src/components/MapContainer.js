@@ -11,6 +11,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 // import { Muxer, ArrayBufferTarget, FileSystemWritableFileStreamTarget } from 'mp4-muxer';
 import toast from 'react-hot-toast';
 import { Toaster } from 'react-hot-toast';
+import { IonLoading } from '@ionic/react';
 import { initShaders, initVertexBuffers, renderImage } from './webgl';
 // import './map.css';
 
@@ -32,6 +33,59 @@ import { mapSelectEntity } from '../functions/map';
 
 export const isDev = () =>  !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
+export class TerrainControl extends Component{
+    
+  constructor(props) {
+      super(props);
+      this.options = props.options;
+      this._mapcontainer = props.mapcontainer;
+  }
+
+  onAdd(map) {
+      this._map = map;
+      this._terrainButton = document.createElement('button');
+      this._terrainButton.className = 'maplibregl-ctrl-terrain';
+      this._terrainButton.type = 'button';
+      this._terrainButton.setAttribute('data-tooltip-id', 'ctrlpanel-tooltip');
+      this._terrainButton.onclick = this._toggleTerrain;      
+      this._ctrlIcon = document.createElement('span');
+      this._ctrlIcon.className = 'maplibregl-ctrl-icon';
+      // this._ctrlIcon.setAttribute('aria-hidden', true);
+      this._terrainButton.appendChild(this._ctrlIcon);
+      this._container = document.createElement('div');
+      this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+      this._container.appendChild(this._terrainButton);
+      this._updateTerrainIcon();
+      this._map.on('terrain', this._updateTerrainIcon);
+
+      return this._container;
+  }
+
+  onRemove() {
+    this._container.parentNode.removeChild(this._container);
+    this._map = undefined;
+  }
+
+  _toggleTerrain = () => {
+    if (this._mapcontainer.state.terrain) {
+      this._mapcontainer.setState({terrain: null}, () => {this._updateTerrainIcon();});
+    } else {
+      this._mapcontainer.setState({terrain: this.options}, () => {this._updateTerrainIcon();});
+    }
+  };
+
+  _updateTerrainIcon = () => {
+      this._terrainButton.classList.remove('maplibregl-ctrl-terrain');
+      this._terrainButton.classList.remove('maplibregl-ctrl-terrain-enabled');
+      if (this._mapcontainer.state.terrain) {
+          this._terrainButton.classList.add('maplibregl-ctrl-terrain-enabled');
+          this._terrainButton.setAttribute('data-tooltip-content', 'Disable terrain - recommended for mobile');
+      } else {
+          this._terrainButton.classList.add('maplibregl-ctrl-terrain');
+          this._terrainButton.setAttribute('data-tooltip-content', 'Enable terrain - may cause problems on some mobiles');
+      }
+  };
+}
 
 export class PitchToggle extends Component{
     
@@ -58,12 +112,14 @@ export class PitchToggle extends Component{
     this._btn.onclick = function() { 
       var currsatellite = _this._mapcontainer.state.satellite;
       var newsatellite = !currsatellite;
-      _this._mapcontainer.setState({showtooltip: false, satellite: newsatellite});
+      _this._mapcontainer.setState({showtooltip: false, idle: false, satellite: newsatellite});
       if (newsatellite) {
           map.easeTo({pitch: _this._pitch});
+          map.addControl(_this._mapcontainer.terraintoggle, 'top-left');
           _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-2d';
       } else {
           map.easeTo({pitch: 0, bearing: 0});
+          map.removeControl(_this._mapcontainer.terraintoggle);
           _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-3d';
       } 
     };
@@ -106,13 +162,15 @@ export class FlyToggle extends Component{
     this._btn.onclick = function() { 
       var currflying = _this._mapcontainer.state.flying;
       var newflying = !currflying;
-      _this._mapcontainer.setState({showtooltip: false, flying: newflying});
+      _this._mapcontainer.setState({showtooltip: false});
       _this._mapcontainer.props.setGlobalState({flying: newflying, flyingindex: 0});
       if (newflying) {
         var entities = _this._mapcontainer.props.global.entities;
+        console.log(entities);
         var flyingtour = false;
         if (entities) {
           if (entities['list']) {
+            _this._mapcontainer.flyingStart();
             _this._mapcontainer.props.startFlyingTour(entities);
             flyingtour = true;
           }
@@ -298,6 +356,7 @@ export class RecordVideo extends Component{
 export class MapContainer extends Component  {
 
   state = {
+    loading: true,
     maploaded: false,
     context: 0,
     satellite: false,
@@ -321,6 +380,8 @@ export class MapContainer extends Component  {
     icons_grey: [],
     iconsloaded_grey: false,
     animationinterval: 0,
+    idle: false,
+    terrain: {source: "terrainSource", exaggeration: 1.1 },
   }
 
   hoveredPolygonId = null;
@@ -330,6 +391,7 @@ export class MapContainer extends Component  {
     this.mapRef = React.createRef();
     this.popupRef = React.createRef();
 
+    this.maxTileCacheSize = this.getMaxTileCacheSize();
     this.placessatellitelayer = require(isDev() ? '../constants/placesterrainstyletest.json' : '../constants/placesterrainstyle.json');
     this.farmssatellitelayer = require(isDev() ? '../constants/farmsterrainstyletest.json' : '../constants/farmsterrainstyle.json');    
     this.positiveplaceslayer = require(isDev() ? '../constants/positiveplacestest.json' : '../constants/positiveplaces.json');
@@ -352,7 +414,7 @@ export class MapContainer extends Component  {
     this.state.bearing = props.bearing;
 
     var fulldomains = Object.keys(POSITIVE_SITES);
-    var ignoredomains = ['localhost'];
+    var ignoredomains = ['localhost', '192'];
     for(let i = 0; i < fulldomains.length; i++) ignoredomains.push(fulldomains[i].split('.')[0]);
     this.ignoredomains = ignoredomains;
 
@@ -393,6 +455,7 @@ export class MapContainer extends Component  {
     }
 
     this.pitchtoggle = new PitchToggle({mapcontainer: this, pitch: 80});
+    this.terraintoggle = new TerrainControl({mapcontainer: this, options: this.state.terrain});
     this.flytoggle = new FlyToggle({mapcontainer: this});
     this.recordvideo = new RecordVideo({mapcontainer: this});
 
@@ -422,8 +485,17 @@ export class MapContainer extends Component  {
   }
 
   flyingStart = () => {
+    this.setState({flying: true}, () => {
+      console.log("isIdle",this.state.idle);
+      if (this.state.idle) this.flyingRun();
+    });
+  }
+
+  flyingRun = () => {
     var interval = 4000;
+    var halfinterval = 60000;
     var degreespersecond = 2.5;
+    var degreesperiteration = 120;
 
     if (this.mapRef) {
       var map = this.mapRef.current.getMap();
@@ -437,22 +509,29 @@ export class MapContainer extends Component  {
       if (this.props.global.zoom) zoom = this.props.global.zoom;
       else this.props.setGlobalState({zoom: zoom});        
       map.jumpTo({center: centre, zoom: zoom});
-      map.rotateTo(map.getBearing() + degreespersecond * (interval / 1000), { 
-        around: centre, easing(t) {return t;}, duration: interval 
-      });  
+      var newbearing = parseInt(map.getBearing() + degreesperiteration);
+      console.log("About to rotateTo", newbearing, centre);
+      map.rotateTo(parseFloat(newbearing), {around: centre, easing(t) {return t;}, duration: halfinterval});  
+      // map.rotateTo(map.getBearing() + degreespersecond * (interval / 1000), { 
+      //   around: centre, easing(t) {return t;}, duration: interval 
+      // });  
     }
   }
 
   flyingStop = () => {
-    if (this.props.global.flyingtimer) {
-      clearTimeout(this.props.global.flyingtimer);
+    this.setState({flying: false}, () => {
+      if (this.props.global.flyingtimer) {
+        clearTimeout(this.props.global.flyingtimer);
+      }
       this.props.setGlobalState({flyingtimer: null});
-    }
-    if (this.mapRef) {
-      // var map = this.mapRef.current.getMap();
-      // map.setZoom(map.getZoom() + 0.01);
-      // map.rotateTo(map.getBearing(), {duration: 0});
-    }
+
+      if (this.mapRef) {
+        var map = this.mapRef.current.getMap();
+        var centre = map.getCenter();
+        var zoom = map.getZoom();
+        map.jumpTo({center: centre, zoom: zoom});
+      }
+    })
   }
 
   selectEntity = (entityid) => {
@@ -502,10 +581,11 @@ export class MapContainer extends Component  {
   }
 
   animateIcons = () => {
-    const intervalmsecs = 250;
+    // const intervalmsecs = 250;
+    const intervalmsecs = 800;
     const speedup = 2;
     const totalduration = 50 * intervalmsecs;
-  
+
     if ((this.state.iconsloaded_white) && (this.state.iconsloaded_grey)) {
       const currentDate = new Date();
       const milliseconds = speedup * currentDate.getTime(); 
@@ -514,19 +594,30 @@ export class MapContainer extends Component  {
       var map = this.mapRef.current.getMap();
       if (this.state.satellite) {
         if (this.state.icons_white[animationindex] !== undefined) {
-          map.removeImage('windturbine_white');
+          try {
+            map.removeImage('windturbine_white');
+          }
+          catch(err) {
+            console.log(err);
+          }        
           map.addImage('windturbine_white', this.state.icons_white[animationindex]);    
         }
       } else {
         if (this.state.icons_grey[animationindex] !== undefined) {
-          map.removeImage('windturbine_grey');
+          try {
+            map.removeImage('windturbine_grey');
+          }
+          catch(err) {
+            console.log(err);
+          }        
           map.addImage('windturbine_grey', this.state.icons_grey[animationindex]);    
         }
       }
     }  
-
+      
     setTimeout(this.animateIcons, intervalmsecs);
   }
+
 
   onLoad = (event) => {
     this.props.setGlobalState({"mapref": this.mapRef}).then(() => {
@@ -534,34 +625,49 @@ export class MapContainer extends Component  {
     });
     var map = this.mapRef.current.getMap();
 
-    var url = null;
-    for(let i = 1; i < 51; i++) {
-      url = process.env.PUBLIC_URL + "/static/icons/windturbine_white_animated_" + i.toString() + ".png";
-      map.loadImage(url, (error, image) => {
-          if (error) throw error;
-          var icons_white = this.state.icons_white;
-          icons_white[i] = image;
-          this.setState({icons_white: icons_white});
-          if (i === 50) this.setState({iconsloaded_white: true});
-      });            
-    }
+    // Only animate turbines on non-iOS platforms due to limited memory on iOS
+    var isiOS = this.isiOS();
 
-    for(let i = 1; i < 51; i++) {
-      url = process.env.PUBLIC_URL + "/static/icons/windturbine_grey_animated_" + i.toString() + ".png";
-      map.loadImage(url, (error, image) => {
-          if (error) throw error;
-          var icons_grey = this.state.icons_grey;
-          icons_grey[i] = image;
-          this.setState({icons_grey: icons_grey});
-          if (i === 50) this.setState({iconsloaded_grey: true});
-      });            
+    // isiOS = true;
+
+    if (!isiOS) {
+      console.log("Initializing images...");
+      var url = null;
+      for(let i = 1; i < 51; i++) {
+        url = process.env.PUBLIC_URL + "/static/icons/windturbine_white_animated_" + i.toString() + ".png";
+        map.loadImage(url, (error, image) => {
+            if (error) throw error;
+            var icons_white = this.state.icons_white;
+            icons_white[i] = image;
+            this.setState({icons_white: icons_white});
+            if (i === 50) {
+              console.log("Loaded turbine images (white)");
+              this.setState({iconsloaded_white: true});
+            }
+        });            
+      }
+
+      for(let i = 1; i < 51; i++) {
+        url = process.env.PUBLIC_URL + "/static/icons/windturbine_grey_animated_" + i.toString() + ".png";
+        map.loadImage(url, (error, image) => {
+            if (error) throw error;
+            var icons_grey = this.state.icons_grey;
+            icons_grey[i] = image;
+            this.setState({icons_grey: icons_grey});
+            if (i === 50) {
+              console.log("Loaded turbine images (grey)");
+              this.setState({loading: false, iconsloaded_grey: true});
+            }
+        });            
+      }
+    } else {
+      this.setState({loading: false});
     }
-    
-    setTimeout(this.animateIcons, 100);
-    
-    map.addControl(this.pitchtoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
-    map.addControl(this.flytoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
-    map.addControl(this.recordvideo, this.props.isMobile ? 'bottom-right' : 'top-left'); 
+        
+    map.addControl(this.pitchtoggle, 'top-left'); 
+    if (this.state.satellite) map.addControl(this.terraintoggle, 'top-left');
+    map.addControl(this.flytoggle, this.props.isMobile ? 'top-right' : 'top-left'); 
+    map.addControl(this.recordvideo, this.props.isMobile ? 'top-right' : 'top-left'); 
     map.setPadding(this.props.isMobile ? MOBILE_PADDING : DESKTOP_PADDING);
 
     var popup = this.popupRef.current;
@@ -612,6 +718,8 @@ export class MapContainer extends Component  {
       this.props.fetchEntity(this.props.global.externalreferencedid, this.props.isMobile);
       mapSelectEntity(this.props.global.context, map, this.props.global.externalreferencedid);
     }
+
+    if (!isiOS) setTimeout(this.animateIcons, 1000);
 
     this.setState({maploaded: true});
   }
@@ -695,25 +803,28 @@ export class MapContainer extends Component  {
     if (this.state.maploaded) {
       var map = this.mapRef.current.getMap();
       map.setPadding(this.props.isMobile ? MOBILE_PADDING : DESKTOP_PADDING);
-      map.removeControl(this.pitchtoggle);
-      map.addControl(this.pitchtoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
+      // map.removeControl(this.pitchtoggle);
+      // map.addControl(this.pitchtoggle, this.props.isMobile ? 'top-left' : 'top-left'); 
       map.removeControl(this.flytoggle);
-      map.addControl(this.flytoggle, this.props.isMobile ? 'bottom-right' : 'top-left'); 
+      map.addControl(this.flytoggle, this.props.isMobile ? 'top-right' : 'top-left'); 
       map.removeControl(this.recordvideo);
-      map.addControl(this.recordvideo, this.props.isMobile ? 'bottom-right' : 'top-left'); 
+      map.addControl(this.recordvideo, this.props.isMobile ? 'top-right' : 'top-left'); 
     }
   }
 
-  onZoomEnd = (event) => {
-
-    var map = this.mapRef.current.getMap();
-
-    if (map) {
-      if (this.props.global.fittingbounds) {
-        this.props.setGlobalState({zoom: map.getZoom(), fittingbounds: false});
-        if (this.state.flying) this.flyingStart();
+  onIdle = (event) => {
+    this.setState({idle: true}, () => {
+      if (this.state.flying) {
+        console.log("onIdle, triggering flyaround");
+        // setTimeout(this.flyingRun, 1000);
+        this.flyingRun();
       }
+    })
+  }
 
+  onZoomEnd = (event) => {
+    var map = this.mapRef.current.getMap();
+    if (map) {
       // Allow user to change flying zoom when not flying
       if (!this.state.flying) {
         this.props.setGlobalState({zoom: map.getZoom()});
@@ -722,9 +833,9 @@ export class MapContainer extends Component  {
   }
 
   onRotateEnd = (event) => {
-    if (this.state.flying) {
-      this.flyingStart();
-    }
+    // if (this.state.flying) {
+    //   this.flyingRun();
+    // }
   }
 
   onMoveEnd = (event) => {
@@ -745,6 +856,14 @@ export class MapContainer extends Component  {
         }          
       }
 
+      if (map) {
+        if (this.props.global.fittingbounds) {
+          this.props.setGlobalState({zoom: map.getZoom(), fittingbounds: false}).then(() => {
+            if (this.state.flying) this.flyingRun();
+          });
+        }  
+      }
+  
       if (this.props.search.searchtext === '') {
         this.props.fetchSearchResults('');
       }
@@ -768,9 +887,46 @@ export class MapContainer extends Component  {
     }
   }
 
+  isiOS = () => {
+    // From https://stackoverflow.com/questions/9038625/detect-if-device-is-ios
+    // and https://davidwalsh.name/detect-iphone
+
+    return (  (navigator.userAgent.match(/iPhone/i)) || 
+              (navigator.userAgent.match(/iPod/i)) || 
+              (navigator.userAgent.match(/iPad/i)) ||
+              (navigator.userAgent.includes("Mac") && "ontouchend" in document));              
+  }
+
+  isAndroid = () => {
+    // From https://davidwalsh.name/detect-android
+    var ua = navigator.userAgent.toLowerCase();
+    var isAndroid = ua.indexOf("android") > -1; 
+    return isAndroid;
+  }
+
+  getMaxTileCacheSize = () => {
+    var maxtilecachesize = 60;
+    if (this.isiOS()) {
+      maxtilecachesize = 1;
+      console.log("iOS, using maxtilecachesize", maxtilecachesize);
+      return maxtilecachesize;
+    }
+    if (this.isAndroid()) {
+      maxtilecachesize = 20;
+      console.log("Android, using maxtilecachesize", maxtilecachesize);
+      return maxtilecachesize;
+    }
+
+    console.log("Not iOS or Android, using maxtilecachesize", maxtilecachesize);
+
+    return maxtilecachesize;
+  }
+
   render () {
     return (
       <>
+        <IonLoading translucent={true} isOpen={this.state.loading} message="Loading images and data..." spinner="circles" />
+
         {this.props.global.mapinitialized ? (
           <Map ref={this.mapRef}
           onLoad={this.onLoad}
@@ -780,6 +936,7 @@ export class MapContainer extends Component  {
           onMouseLeave={this.onMouseLeave}
           onMoveEnd={this.onMoveEnd}
           onRotateEnd={this.onRotateEnd}
+          onIdle={this.onIdle}
           onResize={this.onResize}
           onClick={this.onClick}
           onZoomEnd={this.onZoomEnd}
@@ -788,7 +945,8 @@ export class MapContainer extends Component  {
           maxBounds={this.getMaxBounds()}
           maxPitch={85}
           preserveDrawingBuffer={true} 
-          terrain={{source: "terrainSource", exaggeration: 1.1 }}
+          maxTileCacheSize={this.maxTileCacheSize}
+          terrain={this.state.terrain}
           interactiveLayerIds={[
             'positivefarms_background', 
             'positivefarms_active', 
@@ -814,7 +972,7 @@ export class MapContainer extends Component  {
 
           {this.props.isMobile ? (
               <>
-              <GeolocateControl position="bottom-right" />
+              <GeolocateControl position="top-left" />
               </>
           ) : (
               <GeolocateControl position="top-left" />
@@ -822,7 +980,7 @@ export class MapContainer extends Component  {
 
           {this.props.isMobile ? (
               <>
-              <NavigationControl visualizePitch={true} position="bottom-right" />     
+              <NavigationControl showZoom={false} visualizePitch={true} position="top-left" />     
               </>
           ) : (
               <NavigationControl visualizePitch={true} position="top-left" />     

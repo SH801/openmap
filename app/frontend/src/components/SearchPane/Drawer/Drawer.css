@@ -265,6 +265,15 @@ ion-modal#share-modal::part(content) {
 }
 
 @media only screen and (max-width: 1024px) {
+  .maplibregl-ctrl-top-left {
+    top: 55px!important;
+  }
+  .maplibregl-ctrl-top-right {
+    top: 55px!important;
+  }
+}
+
+@media only screen and (max-width: 1024px) {
   .entity-details-container {
     padding: 16px 16px 32px 16px;
     margin-top: 16px;

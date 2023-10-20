@@ -7,20 +7,20 @@
     "sources": {
         "openmaptiles": {
             "type": "vector",
-            "url": "http://localhost:8080/data/openmaptiles.json"
+            "url": "http://192.168.1.29:8080/data/openmaptiles.json"
         },      
         "positivefarms": {
             "type": "vector",
-            "url": "http://localhost:8080/data/positivefarms.json"
+            "url": "http://192.168.1.29:8080/data/positivefarms.json"
         },
         "renewables": {
           "type": "vector",
-          "url": "http://localhost:8080/data/renewables.json",
+          "url": "http://192.168.1.29:8080/data/renewables.json",
           "attribution": "Renewables data from © OpenStreetMap contributors"
         }
     },
-    "glyphs": "http://localhost:8080/fonts/{fontstack}/{range}.pbf",
-    "sprite": "http://localhost:8080/styles/basic/sprite",
+    "glyphs": "http://192.168.1.29:8080/fonts/{fontstack}/{range}.pbf",
+    "sprite": "http://192.168.1.29:8080/styles/basic/sprite",
     "layers": [
       {
         "id": "background",

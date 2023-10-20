@@ -493,10 +493,18 @@ class Organisations(APIView):
 
     @csrf_exempt
     def get(self, request, format=None):
-        if 'name' in request.GET:
-            organisations = Entity.objects.filter(status=EditTypes.EDIT_LIVE, source=EntitySourceType.ENTITYSOURCE_INTERNAL, name__icontains=request.GET['name']).order_by('external_id')
+        hostname = request.get_host()
+        if hostname == 'positivefarms.org':
+            if 'name' in request.GET:
+                organisations = Entity.objects.filter(status=EditTypes.EDIT_LIVE, source=EntitySourceType.ENTITYSOURCE_INTERNAL, name__icontains=request.GET['name']).order_by('external_id')
+            else:
+                organisations = Entity.objects.filter(status=EditTypes.EDIT_LIVE, source=EntitySourceType.ENTITYSOURCE_INTERNAL).order_by('external_id')
         else:
-            organisations = Entity.objects.filter(status=EditTypes.EDIT_LIVE, source=EntitySourceType.ENTITYSOURCE_INTERNAL).order_by('external_id')
+            if 'name' in request.GET:
+                organisations = Entity.objects.filter(status=EditTypes.EDIT_LIVE, source=EntitySourceType.ENTITYSOURCE_NGO, name__icontains=request.GET['name']).order_by('external_id')
+            else:
+                organisations = Entity.objects.filter(status=EditTypes.EDIT_LIVE, source=EntitySourceType.ENTITYSOURCE_NGO).order_by('external_id')
+
         serializer = OrganisationSerializer(organisations, many=True)
         return Response(serializer.data)
 

@@ -25,7 +25,9 @@ export class Toolbar extends Component {
                     <div className="icon-container">
                         {/* <HelpBtn /> */}
                         <Share />
+                        {(POSITIVE_SITE.shortcode==='positivefarms') ? (
                         <LoginPopover />
+                        ) : null}
                     </div>
                 </div>
             </IonToolbar>

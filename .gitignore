@@ -33,3 +33,6 @@ app/osm/renewables_output.geojson
 app/osm/renewables.mbtiles
 app/osm/restarttileserver.sh
 updaterenewables/
+app/gis/UK.geojson
+app/gis/UK_large.geojson
+app/groups/

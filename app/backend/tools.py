@@ -31,9 +31,10 @@ import fiona
 from copy import copy
 from pyproj import Transformer, Geod
 from googlesearch import search
-from shapely.geometry import shape
+from shapely.geometry import shape, GeometryCollection
 from shapely.geometry import Polygon, MultiPolygon
 from area import area as calculatearea
+from w3lib.html import replace_entities
 # from geojson import MultiPolygon
 
 if __name__ == '__main__':
@@ -115,6 +116,10 @@ renewables = [
     'renewables/*'
 ]
 
+groups = [
+    'groups/*'
+]
+
 osm = [
     'osm/renewables.geojson'
 ]
@@ -124,6 +129,10 @@ osm_output = 'osm/renewables_output.geojson'
 subregion_scotland_correction = "subregions/Counties_and_Unitary_Authorities_GB_2018.json"
 
 non_decimal = re.compile(r'[^\d.]+')
+
+def HTMLEntitiesToUnicode(text):
+    """Converts HTML entities to unicode.  For example '&amp;' becomes '&'."""
+    return replace_entities(text)
 
 def getlargestpolygon(areatype):
     """
@@ -1263,8 +1272,58 @@ def processrenewables():
     with open(osm_output, "w", encoding='UTF-8') as writerfileobj:
         json.dump({"type": "FeatureCollection", "features": outputfeatures}, writerfileobj, indent=2)
 
+def importgroups():
+    """
+    Imports environmental groups data
+    """
 
+    groupfiles = replacefilewildcards(groups)
+    groupproperties = list(Property.objects.filter(name="Volunteering").values_list('pk', flat=True)) 
 
+    with open("gis/UK_large.geojson") as f:
+        features = json.load(f)["features"]
+
+    ukgeojson = [GEOSGeometry(str(feature["geometry"])) for feature in features]
+    groupcount = 0
+    for groupfile in groupfiles:
+        if os.path.isfile(groupfile):
+            file_name, file_extension = os.path.splitext(groupfile)
+            file_name = os.path.basename(file_name)
+            prefix = ''
+            if file_name == 'transition': prefix = 'Transition Network - '
+            with open(groupfile, 'r', encoding="utf-8-sig") as readerfileobj:
+                groupjson = json.loads(readerfileobj.read())
+                if file_extension == '.geojson':
+                    features = groupjson['features']
+                    
+                if file_extension == '.json':
+                    keys = dict.keys(groupjson)
+                    for key in keys:
+                        group = groupjson[key]
+                        newpoint = Point(float(group['lng']), float(group['lat']))
+                        contained = False
+                        for poly in ukgeojson:
+                            if poly.contains(newpoint): 
+                                contained = True
+
+                        if contained:
+                            groupcount += 1
+                            title = HTMLEntitiesToUnicode(group['title'])
+                            if prefix != '': title = prefix + title
+                            entity = Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_NGO, name=title).first()
+                            if entity is None: entity = Entity(source=EntitySourceType.ENTITYSOURCE_NGO, name=title)
+                            entity.status = EditTypes.EDIT_LIVE
+                            entity.website = group['permalink']
+                            entity.location = newpoint
+                            entity.centre = newpoint
+                            if file_name == 'transition':
+                                urlelements = group['permalink'].strip('/').split('/')
+                                lastelement = urlelements[-1:][0]
+                                entity.external_id = 'transition-' + lastelement 
+                            entity.bbox = Polygon.from_bbox(boundingBox(float(group['lat']), float(group['lng']), 0.5))
+                            entity.save()
+                            entity.properties.set(groupproperties)
+                            print("Processing group", groupcount)
 
 
 
@@ -1323,7 +1382,10 @@ updatepostcodes
 
 processrenewables
   Process BEIS renewables locations data
-                                              
+
+importgroups
+  Process environmental group data
+
 importdata [lsoa/msoa/lau1] [yearstart] [yearend]
   Imports data for specific area scale and year range (assuming BEIS data)
   Leaving off [yearend] will only import for [yearstart]
@@ -1361,9 +1423,11 @@ else:
     if primaryargument == "contextualizedata":
         contextualizedata()
     if primaryargument == "updatepostcodes":
-        updatepostcodes()        
+        updatepostcodes()
     if primaryargument == "processrenewables":
-        processrenewables()        
+        processrenewables()
+    if primaryargument == "importgroups":
+        importgroups()
     if primaryargument == "importdata":
         if len(sys.argv) >= 4:
             yearstart = sys.argv[3]

@@ -46,7 +46,8 @@ class EntitySourceType(models.IntegerChoices):
     ENTITYSOURCE_INTERNAL   = 0, 'Internal'
     ENTITYSOURCE_OSM        = 1, 'Open Street Map'
     ENTITYSOURCE_GOVERNMENT = 2, 'Government'
-
+    ENTITYSOURCE_NGO        = 3, 'Non-Governmental Organisation'
+    
 class EditTypes(models.IntegerChoices):
     EDIT_DRAFT          = 0, 'Draft'
     EDIT_PUBLISH        = 1, 'Publish'

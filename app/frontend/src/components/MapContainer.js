@@ -79,10 +79,10 @@ export class TerrainControl extends Component{
       this._terrainButton.classList.remove('maplibregl-ctrl-terrain-enabled');
       if (this._mapcontainer.state.terrain) {
           this._terrainButton.classList.add('maplibregl-ctrl-terrain-enabled');
-          this._terrainButton.setAttribute('data-tooltip-content', 'Disable terrain - recommended for mobile');
+          this._terrainButton.setAttribute('data-tooltip-content', 'Terrain OFF - recommended for older mobiles');
       } else {
           this._terrainButton.classList.add('maplibregl-ctrl-terrain');
-          this._terrainButton.setAttribute('data-tooltip-content', 'Enable terrain - may cause problems on some mobiles');
+          this._terrainButton.setAttribute('data-tooltip-content', 'Terrain ON - may cause problems on mobiles');
       }
   };
 }
@@ -115,11 +115,9 @@ export class PitchToggle extends Component{
       _this._mapcontainer.setState({showtooltip: false, idle: false, satellite: newsatellite});
       if (newsatellite) {
           map.easeTo({pitch: _this._pitch});
-          map.addControl(_this._mapcontainer.terraintoggle, 'top-left');
           _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-2d';
       } else {
           map.easeTo({pitch: 0, bearing: 0});
-          map.removeControl(_this._mapcontainer.terraintoggle);
           _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-3d';
       } 
     };
@@ -665,7 +663,7 @@ export class MapContainer extends Component  {
     }
         
     map.addControl(this.pitchtoggle, 'top-left'); 
-    if (this.state.satellite) map.addControl(this.terraintoggle, 'top-left');
+    map.addControl(this.terraintoggle, 'top-left');
     map.addControl(this.flytoggle, this.props.isMobile ? 'top-right' : 'top-left'); 
     map.addControl(this.recordvideo, this.props.isMobile ? 'top-right' : 'top-left'); 
     map.setPadding(this.props.isMobile ? MOBILE_PADDING : DESKTOP_PADDING);
@@ -803,8 +801,10 @@ export class MapContainer extends Component  {
     if (this.state.maploaded) {
       var map = this.mapRef.current.getMap();
       map.setPadding(this.props.isMobile ? MOBILE_PADDING : DESKTOP_PADDING);
-      // map.removeControl(this.pitchtoggle);
-      // map.addControl(this.pitchtoggle, this.props.isMobile ? 'top-left' : 'top-left'); 
+      map.removeControl(this.pitchtoggle);
+      map.addControl(this.pitchtoggle, this.props.isMobile ? 'top-left' : 'top-left'); 
+      map.removeControl(this.terraintoggle);
+      map.addControl(this.terraintoggle, this.props.isMobile ? 'top-left' : 'top-left'); 
       map.removeControl(this.flytoggle);
       map.addControl(this.flytoggle, this.props.isMobile ? 'top-right' : 'top-left'); 
       map.removeControl(this.recordvideo);

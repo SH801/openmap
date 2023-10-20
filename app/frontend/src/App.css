@@ -55,6 +55,10 @@
   background-color: red!important;
 }
 
+.maplibregl-ctrl-terrain {
+  opacity: 0.3;
+}
+
 .maplibregl-popup,
 .maplibregl-popup-content {
   pointer-events: none;

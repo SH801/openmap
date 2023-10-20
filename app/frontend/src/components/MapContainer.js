@@ -47,7 +47,7 @@ export class TerrainControl extends Component{
       this._terrainButton.className = 'maplibregl-ctrl-terrain';
       this._terrainButton.type = 'button';
       this._terrainButton.setAttribute('data-tooltip-id', 'ctrlpanel-tooltip');
-      this._terrainButton.onclick = this._toggleTerrain;      
+      this._terrainButton.onclick = this._toggleTerrain;   
       this._ctrlIcon = document.createElement('span');
       this._ctrlIcon.className = 'maplibregl-ctrl-icon';
       // this._ctrlIcon.setAttribute('aria-hidden', true);
@@ -57,8 +57,13 @@ export class TerrainControl extends Component{
       this._container.appendChild(this._terrainButton);
       this._updateTerrainIcon();
       this._map.on('terrain', this._updateTerrainIcon);
+      this._terrainButton.onmouseleave = this._onMouseLeave;
 
       return this._container;
+  }
+
+  _onMouseLeave = () => {
+    this._mapcontainer.setState({showtooltip: true});
   }
 
   onRemove() {
@@ -67,6 +72,7 @@ export class TerrainControl extends Component{
   }
 
   _toggleTerrain = () => {
+    this._mapcontainer.setState({showtooltip: false});
     if (this._mapcontainer.state.terrain) {
       this._mapcontainer.setState({terrain: null}, () => {this._updateTerrainIcon();});
     } else {
@@ -79,10 +85,10 @@ export class TerrainControl extends Component{
       this._terrainButton.classList.remove('maplibregl-ctrl-terrain-enabled');
       if (this._mapcontainer.state.terrain) {
           this._terrainButton.classList.add('maplibregl-ctrl-terrain-enabled');
-          this._terrainButton.setAttribute('data-tooltip-content', 'Terrain OFF - recommended for older mobiles');
+          this._terrainButton.setAttribute('data-tooltip-content', 'Set hills OFF - better for mobiles');
       } else {
           this._terrainButton.classList.add('maplibregl-ctrl-terrain');
-          this._terrainButton.setAttribute('data-tooltip-content', 'Terrain ON - may cause problems on mobiles');
+          this._terrainButton.setAttribute('data-tooltip-content', 'Set hills ON - may cause mobile problems');
       }
   };
 }

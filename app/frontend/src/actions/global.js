@@ -11,6 +11,7 @@
  * Actions for global redux object
  */ 
 
+import { v4 as uuidv4 } from 'uuid';
 import { API_URL, FLYINGTOUR_LINGERTIME } from "../constants";
 import { setURLState } from "../functions/urlstate";
 import { mapSelectEntity } from '../functions/map';
@@ -272,6 +273,68 @@ export const fetchEntitiesByProperties = (propertyids, isMobile) => {
  */
 export const fetchEntitiesByProperty = (propertyid, isMobile) => {
   return fetchEntities({list: true, properties: [propertyid]}, isMobile);
+}
+
+
+/**
+ * addAsset
+ * 
+ * Add user-specific asset
+ * 
+ * @param {*} asset
+ */
+export const addAsset = (asset) => {
+
+  return (dispatch, getState) => {
+    var feature = null;
+    let id = uuidv4();
+
+    switch(asset.type) {
+      case "wind":
+        feature = {
+          type: "Feature",
+          id: id,
+          properties: {
+            id: id,
+            type: "wind"
+          },
+          geometry: {
+            type: "Point",
+            coordinates: [asset.lng, asset.lat]
+          }
+        }
+        break;
+      case "solar":
+        feature = {
+          type: "Feature",
+          id: id,
+          properties: {
+            id: id,
+            type: "solar"
+          },
+          geometry: {
+            type: "MultiPolygon",
+            coordinates: asset.coordinates
+          }
+        }
+        break;
+    }  
+
+    return dispatch({type: 'ADD_FEATURE', feature: feature});
+  }
+}
+
+/**
+ * deleteAsset
+ * 
+ * Delete user-specific asset
+ * 
+ * @param {*} featureid
+ */
+export const deleteAsset = (featureid) => {
+  return (dispatch, getState) => {
+    return dispatch({type: 'DELETE_FEATURE', featureid: featureid});
+  }
 }
 
 /**

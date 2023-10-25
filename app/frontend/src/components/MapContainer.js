@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { global, search } from "../actions";
 import { Tooltip } from 'react-tooltip';
-import { Map, Popup, NavigationControl, GeolocateControl }  from 'react-map-gl/maplibre';
+import { Map, Popup, NavigationControl, GeolocateControl, Source, Layer }  from 'react-map-gl/maplibre';
 import { centroid } from '@turf/turf';
 import queryString from "query-string";
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -12,6 +12,25 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import toast from 'react-hot-toast';
 import { Toaster } from 'react-hot-toast';
 import { IonLoading } from '@ionic/react';
+import { 
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonIcon,
+  IonModal, 
+  IonHeader, 
+  IonToolbar, 
+  IonButtons, 
+  IonButton, 
+  IonContent, 
+  IonTitle,
+  IonItem,
+  IonText,
+  IonLabel,
+  IonTextarea,
+  IonList,
+} from '@ionic/react'
+
 import { initShaders, initVertexBuffers, renderImage } from './webgl';
 // import './map.css';
 
@@ -30,6 +49,8 @@ import {
   DEFAULT_MAXBOUNDS
 } from "../constants";
 import { mapSelectEntity } from '../functions/map';
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 
 export const isDev = () =>  !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
@@ -394,6 +415,7 @@ export class MapContainer extends Component  {
     super(props);
     this.mapRef = React.createRef();
     this.popupRef = React.createRef();
+    // this.customgeojsonStyle = require('../constants/customgeojson.json');
 
     this.maxTileCacheSize = this.getMaxTileCacheSize();
     this.placessatellitelayer = require(isDev() ? '../constants/placesterrainstyletest.json' : '../constants/placesterrainstyle.json');
@@ -595,26 +617,30 @@ export class MapContainer extends Component  {
       const milliseconds = speedup * currentDate.getTime(); 
       const deltamsecs = milliseconds % totalduration;
       const animationindex = parseInt((deltamsecs + 1) / intervalmsecs);
-      var map = this.mapRef.current.getMap();
-      if (this.state.satellite) {
-        if (this.state.icons_white[animationindex] !== undefined) {
-          try {
-            map.removeImage('windturbine_white');
+      if ((this.mapRef !== null) && (this.mapRef.current !== null)) {
+        var map = this.mapRef.current.getMap();
+        if (map) {
+          if (this.state.satellite) {
+            if (this.state.icons_white[animationindex] !== undefined) {
+              try {
+                map.removeImage('windturbine_white');
+              }
+              catch(err) {
+                console.log(err);
+              }        
+              map.addImage('windturbine_white', this.state.icons_white[animationindex]);    
+            }
+          } else {
+            if (this.state.icons_grey[animationindex] !== undefined) {
+              try {
+                map.removeImage('windturbine_grey');
+              }
+              catch(err) {
+                console.log(err);
+              }        
+              map.addImage('windturbine_grey', this.state.icons_grey[animationindex]);    
+            }
           }
-          catch(err) {
-            console.log(err);
-          }        
-          map.addImage('windturbine_white', this.state.icons_white[animationindex]);    
-        }
-      } else {
-        if (this.state.icons_grey[animationindex] !== undefined) {
-          try {
-            map.removeImage('windturbine_grey');
-          }
-          catch(err) {
-            console.log(err);
-          }        
-          map.addImage('windturbine_grey', this.state.icons_grey[animationindex]);    
         }
       }
     }  
@@ -732,6 +758,8 @@ export class MapContainer extends Component  {
 
     var map = this.mapRef.current.getMap();
 
+    if (this.props.global.addasset) return;
+
     if (event.features.length > 0) {
       if (this.hoveredPolygonId === null) {
         map.getCanvas().style.cursor = 'pointer';
@@ -739,16 +767,18 @@ export class MapContainer extends Component  {
         // Note unique numberical ID required for setFeatureState
         // OSM ids, eg 'way/12345' don't work
         this.hoveredPolygonId = event.features[0].id;
-        if (POSITIVE_SITE.shortcode === "positivefarms") {
+        if (properties.type !== 'custom') {
+          if (POSITIVE_SITE.shortcode === "positivefarms") {
+            map.setFeatureState(
+              { source: 'positivefarms', sourceLayer: 'positivefarms', id: this.hoveredPolygonId },
+              { hover: true }
+            );
+          }
           map.setFeatureState(
-            { source: 'positivefarms', sourceLayer: 'positivefarms', id: this.hoveredPolygonId },
+            { source: 'renewables', sourceLayer: 'renewables', id: this.hoveredPolygonId },
             { hover: true }
           );
         }
-        map.setFeatureState(
-          { source: 'renewables', sourceLayer: 'renewables', id: this.hoveredPolygonId },
-          { hover: true }
-        );
 
         var featurecentroid = centroid(event.features[0]);
         var description = properties.name;
@@ -768,6 +798,9 @@ export class MapContainer extends Component  {
   }
 
   onMouseMove = (event) => {
+
+    if (this.props.global.addasset) return;
+
     if (this.hoveredPolygonId) {
       var popup = this.popupRef.current;
       popup.setLngLat(event.lngLat);
@@ -790,16 +823,23 @@ export class MapContainer extends Component  {
         { source: 'renewables', sourceLayer: 'renewables', id: this.hoveredPolygonId },
         { hover: false }
       );
-      this.hoveredPolygonId = null;
-      map.getCanvas().style.cursor = '';
-      popup.remove();  
     }
+    this.hoveredPolygonId = null;
+    map.getCanvas().style.cursor = '';
+    popup.remove();  
   }
 
   onClick = (event) => {
-    if (event.features.length > 0) {
-      var entityid = event.features[0].properties.id;
-      this.selectEntity(entityid);
+    // Don't select features if adding asset
+    if (this.props.global.addasset === null) {
+      if (event.features.length > 0) {
+        if (event.features[0].properties.type === 'custom') {
+          console.log("Custom feature");
+        } else {
+          var entityid = event.features[0].properties.id;
+          this.selectEntity(entityid);
+        }
+      }  
     }
   }
 
@@ -819,6 +859,17 @@ export class MapContainer extends Component  {
   }
 
   onIdle = (event) => {
+    if (this.props.global.addasset === null) {
+      if (this.mapRef) {
+        let map = this.mapRef.current.getMap();
+        let map_customgeojson = map.querySourceFeatures("customgeojson");
+        if ((map_customgeojson.length === 0) && (this.props.global.customgeojson.features.length !== 0)) {
+          this.reloadCustomGeoJSON();
+        }
+      }  
+    }
+
+
     this.setState({idle: true}, () => {
       if (this.state.flying) {
         console.log("onIdle, triggering flyaround");
@@ -928,6 +979,50 @@ export class MapContainer extends Component  {
     return maxtilecachesize;
   }
 
+  onMouseEnterAssetFinish = () => {
+    if (this.props.global.addasset === 'solar') {
+      this.props.global.mapdraw.changeMode('simple_select');
+    }
+  }
+
+  onMouseExitAssetFinish = () => {
+    if (this.props.global.addasset === 'solar') {
+      this.props.global.mapdraw.changeMode('draw_polygon');
+    }
+  }
+
+  reloadCustomGeoJSON = () => {
+    if (this.mapRef) {
+      var map = this.mapRef.current.getMap();
+      if (map) {
+        map.getSource("customgeojson").setData(this.props.global.customgeojson);
+      }    
+    }
+  }
+
+  addassetFinish = (ev) => {
+    ev.stopPropagation();
+
+    if (this.mapRef) {
+      var map = this.mapRef.current.getMap();
+      var customgeojson = JSON.parse(JSON.stringify(this.props.global.mapdraw.getAll()));
+      for(let i = 0; i < customgeojson.features.length; i++) {
+        var name = 'Manually-added solar farm';
+        if (customgeojson.features[i].geometry.type === 'Point') name = 'Manually-added wind turbine';
+        customgeojson.features[i].properties = {
+          type: 'custom', 
+          name: name
+        };
+      }
+      this.props.setGlobalState({customgeojson: customgeojson});
+      if (map) {
+        map.removeControl(this.props.global.mapdraw);
+        map.getSource("customgeojson").setData(customgeojson);
+      }    
+    }
+    this.props.setGlobalState({addasset: null});
+  }
+
   render () {
     return (
       <>
@@ -958,7 +1053,9 @@ export class MapContainer extends Component  {
             'positivefarms_active', 
             'renewables_background',
             'renewables_active',
-            'renewables_windturbine'
+            'renewables_windturbine',
+            'customgeojson_windturbine',
+            'customgeojson_solarfarm'
           ]}
           initialViewState={{
             longitude: this.state.lng,
@@ -971,6 +1068,35 @@ export class MapContainer extends Component  {
         >
 
           <Toaster position="top-center"  containerStyle={{top: 20}}/>
+
+          {this.props.global.addasset ? (
+            <div onMouseEnter={this.onMouseEnterAssetFinish} onMouseLeave={this.onMouseExitAssetFinish} style={{position: "absolute", top: this.props.isMobile ? "64px": "10px", left: "0px", width: "100vw"}}>
+              <div style={{marginLeft: "50px", marginRight: this.props.isMobile ? "50px" : "calc(24% + 10px)", backgroundColor: "#ffffff78"}}>
+                <div>
+                  <IonGrid>
+                    <IonRow class="ion-align-items-center ion-justify-content-center">
+                      <IonCol size="auto">
+                        <IonText style={{fontSize: "120%"}}>
+                          {(this.props.global.addasset === 'wind') ? (
+                            <>Click on map to add one or more wind turbines then select "Finish" when complete</>
+                          ) : null}
+                          {(this.props.global.addasset === 'solar') ? (
+                            <>Click on map to draw outline of one or more solar farms then select "Finish" when complete</>
+                          ) : null}
+                          {(this.props.global.addasset === 'edit') ? (
+                            <>Click on existing wind/solar to select then edit points, drag to move or select trash (right) to delete</>
+                          ) : null}
+                        </IonText>
+                      </IonCol>
+                      <IonCol size="auto">
+                        <IonButton onClick={this.addassetFinish}>Finish</IonButton>                                        
+                      </IonCol>
+                    </IonRow>
+                  </IonGrid>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           {this.state.showtooltip ? (
             <Tooltip id="ctrlpanel-tooltip" place="right" variant="light" style={{fontSize: "120%"}} />
@@ -1024,6 +1150,9 @@ export const mapDispatchToProps = dispatch => {
       setGlobalState: (globalstate) => {
         return dispatch(global.setGlobalState(globalstate));
       },  
+      addAsset: (asset) => {
+        return dispatch(global.addAsset(asset));
+      },      
       setSearchText: (searchtext) => {
         return dispatch(search.setSearchText(searchtext));
       },      

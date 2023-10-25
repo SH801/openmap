@@ -161,3 +161,11 @@ ion-modal#drawer {
   visibility: hidden;
   left: -1000px;
 }
+
+/* Fix problem with ResizeObserver */
+
+:root {
+  iframe#webpack-dev-server-client-overlay {
+       display: none !important
+  }
+}

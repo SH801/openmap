@@ -7,6 +7,8 @@
   flex-direction: row;
   justify-content: space-between;
 }
+
+.addasset-icon,
 .login-icon,
 .share-icon {
   font-size: 28px;
@@ -16,6 +18,11 @@
   /* color: white; */
   color: #666;
 }
+
+.addasset-icon {
+  padding-right: 3px;
+}
+
 .icon-container {
   margin-right: 8px;
   display: flex;
@@ -67,6 +74,7 @@
   .toolbar-title {
     font-size: 16px;
   }
+  .addasset-icon,
   .login-icon,
   .share-icon {
     font-size: 20px;
@@ -80,6 +88,7 @@
 }
 
 @media only screen and (min-width: 340px) and (max-width: 600px) and (orientation: portrait) {
+  .addasset-icon,
   .login-icon,
   .share-icon {
     font-size: 24px;

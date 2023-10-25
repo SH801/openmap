@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom';
 import { IonTitle, IonToolbar } from '@ionic/react';
 import { POSITIVE_SITE } from '../../constants';
 import { global } from "../../actions";
+import NewAsset from './NewAsset/NewAsset';
 import Share from './share';
 import LoginPopover from './LoginPopover/LoginPopover';
 // import HelpBtn from './HelpBtn/HelpBtn';
@@ -24,6 +25,7 @@ export class Toolbar extends Component {
                     </IonTitle>
                     <div className="icon-container">
                         {/* <HelpBtn /> */}
+                        <NewAsset />
                         <Share />
                         {(POSITIVE_SITE.shortcode==='positivefarms') ? (
                         <LoginPopover />

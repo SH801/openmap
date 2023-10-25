@@ -11,6 +11,7 @@
  * react-redux reducer initializers
  */ 
 
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { periodstart, periodend, areascale } from "../constants";
 
 // Set up initial state of some global variables using constants
@@ -42,6 +43,18 @@ export const initialStateGlobal = {
     entitygeometries: [],
     editentity: null,
     externalreferencedid: null,
+    addasset: null,
+    customgeojson: {type: 'FeatureCollection', features: []},
+    mapdraw: new MapboxDraw({
+        displayControlsDefault: false,
+        controls: {
+            point: true,
+            polygon: true, 
+            trash: true
+        },
+        userProperties: true,
+        // styles: this.mapdrawStyles
+    }),
 };
 
 export const initialStateMap = {

@@ -27,6 +27,26 @@ export default function selector(state=initialStateGlobal, action) {
             Object.keys(action.object).forEach((key) => newState[key] = action.object[key]);                
             return newState;
 
+        case 'ADD_FEATURE': 
+            var customgeojson = newState.customgeojson;
+            customgeojson.features.push(action.feature);
+            newState = {...newState, customgeojson: customgeojson};
+            console.log(customgeojson);
+            return newState;
+
+        case 'DELETE_FEATURE':
+            let features = newState.customgeojson.features;
+            let deleteindex = null;
+            for(let i = 0; i < features.length; i++) {
+                if (features[i].id === action.featureid) deleteindex = i;
+            }
+
+            if (deleteindex) features.splice(deleteindex, 1);
+            var customgeojson = newState.customgeojson;
+            customgeojson.features = features;
+            newState = {...newState, customgeojson: customgeojson};
+            return newState;
+
         case 'SET_TIME_RANGE':
             newState.periodstart = action.periodstart;
             newState.periodend = action.periodend;            

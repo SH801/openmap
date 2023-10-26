@@ -47,7 +47,7 @@ class EntitySourceType(models.IntegerChoices):
     ENTITYSOURCE_OSM        = 1, 'Open Street Map'
     ENTITYSOURCE_GOVERNMENT = 2, 'Government'
     ENTITYSOURCE_NGO        = 3, 'Non-Governmental Organisation'
-    
+
 class EditTypes(models.IntegerChoices):
     EDIT_DRAFT          = 0, 'Draft'
     EDIT_PUBLISH        = 1, 'Publish'
@@ -430,6 +430,30 @@ class FundingAdmin(admin.ModelAdmin):
         'area',
         'code',
         'description'
+    )
+
+class CustomGeoJSON(models.Model):
+    """
+    Stores customgeojson objects created by user through website
+    """
+
+    cookie = models.CharField(default='', max_length=255)
+    shortcode = models.CharField(default='', max_length=255)
+    customgeojson = models.TextField(default='')
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['cookie', 'shortcode']),
+        ]
+        verbose_name = "Custom GeoJSON"
+        verbose_name_plural = "Custom GeoJSONs"
+
+class CustomGeoJSONAdmin(admin.ModelAdmin):
+    list_display = ['pk', 'cookie', 'shortcode']
+
+    search_fields = (
+        'cookie',
+        'shortcode'
     )
 
 class Geometry(models.Model):

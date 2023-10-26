@@ -72,7 +72,9 @@ from .models import \
     Plan, \
     Post, \
     Message, \
-    Funding
+    Funding, \
+    CustomGeoJSON
+
 from .gis import get_postcode_point
 from .serializers import OrganisationSerializer
 from .functions import format_address, remove_html_tags
@@ -540,6 +542,49 @@ class SingleOrganisation(APIView):
                         "data": organisation.data }
 
         return Response(data)
+
+@csrf_exempt
+def CustomGeoJSONFetch(request):
+    """
+    Retrieves CustomGeoJSON using cookie or shortcode
+    """
+
+    try:
+        data = json.loads(request.body)
+    except ValueError:
+        return OutputError()
+
+    print(data)    
+    if data['cookie'] is None: data['cookie'] = ''
+    if data['shortcode'] is None: data['shortcode'] = ''
+    customgeojson = CustomGeoJSON.objects.filter(cookie=data['cookie'], shortcode=data['shortcode']).values_list('customgeojson', flat=True).first()
+    if customgeojson is None:
+        customgeojson = {'type': 'FeatureCollection', 'features': []}
+    else:
+        try:
+            customgeojson = json.loads(customgeojson)
+        except ValueError:
+            customgeojson = {'type': 'FeatureCollection', 'features': []}
+    return OutputJson(customgeojson)
+
+@csrf_exempt
+def CustomGeoJSONUpdate(request):
+    """
+    Sets CustomGeoJSON using cookie or shortcode
+    """
+
+    try:
+        data = json.loads(request.body)
+    except ValueError:
+        return OutputError()
+
+    if data['cookie'] is None: data['cookie'] = ''
+    if data['shortcode'] is None: data['shortcode'] = ''
+    customgeojson = CustomGeoJSON.objects.filter(cookie=data['cookie'], shortcode=data['shortcode']).first()
+    if customgeojson is None: customgeojson = CustomGeoJSON(cookie=data['cookie'], shortcode=data['shortcode'])
+    customgeojson.customgeojson = json.dumps(data['customgeojson'], cls=DjangoJSONEncoder, indent=2)
+    customgeojson.save()
+    return OutputJson({'result': 'success'})
 
 @csrf_exempt
 def LocationPosition(request):

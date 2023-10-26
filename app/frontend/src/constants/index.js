@@ -34,6 +34,9 @@ export const POSITIVE_SITE = (BASEDOMAIN in POSITIVE_SITES) ? POSITIVE_SITES[BAS
 export const API_URL = isDev() ? "http://localhost:80" : "";
 // export const API_URL = isDev() ? "http://192.168.1.29:80" : "";
 
+// Height of wind turbine in metres in order to calculate bounding box for wind turbine points
+export const WINDTURBINE_HEIGHT = 150;
+
 // Number of milliseconds to stay at each entity during flying tour
 export const FLYINGTOUR_LINGERTIME = 25000;
 

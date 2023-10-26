@@ -1,4 +1,11 @@
 import React, { Component }  from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+import { nanoid } from 'nanoid';
+import queryString from "query-string";
+import { global } from "../../actions";
+import { modifyURLParameter } from "../../functions/urlstate";
+
 import { shareSocialOutline } from 'ionicons/icons';
 import { 
     IonIcon,
@@ -29,6 +36,16 @@ export class Share extends Component {
     }
 
     showShare = () => {
+        // If customgeojson, create shareable link
+        if (this.props.global.customgeojson.features.length > 0) {
+            var shortcode = nanoid();
+            let params = queryString.parse(this.props.location.search);
+            if (params.plan === undefined) {        
+                this.props.updateCustomGeoJSON('', shortcode, this.props.global.customgeojson);
+                modifyURLParameter({plan: shortcode}, this.props.history, this.props.location);
+            } else shortcode = params.plan;            
+        }
+
         this.setState({link: window.location.href, showsharemodal: true});
     }
 
@@ -74,4 +91,21 @@ export class Share extends Component {
     }
 };
 
-export default Share;
+export const mapStateToProps = state => {
+    return {
+      global: state.global,
+    }
+}
+      
+export const mapDispatchToProps = dispatch => {
+  return {
+      setGlobalState: (globalstate) => {
+        return dispatch(global.setGlobalState(globalstate));
+      },  
+      updateCustomGeoJSON: (cookie, shortcode, customgeojson) => {
+        return dispatch(global.updateCustomGeoJSON(cookie, shortcode, customgeojson));
+      },      
+  }
+}  
+  
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Share));

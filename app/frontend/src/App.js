@@ -16,6 +16,7 @@ import { Route, Switch, BrowserRouter } from 'react-router-dom';
 import { createStore, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
 import thunk from "redux-thunk";
+import { v4 as uuidv4 } from 'uuid';
 import { isMobile } from './service/checkScreenSize';
 import CarbonMapApp from "./reducers";
 
@@ -33,6 +34,8 @@ import '@ionic/react/css/text-alignment.css';
 import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
+import { instanceOf } from 'prop-types';
+import { withCookies, Cookies } from 'react-cookie';
 /* Theme variables */
 import './theme/variables.css';
 import './theme/app.css';
@@ -56,9 +59,25 @@ let store = createStore(CarbonMapApp, applyMiddleware(thunk));
  * Main template class for App 
  */
 class App extends Component {
+  static propTypes = {
+    cookies: instanceOf(Cookies).isRequired,
+  };
 
-  state = {
-    isMobile: false
+  constructor(props) {
+    super(props);
+
+    const { cookies } = props;
+    const cookieexpiry = new Date(new Date().setFullYear(new Date().getFullYear() + 2));
+    let positivecookie = (cookies.get('positiveplaces') || '');
+    if (positivecookie === '') {
+      positivecookie = uuidv4();
+    }
+    cookies.set('positiveplaces', positivecookie, { path: '/', expires: cookieexpiry});
+
+    this.state = {
+      isMobile: false,
+      positivecookie: positivecookie,
+    };
   }
 
   componentDidMount() {
@@ -84,7 +103,7 @@ class App extends Component {
         <BrowserRouter>
           <Switch>
             {/* <Route exact path="/login" render={(props) => (<Login isMobile={this.state.isMobile} />)} /> */}
-            <Route path="/" render={(props) => (<BasicPage isMobile={this.state.isMobile} />)} />
+            <Route path="/" render={(props) => (<BasicPage positivecookie={this.state.positivecookie} isMobile={this.state.isMobile} />)} />
           </Switch>
         </BrowserRouter>
       </Provider>
@@ -92,4 +111,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default withCookies(App);

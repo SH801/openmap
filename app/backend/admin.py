@@ -22,6 +22,7 @@ from .models import Message, MessageAdmin
 from .models import ExportQueue, ExportQueueAdmin
 from .models import Postcode, PostcodeAdmin
 from .models import Funding, FundingAdmin
+from .models import CustomGeoJSON, CustomGeoJSONAdmin
 
 admin.site.register(Profile)
 admin.site.register(Context, ContextAdmin)
@@ -36,3 +37,4 @@ admin.site.register(Post, PostAdmin)
 admin.site.register(Message, MessageAdmin)
 admin.site.register(Postcode, PostcodeAdmin)
 admin.site.register(Funding, FundingAdmin)
+admin.site.register(CustomGeoJSON, CustomGeoJSONAdmin)

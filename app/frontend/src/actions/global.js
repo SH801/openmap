@@ -11,7 +11,6 @@
  * Actions for global redux object
  */ 
 
-import { v4 as uuidv4 } from 'uuid';
 import { API_URL, FLYINGTOUR_LINGERTIME } from "../constants";
 import { setURLState } from "../functions/urlstate";
 import { mapSelectEntity } from '../functions/map';
@@ -277,67 +276,6 @@ export const fetchEntitiesByProperty = (propertyid, isMobile) => {
 
 
 /**
- * addAsset
- * 
- * Add user-specific asset
- * 
- * @param {*} asset
- */
-export const addAsset = (asset) => {
-
-  return (dispatch, getState) => {
-    var feature = null;
-    let id = uuidv4();
-
-    switch(asset.type) {
-      case "wind":
-        feature = {
-          type: "Feature",
-          id: id,
-          properties: {
-            id: id,
-            type: "wind"
-          },
-          geometry: {
-            type: "Point",
-            coordinates: [asset.lng, asset.lat]
-          }
-        }
-        break;
-      case "solar":
-        feature = {
-          type: "Feature",
-          id: id,
-          properties: {
-            id: id,
-            type: "solar"
-          },
-          geometry: {
-            type: "MultiPolygon",
-            coordinates: asset.coordinates
-          }
-        }
-        break;
-    }  
-
-    return dispatch({type: 'ADD_FEATURE', feature: feature});
-  }
-}
-
-/**
- * deleteAsset
- * 
- * Delete user-specific asset
- * 
- * @param {*} featureid
- */
-export const deleteAsset = (featureid) => {
-  return (dispatch, getState) => {
-    return dispatch({type: 'DELETE_FEATURE', featureid: featureid});
-  }
-}
-
-/**
  * nextstepFlyingTour
  * 
  * Performs first step of flying tour and then calls setTimeout to run next step
@@ -559,6 +497,82 @@ export const fetchAllProperties = () => {
       .then(res => {
         if (res.status === 200) {
           return dispatch({type: 'FETCH_ALLPROPERTIES', allproperties: res.data});
+        }         
+      })
+  }
+}
+
+
+/**
+ * fetchCustomGeoJSON
+ * 
+ * Fetches custom geojson from backend server using cookie id or shortcode
+ * 
+ * @param {*} cookie
+ * @param {*} shortcode
+*/
+export const fetchCustomGeoJSON = (cookie, shortcode) => {
+  return (dispatch, getState) => {
+    let headers = {"Content-Type": "application/json"};
+    const searchcriteria = {
+      cookie: cookie,
+      shortcode: shortcode
+    }
+    let body = JSON.stringify(searchcriteria);
+
+    return fetch(API_URL + "/customgeojson/fetch/", {headers, method: "POST", body})
+      .then(res => {
+        if (res.status < 500) {
+          return res.json().then(data => {
+            return {status: res.status, data};
+          })
+        } else {
+          console.log("Server Error!");
+          throw res;
+        }
+      })
+      .then(res => {
+        if (res.status === 200) {
+          return dispatch({type: 'FETCH_CUSTOMGEOJSON', customgeojson: res.data});
+        }         
+      })
+  }
+}
+
+
+/**
+ * updateCustomGeoJSON
+ * 
+ * Updates custom geojson at backend server using cookie id or shortcode
+ * 
+ * @param {*} cookie
+ * @param {*} shortcode
+ * @param {*} customgeojson
+*/
+export const updateCustomGeoJSON = (cookie, shortcode, customgeojson) => {
+  return (dispatch, getState) => {
+    let headers = {"Content-Type": "application/json"};
+    const content = {
+      cookie: cookie,
+      shortcode: shortcode,
+      customgeojson: customgeojson
+    }
+    let body = JSON.stringify(content);
+
+    return fetch(API_URL + "/customgeojson/update/", {headers, method: "POST", body})
+      .then(res => {
+        if (res.status < 500) {
+          return res.json().then(data => {
+            return {status: res.status, data};
+          })
+        } else {
+          console.log("Server Error!");
+          throw res;
+        }
+      })
+      .then(res => {
+        if (res.status === 200) {
+          return dispatch({type: 'UPDATE_CUSTOMGEOJSON', customgeojson: res.data});
         }         
       })
   }

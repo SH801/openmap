@@ -1,0 +1,117 @@
+[
+    {
+        "id": "highlight-active-points",
+        "type": "symbol",
+        "filter": ["all",
+            ["==", "$type", "Point"],
+            ["==", "meta", "feature"],
+            ["==", "active", "true"]],
+        "layout": {
+            "icon-image": "windturbine_orange", 
+            "icon-size": [
+                "interpolate", ["exponential", 2], ["zoom"], 
+                12, 0.03125,
+                20, 8
+            ],
+            "icon-anchor": "bottom",
+            "icon-allow-overlap": [
+                "step",
+                ["zoom"],
+                false,
+                12,
+                true
+            ]            
+        }
+    },
+    {
+        "id": "points-are-blue",
+        "type": "symbol",
+        "filter": ["all",
+            ["==", "$type", "Point"],
+            ["==", "meta", "feature"],
+            ["==", "active", "false"]],
+        "layout": {
+            "icon-image": "windturbine_grey", 
+            "icon-size": [
+                "interpolate", ["exponential", 2], ["zoom"], 
+                12, 0.03125,
+                20, 8
+            ],
+            "icon-anchor": "bottom",
+            "icon-allow-overlap": [
+                "step",
+                ["zoom"],
+                false,
+                12,
+                true
+            ]            
+        }
+    },
+    {
+        "id": "gl-draw-line",
+        "type": "line",
+        "filter": ["all", ["==", "$type", "LineString"], ["!=", "mode", "static"]],
+        "layout": {
+            "line-cap": "round",
+            "line-join": "round"
+        },
+        "paint": {
+            "line-color": "black",
+            "line-dasharray": [0.2, 2],
+            "line-width": 2
+        }
+    },
+    {
+      "id": "gl-draw-polygon-fill",
+      "type": "fill",
+      "filter": ["all", ["==", "$type", "Polygon"], ["!=", "mode", "static"]],
+      "paint": {
+          "fill-color": "black",
+          "fill-outline-color": "black",
+          "fill-opacity": 0
+      }
+    },
+    {
+      "id": "gl-draw-polygon-midpoint",
+      "type": "circle",
+      "filter": ["all",
+          ["==", "$type", "Point"],
+          ["==", "meta", "midpoint"]],
+      "paint": {
+          "circle-radius": 5,
+          "circle-color": "grey"
+      }
+    },
+    {
+      "id": "gl-draw-polygon-stroke-active",
+      "type": "line",
+      "filter": ["all", ["==", "$type", "Polygon"], ["!=", "mode", "static"]],
+      "layout": {
+          "line-cap": "round",
+          "line-join": "round"
+      },
+      "paint": {
+          "line-color": "grey",
+          "line-dasharray": [0.2, 2],
+          "line-width": 4
+      }
+    },
+    {
+      "id": "gl-draw-polygon-and-line-vertex-halo-active",
+      "type": "circle",
+      "filter": ["all", ["==", "meta", "vertex"], ["==", "$type", "Point"], ["!=", "mode", "static"]],
+      "paint": {
+          "circle-radius": 7,
+          "circle-color": "#FFF"
+      }
+    },
+    {
+      "id": "gl-draw-polygon-and-line-vertex-active",
+      "type": "circle",
+      "filter": ["all", ["==", "meta", "vertex"], ["==", "$type", "Point"], ["!=", "mode", "static"]],
+      "paint": {
+          "circle-radius": 5,
+          "circle-color": "#000"
+      }
+    }
+  ]

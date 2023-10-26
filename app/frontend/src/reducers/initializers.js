@@ -43,7 +43,7 @@ export const initialStateGlobal = {
     entitygeometries: [],
     editentity: null,
     externalreferencedid: null,
-    addasset: null,
+    editcustomgeojson: null,
     customgeojson: {type: 'FeatureCollection', features: []},
     mapdraw: new MapboxDraw({
         displayControlsDefault: false,
@@ -53,7 +53,7 @@ export const initialStateGlobal = {
             trash: true
         },
         userProperties: true,
-        // styles: this.mapdrawStyles
+        styles: require('../constants/mapdrawstyles.json')
     }),
 };
 

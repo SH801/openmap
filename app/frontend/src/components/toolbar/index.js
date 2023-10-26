@@ -25,7 +25,7 @@ export class Toolbar extends Component {
                     </IonTitle>
                     <div className="icon-container">
                         {/* <HelpBtn /> */}
-                        <NewAsset />
+                        <NewAsset isMobile={this.props.isMobile} />
                         <Share />
                         {(POSITIVE_SITE.shortcode==='positivefarms') ? (
                         <LoginPopover />

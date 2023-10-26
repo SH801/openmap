@@ -23,12 +23,12 @@ class BasicPage extends Component {
     return (
       <IonApp>
         <IonHeader>
-          <Toolbar />
+          <Toolbar positivecookie={this.props.positivecookie} isMobile={this.props.isMobile} />
         </IonHeader>
         <div style={{ height: "100vh", position: "relative" }}>
             <div style={{ height: "100%" }}>
               <SearchPane isMobile={this.props.isMobile} />
-              <MapContainer isMobile={this.props.isMobile} />
+              <MapContainer positivecookie={this.props.positivecookie} isMobile={this.props.isMobile} />
             </div>
         </div>
       </IonApp>

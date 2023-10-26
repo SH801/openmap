@@ -10,16 +10,13 @@ import {
     IonHeader, 
     IonToolbar, 
     IonButtons, 
-    IonButton, 
     IonContent, 
     IonTitle,
     IonItem,
     IonText,
-    IonLabel,
-    IonTextarea,
     IonList,
-} from '@ionic/react'
-import MapboxDraw from "@mapbox/mapbox-gl-draw";
+} from '@ionic/react';
+import { getBoundingBox } from '../../../functions/map';
 
 export class NewAsset extends Component {
 
@@ -28,15 +25,21 @@ export class NewAsset extends Component {
     }
 
     showNewAssetSelector = () => {
-        if (this.props.global.addasset === null) this.setState({shownewassetmodal: true});
+        if (this.props.global.editcustomgeojson === null) this.setState({shownewassetmodal: true});
     }
 
     showMapdraw = (assettype) => {
         if (this.props.global.mapref !== null) {
             var map = this.props.global.mapref.current.getMap();
-            map.addControl(this.props.global.mapdraw, 'top-right'); 
+            map.addControl(this.props.global.mapdraw, this.props.isMobile ? 'top-right' : 'top-left'); 
             map._mapdraw = this.props.global.mapdraw;
             this.props.global.mapdraw.set(this.props.global.customgeojson);
+            if (assettype === 'edit') {
+                if (this.props.global.customgeojson.features.length > 0) {
+                    var overallboundingbox = getBoundingBox(this.props.global.customgeojson);
+                    map.fitBounds(overallboundingbox, {animate: false, padding: 100});
+                }
+            }
             map.getSource("customgeojson").setData({type: "FeatureCollection", features: []});
             document.getElementsByClassName('mapboxgl-ctrl-group')[0].classList.add('maplibregl-ctrl');                      
             document.getElementsByClassName('mapboxgl-ctrl-group')[0].classList.add('maplibregl-ctrl-group');  
@@ -56,20 +59,22 @@ export class NewAsset extends Component {
     }
 
     enableEdit = () => {
-        this.showMapdraw('edit');
-        this.props.setGlobalState({addasset: 'edit'});
+        if (this.props.global.editcustomgeojson === null) {
+            this.showMapdraw('edit');
+            this.props.setGlobalState({editcustomgeojson: 'edit'});
+        }
     }
 
     selectWind = () => {
         console.log("selectWind");
-        this.props.setGlobalState({addasset: 'wind'});
+        this.props.setGlobalState({editcustomgeojson: 'wind'});
         this.showMapdraw('wind');        
         this.closeModal();
     }
 
     selectSolar = () => {
         console.log("selectSolar");
-        this.props.setGlobalState({addasset: 'solar'});
+        this.props.setGlobalState({editcustomgeojson: 'solar'});
         this.showMapdraw('solar');        
         this.closeModal();
     }
@@ -86,34 +91,36 @@ export class NewAsset extends Component {
         return (
             <>
             <Tooltip id="actions-tooltip" place="left" variant="light" style={{fontSize: "100%", zIndex: 1000}} />
-            <IonIcon data-tooltip-id="actions-tooltip" data-tooltip-content="Add wind/solar" onClick={this.showNewAssetSelector} icon={addCircleOutline} className="addasset-icon"/>
+            <IonIcon data-tooltip-id="actions-tooltip" data-tooltip-content="Add wind/solar" onClick={this.showNewAssetSelector} icon={addCircleOutline} className="editcustomgeojson-icon"/>
             {this.props.global.customgeojson.features.length > 0 ? (
-                <IonIcon data-tooltip-id="actions-tooltip" data-tooltip-content="Edit wind/solar" onClick={this.enableEdit} icon={createOutline} className="addasset-icon"/>
+                <IonIcon data-tooltip-id="actions-tooltip" data-tooltip-content="Edit wind/solar" onClick={this.enableEdit} icon={createOutline} className="editcustomgeojson-icon"/>
             ) : null}
-            <IonModal 
-                id="newasset-modal"
-                isOpen={this.state.shownewassetmodal} 
-                onWillDismiss={(ev) => this.onWillDismiss(ev)} 
-            >
-                <IonHeader>
-                    <IonToolbar>
-                        <IonButtons slot="start">
-                            <IonIcon onClick={() => this.onWillDismiss()} icon={closeOutline} className="addasset-icon"/>
-                        </IonButtons>
-                        <IonTitle className="message-title">Select wind / solar</IonTitle>
-                    </IonToolbar>
-                </IonHeader>
-                <IonContent className="ion-padding">
-                    <IonList>
-                        <IonItem onClick={this.selectWind} className="ion-no-padding" lines="none" style={{cursor: "default", paddingLeft: "10px"}}>
-                            <img src="/static/assets/icon/actionIcons/coloured/windturbine.png" style={{width: "100px"}} />Wind turbine
-                        </IonItem>
-                        <IonItem onClick={this.selectSolar} className="ion-no-padding" lines="none" style={{cursor: "default", paddingTop: "10px", paddingLeft: "10px"}}>
-                            <img src="/static/assets/icon/actionIcons/coloured/solarpanel.png" style={{width: "80px", marginLeft: "10px", marginRight: "10px"}} /><IonText>Solar panels</IonText>
-                        </IonItem>
-                    </IonList>
-                </IonContent>
-            </IonModal>
+            {this.state.shownewassetmodal ? (
+                <IonModal 
+                    id="newasset-modal"
+                    isOpen={this.state.shownewassetmodal} 
+                    onWillDismiss={(ev) => this.onWillDismiss(ev)} 
+                >
+                    <IonHeader>
+                        <IonToolbar>
+                            <IonButtons slot="start">
+                                <IonIcon onClick={() => this.onWillDismiss()} icon={closeOutline} className="editcustomgeojson-icon"/>
+                            </IonButtons>
+                            <IonTitle className="message-title">Select wind / solar</IonTitle>
+                        </IonToolbar>
+                    </IonHeader>
+                    <IonContent className="ion-padding">
+                        <IonList>
+                            <IonItem onClick={this.selectWind} className="ion-no-padding" lines="none" style={{cursor: "default", paddingLeft: "10px"}}>
+                                <img alt="Wind turbine" src="/static/assets/icon/actionIcons/coloured/windturbine.png" style={{width: "100px"}} />Wind turbine
+                            </IonItem>
+                            <IonItem onClick={this.selectSolar} className="ion-no-padding" lines="none" style={{cursor: "default", paddingTop: "10px", paddingLeft: "10px"}}>
+                                <img alt="Solar panels" src="/static/assets/icon/actionIcons/coloured/solarpanel.png" style={{width: "80px", marginLeft: "10px", marginRight: "10px"}} /><IonText>Solar panels</IonText>
+                            </IonItem>
+                        </IonList>
+                    </IonContent>
+                </IonModal>
+            ) : null}
             </>
         );
     }

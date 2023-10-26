@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { global, search } from "../actions";
 import { Tooltip } from 'react-tooltip';
-import { Map, Popup, NavigationControl, GeolocateControl, Source, Layer }  from 'react-map-gl/maplibre';
+import { Map, Popup, NavigationControl, GeolocateControl }  from 'react-map-gl/maplibre';
 import { centroid } from '@turf/turf';
 import queryString from "query-string";
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -16,25 +16,11 @@ import {
   IonGrid,
   IonRow,
   IonCol,
-  IonIcon,
-  IonModal, 
-  IonHeader, 
-  IonToolbar, 
-  IonButtons, 
   IonButton, 
-  IonContent, 
-  IonTitle,
-  IonItem,
   IonText,
-  IonLabel,
-  IonTextarea,
-  IonList,
-} from '@ionic/react'
-
+} from '@ionic/react';
 import { initShaders, initVertexBuffers, renderImage } from './webgl';
-// import './map.css';
-
-import { setURLState, getURLSubdomain, getExternalReference } from "../functions/urlstate";
+import { setURLState, modifyURLParameter, getURLSubdomain, getExternalReference } from "../functions/urlstate";
 import { 
   POSITIVE_SITE,
   POSITIVE_SITES,
@@ -48,8 +34,7 @@ import {
   DESKTOP_PADDING,
   DEFAULT_MAXBOUNDS
 } from "../constants";
-import { mapSelectEntity } from '../functions/map';
-import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import { getBoundingBox, mapSelectEntity } from '../functions/map';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 
 export const isDev = () =>  !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
@@ -416,7 +401,7 @@ export class MapContainer extends Component  {
     this.mapRef = React.createRef();
     this.popupRef = React.createRef();
     // this.customgeojsonStyle = require('../constants/customgeojson.json');
-
+    
     this.maxTileCacheSize = this.getMaxTileCacheSize();
     this.placessatellitelayer = require(isDev() ? '../constants/placesterrainstyletest.json' : '../constants/placesterrainstyle.json');
     this.farmssatellitelayer = require(isDev() ? '../constants/farmsterrainstyletest.json' : '../constants/farmsterrainstyle.json');    
@@ -438,6 +423,7 @@ export class MapContainer extends Component  {
     this.state.zoom = props.zoom;  
     this.state.pitch = props.pitch;
     this.state.bearing = props.bearing;
+    this.state.plan = props.plan;
 
     var fulldomains = Object.keys(POSITIVE_SITES);
     var ignoredomains = ['localhost', '192'];
@@ -471,6 +457,7 @@ export class MapContainer extends Component  {
     this.state.logo = logo;
 
     let params = queryString.parse(this.props.location.search);
+    if (params.plan !== undefined) this.state.plan = params.plan;
     if (params.lat !== undefined) this.state.lat = params.lat;
     if (params.lng !== undefined) this.state.lng = params.lng;
     if (params.zoom !== undefined) this.state.zoom = params.zoom;  
@@ -518,9 +505,7 @@ export class MapContainer extends Component  {
   }
 
   flyingRun = () => {
-    var interval = 4000;
     var halfinterval = 60000;
-    var degreespersecond = 2.5;
     var degreesperiteration = 120;
 
     if (this.mapRef) {
@@ -655,6 +640,15 @@ export class MapContainer extends Component  {
     });
     var map = this.mapRef.current.getMap();
 
+    if (this.state.plan !== '') this.props.fetchCustomGeoJSON('', this.state.plan);
+    else if (this.props.positivecookie !== '') this.props.fetchCustomGeoJSON(this.props.positivecookie, '');
+    
+    // map.loadImage('/static/assets/icon/actionIcons/coloured/windturbine_sdf_final.png', (error, image) => {
+    //   if (error) throw error;
+    //   // add image to the active style and make it SDF-enabled
+    //   map.addImage('windturbine-sdf', image, { sdf: true });
+    // });
+
     // Only animate turbines on non-iOS platforms due to limited memory on iOS
     var isiOS = this.isiOS();
 
@@ -758,7 +752,7 @@ export class MapContainer extends Component  {
 
     var map = this.mapRef.current.getMap();
 
-    if (this.props.global.addasset) return;
+    if (this.props.global.editcustomgeojson) return;
 
     if (event.features.length > 0) {
       if (this.hoveredPolygonId === null) {
@@ -792,6 +786,8 @@ export class MapContainer extends Component  {
         }
         this.setState({'showpopup': true});
         var popup = this.popupRef.current;
+        if (properties.subtype === 'wind') popup.setOffset([0, -20]);
+        else popup.setOffset([0, 0]);
         popup.setLngLat(featurecentroid.geometry.coordinates).setHTML(description).addTo(map);
       }  
     }
@@ -799,7 +795,7 @@ export class MapContainer extends Component  {
 
   onMouseMove = (event) => {
 
-    if (this.props.global.addasset) return;
+    if (this.props.global.editcustomgeojson) return;
 
     if (this.hoveredPolygonId) {
       var popup = this.popupRef.current;
@@ -831,10 +827,17 @@ export class MapContainer extends Component  {
 
   onClick = (event) => {
     // Don't select features if adding asset
-    if (this.props.global.addasset === null) {
+    if (this.props.global.editcustomgeojson === null) {
       if (event.features.length > 0) {
         if (event.features[0].properties.type === 'custom') {
           console.log("Custom feature");
+
+          if (this.props.global.customgeojson.features.length > 0) {
+            var overallboundingbox = getBoundingBox(this.props.global.customgeojson);
+            var map = this.mapRef.current.getMap();
+            map.fitBounds(overallboundingbox, {animate: true, padding: 100});
+          }
+
         } else {
           var entityid = event.features[0].properties.id;
           this.selectEntity(entityid);
@@ -859,7 +862,7 @@ export class MapContainer extends Component  {
   }
 
   onIdle = (event) => {
-    if (this.props.global.addasset === null) {
+    if (this.props.global.editcustomgeojson === null) {
       if (this.mapRef) {
         let map = this.mapRef.current.getMap();
         let map_customgeojson = map.querySourceFeatures("customgeojson");
@@ -905,6 +908,7 @@ export class MapContainer extends Component  {
       let pitch = map.getPitch();
       let bearing = map.getBearing();
       let satellite = this.state.satellite ? "yes" : "no";
+      let plan = this.state.plan;
 
       // Refresh search results if geosearch on and flying off
       if ((this.props.search.geosearch) && (!this.state.flying)) {
@@ -925,13 +929,24 @@ export class MapContainer extends Component  {
         this.props.fetchSearchResults('');
       }
 
-      setURLState({ 'lat': center.lat, 
-        'lng': center.lng, 
-        'zoom': zoom,
-        'pitch': pitch,
-        'bearing': bearing,
-        'satellite': satellite
-      }, this.props.history, this.props.location);
+      if (plan === '') {
+        setURLState({ 'lat': center.lat, 
+          'lng': center.lng, 
+          'zoom': zoom,
+          'pitch': pitch,
+          'bearing': bearing,
+          'satellite': satellite
+        }, this.props.history, this.props.location);
+      } else {
+        setURLState({ 'lat': center.lat, 
+          'lng': center.lng, 
+          'zoom': zoom,
+          'pitch': pitch,
+          'bearing': bearing,
+          'satellite': satellite,
+          'plan': plan
+        }, this.props.history, this.props.location);
+      }
   }
 
   getMaxBounds = () => {
@@ -980,13 +995,13 @@ export class MapContainer extends Component  {
   }
 
   onMouseEnterAssetFinish = () => {
-    if (this.props.global.addasset === 'solar') {
+    if (this.props.global.editcustomgeojson === 'solar') {
       this.props.global.mapdraw.changeMode('simple_select');
     }
   }
 
   onMouseExitAssetFinish = () => {
-    if (this.props.global.addasset === 'solar') {
+    if (this.props.global.editcustomgeojson === 'solar') {
       this.props.global.mapdraw.changeMode('draw_polygon');
     }
   }
@@ -1000,27 +1015,47 @@ export class MapContainer extends Component  {
     }
   }
 
-  addassetFinish = (ev) => {
+  editcustomgeojsonFinish = (ev) => {
     ev.stopPropagation();
 
     if (this.mapRef) {
       var map = this.mapRef.current.getMap();
       var customgeojson = JSON.parse(JSON.stringify(this.props.global.mapdraw.getAll()));
+      var outputfeatures = [];
       for(let i = 0; i < customgeojson.features.length; i++) {
         var name = 'Manually-added solar farm';
-        if (customgeojson.features[i].geometry.type === 'Point') name = 'Manually-added wind turbine';
+        var subtype = 'solar';
+        var addfeature = true;
+        if (customgeojson.features[i].geometry.type === 'Point') {
+          name = 'Manually-added wind turbine';
+          subtype = 'wind';
+          // Weird anomaly where MapbowDraw sometimes adds point with no coordinates
+          if (customgeojson.features[i].geometry.coordinates.length < 2) addfeature = false;  
+        }
         customgeojson.features[i].properties = {
           type: 'custom', 
+          subtype: subtype, 
           name: name
         };
+        if (addfeature) outputfeatures.push(customgeojson.features[i]);
       }
-      this.props.setGlobalState({customgeojson: customgeojson});
+      customgeojson = {type: 'FeatureCollection', features: outputfeatures};
+      var oldcustomgeojson = JSON.stringify(this.props.global.customgeojson);
+      // Compare old with new to determine whether to save and invalidate plan shortcode
+      if (oldcustomgeojson !== JSON.stringify(customgeojson)) {
+        this.props.updateCustomGeoJSON(this.props.positivecookie, '', customgeojson);
+        this.props.setGlobalState({customgeojson: customgeojson});
+        // We remove 'plan' parameter after edit as customgeojson may diverge from saved plan
+        modifyURLParameter({plan: null}, this.props.history, this.props.location);
+        this.setState({plan: ''});
+      }
+
       if (map) {
         map.removeControl(this.props.global.mapdraw);
         map.getSource("customgeojson").setData(customgeojson);
       }    
     }
-    this.props.setGlobalState({addasset: null});
+    this.props.setGlobalState({editcustomgeojson: null});
   }
 
   render () {
@@ -1069,27 +1104,27 @@ export class MapContainer extends Component  {
 
           <Toaster position="top-center"  containerStyle={{top: 20}}/>
 
-          {this.props.global.addasset ? (
+          {this.props.global.editcustomgeojson ? (
             <div onMouseEnter={this.onMouseEnterAssetFinish} onMouseLeave={this.onMouseExitAssetFinish} style={{position: "absolute", top: this.props.isMobile ? "64px": "10px", left: "0px", width: "100vw"}}>
-              <div style={{marginLeft: "50px", marginRight: this.props.isMobile ? "50px" : "calc(24% + 10px)", backgroundColor: "#ffffff78"}}>
+              <div style={{marginLeft: "50px", marginRight: this.props.isMobile ? "50px" : "calc(24% + 10px)", backgroundColor: "#ffffffaa"}}>
                 <div>
                   <IonGrid>
                     <IonRow class="ion-align-items-center ion-justify-content-center">
                       <IonCol size="auto">
                         <IonText style={{fontSize: "120%"}}>
-                          {(this.props.global.addasset === 'wind') ? (
+                          {(this.props.global.editcustomgeojson === 'wind') ? (
                             <>Click on map to add one or more wind turbines then select "Finish" when complete</>
                           ) : null}
-                          {(this.props.global.addasset === 'solar') ? (
+                          {(this.props.global.editcustomgeojson === 'solar') ? (
                             <>Click on map to draw outline of one or more solar farms then select "Finish" when complete</>
                           ) : null}
-                          {(this.props.global.addasset === 'edit') ? (
-                            <>Click on existing wind/solar to select then edit points, drag to move or select trash (right) to delete</>
+                          {(this.props.global.editcustomgeojson === 'edit') ? (
+                            <>Click on existing wind/solar to select - then edit points, drag to move or select trash to delete</>
                           ) : null}
                         </IonText>
                       </IonCol>
                       <IonCol size="auto">
-                        <IonButton onClick={this.addassetFinish}>Finish</IonButton>                                        
+                        <IonButton onClick={this.editcustomgeojsonFinish}>Finish</IonButton>                                        
                       </IonCol>
                     </IonRow>
                   </IonGrid>
@@ -1132,7 +1167,8 @@ MapContainer.defaultProps = {
   lng: DEFAULT_LNG,
   zoom: DEFAULT_ZOOM,
   pitch: DEFAULT_PITCH,
-  bearing: DEFAULT_BEARING
+  bearing: DEFAULT_BEARING,
+  plan: ''
 };
   
   
@@ -1150,11 +1186,14 @@ export const mapDispatchToProps = dispatch => {
       setGlobalState: (globalstate) => {
         return dispatch(global.setGlobalState(globalstate));
       },  
-      addAsset: (asset) => {
-        return dispatch(global.addAsset(asset));
-      },      
       setSearchText: (searchtext) => {
         return dispatch(search.setSearchText(searchtext));
+      },      
+      fetchCustomGeoJSON: (cookie, shortcode) => {
+        return dispatch(global.fetchCustomGeoJSON(cookie, shortcode));
+      },      
+      updateCustomGeoJSON: (cookie, shortcode, customgeojson) => {
+        return dispatch(global.updateCustomGeoJSON(cookie, shortcode, customgeojson));
       },      
       startFlyingTour: (entities) => {
         return dispatch(global.startFlyingTour(entities));

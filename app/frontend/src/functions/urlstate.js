@@ -41,6 +41,10 @@ export const getURLState = (variablename, location) => {
     return variablevalue;
 }
 
+export const isFloat = (n) => {
+    return Number(n) === n && n % 1 !== 0;
+}
+
 /**
  * setURLState
  * Set value of specific variables in URL that are defined in 'object'
@@ -51,12 +55,25 @@ export const getURLState = (variablename, location) => {
  */
 export const setURLState = (object, history, location) => {
 
+    // Convert param names
+    // let paramnamelookup = {
+    //     bearing: 'b',
+    //     pitch: 'p',
+    //     zoom: 'z',
+    //     satellite: 's',
+    //     lat: 'lat',
+    //     lng: 'lng'
+    // }
+
+    // Custom array for parameters that should be shortened
+    let shortenparams = ['bearing', 'pitch', 'zoom'];
+
     // Parse location.search for parameters
     let urlparams = queryString.parse(location.search);
 
     // Iterate through elements of new state object
     Object.keys(object).forEach((variablename) => {
-        const variablevalue = object[variablename];
+        let variablevalue = object[variablename];
 
         // How to set new value depends on whether element is meant to be part of array
         if (arrayvariables.includes(variablename)) {
@@ -65,7 +82,11 @@ export const setURLState = (object, history, location) => {
             else if (!Array.isArray(existingvalue)) existingvalue = [existingvalue];
             if (!existingvalue.includes(variablevalue)) existingvalue.push(variablevalue);
             urlparams[variablename] = existingvalue;
-        } else urlparams[variablename] = variablevalue;
+        } else {
+            if (shortenparams.includes(variablename)) variablevalue = variablevalue.toFixed(2);
+            else if (isFloat(variablevalue)) variablevalue = variablevalue.toFixed(5);
+            urlparams[variablename] = variablevalue;
+        }
     })
 
     history.replace({pathname: location.pathname, search: queryString.stringify(urlparams)});  
@@ -116,6 +137,29 @@ export const deleteURLState = (deleteobject, history, location) => {
             const variableposition = existingvalue.indexOf(variablevalue);
             if (variableposition !== -1) existingvalue.splice(variableposition, 1);
         } else delete urlparams[variablename];
+    })
+
+    history.replace({pathname: location.pathname, search: queryString.stringify(urlparams)});  
+}
+
+
+/**
+ * modifyURLParameter
+ * Modify specific URL parameter while leaving all other parameters unchanged
+ * 
+ * @param {*} modifyobject 
+ * @param {*} history 
+ * @param {*} location 
+ */
+export const modifyURLParameter = (modifyobject, history, location) => {
+
+    // Parse location.search for parameters
+    let urlparams = queryString.parse(location.search);
+
+    // Iterate through elements of modify object
+    Object.keys(modifyobject).forEach((variablename) => {
+        if (modifyobject[variablename] === null) delete urlparams[variablename];
+        else urlparams[variablename] = modifyobject[variablename];
     })
 
     history.replace({pathname: location.pathname, search: queryString.stringify(urlparams)});  

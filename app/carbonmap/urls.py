@@ -62,6 +62,8 @@ urlpatterns = [
     path('export/<exportid>', views.Export, name='export'),
     path('lastexport/', views.LastExport, name='lastexport'),
     path('message/', views.SendMessage, name='sendmessage'),
+    path('customgeojson/fetch/', views.CustomGeoJSONFetch, name='customgeojsonfetch'),
+    path('customgeojson/update/', views.CustomGeoJSONUpdate, name='customgeojsonupdate'),
     path('geometrybounds/', views.GeometryBounds, name='geometrybounds'),
     path('locationposition', views.LocationPosition, name='locationposition'),
     path('organisations/', views.Organisations.as_view()),

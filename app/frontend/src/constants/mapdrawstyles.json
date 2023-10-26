@@ -66,9 +66,9 @@
       "type": "fill",
       "filter": ["all", ["==", "$type", "Polygon"], ["!=", "mode", "static"]],
       "paint": {
-          "fill-color": "black",
+          "fill-color": "white",
           "fill-outline-color": "black",
-          "fill-opacity": 0
+          "fill-opacity": 0.5
       }
     },
     {
@@ -111,7 +111,7 @@
       "filter": ["all", ["==", "meta", "vertex"], ["==", "$type", "Point"], ["!=", "mode", "static"]],
       "paint": {
           "circle-radius": 5,
-          "circle-color": "#000"
+          "circle-color": "orange"
       }
     }
   ]

@@ -184,6 +184,23 @@
             ]
         },
         {
+            "id": "customgeojson_solarfarm",
+            "source": "customgeojson",
+            "type": "fill",
+            "layout": {},
+            "filter": [
+              "all",
+              [
+                "==",
+                "$type",
+                "Polygon"
+              ]
+            ],
+            "paint": {
+              "fill-pattern": "solarpanel"
+            }
+        },    
+        {
             "id": "customgeojson_windturbine",
             "type": "symbol",
             "source": "customgeojson",
@@ -211,24 +228,7 @@
                 "Point"
               ]
             ]
-        },
-        {
-            "id": "customgeojson_solarfarm",
-            "source": "customgeojson",
-            "type": "fill",
-            "layout": {},
-            "filter": [
-              "all",
-              [
-                "==",
-                "$type",
-                "Polygon"
-              ]
-            ],
-            "paint": {
-              "fill-pattern": "solarpanel"
-            }
-        }                   
+        }           
     ],
     "terrain": {
         "source": "terrainSource",

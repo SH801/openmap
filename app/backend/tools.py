@@ -1272,6 +1272,60 @@ def processrenewables():
     with open(osm_output, "w", encoding='UTF-8') as writerfileobj:
         json.dump({"type": "FeatureCollection", "features": outputfeatures}, writerfileobj, indent=2)
 
+def computerenewablesareas():
+    """
+    Computes area of renewables assets and determines MW/hectare for solar
+    """
+
+    windfarm_propertyid = Property.objects.filter(name="Wind Farm").first().pk
+    solarfarm_propertyid = Property.objects.filter(name="Solar Farm").first().pk
+    solar_osm = Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_OSM, properties=solarfarm_propertyid)
+
+    with open(osm_output, "r", encoding='UTF-8') as readerfileobj: osm_geojson = json.load(readerfileobj)
+        
+    osm_lookup = {}
+    for feature in osm_geojson['features']:
+        area_hectares = calculatearea(feature['geometry']) / 10000
+        if area_hectares > 4:
+            entity = Entity.objects.filter(source=EntitySourceType.ENTITYSOURCE_OSM, external_id = feature['properties']['id']).first()
+            if entity.extraproperties is None: extraproperties = {}
+            else: extraproperties = json.loads(entity.extraproperties)
+            if 'site:area' not in extraproperties: 
+                extraproperties['site:area'] = str(round(area_hectares, 2)) + ' hectares'
+                print(feature['properties']['id'], extraproperties)
+                entity.extraproperties = json.dumps(extraproperties, indent=2)
+                entity.save()
+
+    # Calculate total power output and total area for solar assets
+    totalpoweroutput, totalarea = 0.0, 0.0
+    for entity in solar_osm:
+        if entity.extraproperties is not None:
+            extraproperties = json.loads(entity.extraproperties)
+            poweroutput = None
+            area = None
+
+            if "plant:output:electricity" in extraproperties: poweroutput = extraproperties['plant:output:electricity']
+            if "generator:output:electricity" in extraproperties: poweroutput = extraproperties['generator:output:electricity']
+            if "site:area" in extraproperties: area = extraproperties['site:area']
+
+            if poweroutput is not None:
+                poweroutput = poweroutput.strip().upper().split()
+                # Sanitize poweroutput if no space between value and units, eg. '250MW'
+                if len(poweroutput) == 1:
+                    if (poweroutput[0][-2:] == 'KW'): poweroutput = [poweroutput[0][:-2], 'KW']
+                    if (poweroutput[0][-2:] == 'MW'): poweroutput = [poweroutput[0][:-2], 'MW']
+                if len(poweroutput) == 2:
+                    if poweroutput[1] == 'KW': 
+                        poweroutput[0] = float(float(poweroutput[0]) / 1000)
+                        poweroutput[1] = 'MW'
+
+                    if (poweroutput[1] == 'MW') and (area is not None):
+                        totalpoweroutput += float(poweroutput[0])
+                        area = area.strip().split()
+                        totalarea += float(area[0])
+
+    print("MW / hectare ratio:", totalpoweroutput, totalarea, float(totalpoweroutput / totalarea))
+
 def importgroups():
     """
     Imports environmental groups data
@@ -1383,6 +1437,9 @@ updatepostcodes
 processrenewables
   Process BEIS renewables locations data
 
+computerenewablesareas
+  Computes area of renewables assets and determines MW/hectare for solar
+          
 importgroups
   Process environmental group data
 
@@ -1426,6 +1483,8 @@ else:
         updatepostcodes()
     if primaryargument == "processrenewables":
         processrenewables()
+    if primaryargument == "computerenewablesareas":
+        computerenewablesareas()
     if primaryargument == "importgroups":
         importgroups()
     if primaryargument == "importdata":

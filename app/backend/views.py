@@ -554,7 +554,6 @@ def CustomGeoJSONFetch(request):
     except ValueError:
         return OutputError()
 
-    print(data)    
     if data['cookie'] is None: data['cookie'] = ''
     if data['shortcode'] is None: data['shortcode'] = ''
     customgeojson = CustomGeoJSON.objects.filter(cookie=data['cookie'], shortcode=data['shortcode']).values_list('customgeojson', flat=True).first()

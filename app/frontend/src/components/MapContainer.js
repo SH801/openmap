@@ -838,7 +838,7 @@ export class MapContainer extends Component  {
 
           this.props.setGlobalState({'drawer': true, 'searching': false, entities: {entities: [customentity]}});
           this.props.resetGeosearch();
-          this.props.setSearchText('');
+          this.props.setSearchText(customentity.name);
       
           if (this.props.global.customgeojson.features.length > 0) {
 

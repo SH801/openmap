@@ -26,8 +26,8 @@ from .settings import STATIC_ROOT
 from backend import views
 from backend import endpoints
 
-admin.site.site_header  =  "Future Farms"  
-admin.site.site_title  =  "Future Farms Administration Site"
+admin.site.site_header  =  "Positive Places"  
+admin.site.site_title  =  "Positive Places Administration Site"
 admin.site.index_title  =  "Administration Site"
 
 urlpatterns = [

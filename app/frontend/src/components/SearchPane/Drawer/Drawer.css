@@ -134,11 +134,17 @@ h2 {
 .entity-title-customgeojson {
   padding-top: 10px;
   padding-bottom: 10px;
+  font-size: 120%;
   font-weight: 600;
 }
 .entity-item-customgeojson {
   padding-top: 2px;
   padding-bottom: 3px;
+}
+.entity-item-customgeojson-note {
+  padding-top: 2px;
+  padding-bottom: 3px;
+  font-size: 80%;
 }
 .entity-title {
   padding-top: 10px;

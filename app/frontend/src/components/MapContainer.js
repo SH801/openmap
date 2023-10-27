@@ -841,9 +841,11 @@ export class MapContainer extends Component  {
           this.props.setSearchText('');
       
           if (this.props.global.customgeojson.features.length > 0) {
+
             var overallboundingbox = getBoundingBox(this.props.global.customgeojson);
             var map = this.mapRef.current.getMap();
-            map.fitBounds(overallboundingbox, {animate: true, padding: 100});
+            this.props.setGlobalState({fittingbounds: true});
+            map.fitBounds(overallboundingbox, {animate: true});
           }
 
         } else {

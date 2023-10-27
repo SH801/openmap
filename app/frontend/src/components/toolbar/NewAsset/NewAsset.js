@@ -37,7 +37,8 @@ export class NewAsset extends Component {
             if (assettype === 'edit') {
                 if (this.props.global.customgeojson.features.length > 0) {
                     var overallboundingbox = getBoundingBox(this.props.global.customgeojson);
-                    map.fitBounds(overallboundingbox, {animate: false, padding: 100});
+                    this.props.setGlobalState({fittingbounds: true});
+                    map.fitBounds(overallboundingbox, {animate: true});
                 }
             }
             map.getSource("customgeojson").setData({type: "FeatureCollection", features: []});

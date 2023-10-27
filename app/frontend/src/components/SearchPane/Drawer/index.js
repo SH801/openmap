@@ -12,7 +12,8 @@ export class Drawer extends Component {
       <>
       {this.props.global.drawer && !this.props.global.searching ? (
         <>
-          {this.props.isMobile ? (<MobileDrawer isMobile={this.props.isMobile} />) : 
+          {this.props.isMobile ? 
+          (<MobileDrawer isMobile={this.props.isMobile} />) : 
           (<DesktopDrawer isMobile={this.props.isMobile} />)}
         </>
       ) : null}

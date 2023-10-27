@@ -131,6 +131,15 @@ h2 {
 .entity-desc {
   text-overflow: ellipsis;
 }
+.entity-title-customgeojson {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-weight: 600;
+}
+.entity-item-customgeojson {
+  padding-top: 2px;
+  padding-bottom: 3px;
+}
 .entity-title {
   padding-top: 10px;
   font-weight: 600;

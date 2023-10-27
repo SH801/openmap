@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { global, search } from "../../../../../actions";
+import EntityCustomGeoJSON from './EntityComponents/EntityCustomGeoJSON/EntityCustomGeoJSON';
 import EntityInfo from './EntityComponents/EntityInfo/EntityInfo';
 import EntityRelated from './EntityComponents/EntityRelated/EntityRelated';
 import { mapSelectProperty } from '../../../../../functions/map';
@@ -55,19 +56,24 @@ export class EntityDetails extends Component {
             {this.props.global.entities.entities.map((entity, index) => {
               return(
                 <div key={index}>
-                  <EntityInfo 
-                    isMobile={this.props.isMobile} 
-                    entity={entity} 
-                    selectProperty={this.selectProperty} 
-                  />
-                  {!this.props.global.entities.list ? (
-                    <EntityRelated 
+                  {entity.customgeojson ? (
+                    <EntityCustomGeoJSON entity={entity} />
+                  ) : (
+                    <>
+                    <EntityInfo 
                       isMobile={this.props.isMobile} 
-                      key={index} 
                       entity={entity} 
-                      selectProperty={this.selectProperty} 
-                    />
-                  ) : null}
+                      selectProperty={this.selectProperty} />
+                    {!this.props.global.entities.list ? (
+                      <EntityRelated 
+                        isMobile={this.props.isMobile} 
+                        key={index} 
+                        entity={entity} 
+                        selectProperty={this.selectProperty} 
+                      />
+                    ) : null}
+                    </>
+                  )}
                 </div>
               );
             })}

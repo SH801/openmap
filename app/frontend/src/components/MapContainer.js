@@ -830,8 +830,16 @@ export class MapContainer extends Component  {
     if (this.props.global.editcustomgeojson === null) {
       if (event.features.length > 0) {
         if (event.features[0].properties.type === 'custom') {
-          console.log("Custom feature");
 
+          var customentity = {
+            name: 'Manually-added renewables',
+            customgeojson: this.props.global.customgeojson
+          }
+
+          this.props.setGlobalState({'drawer': true, 'searching': false, entities: {entities: [customentity]}});
+          this.props.resetGeosearch();
+          this.props.setSearchText('');
+      
           if (this.props.global.customgeojson.features.length > 0) {
             var overallboundingbox = getBoundingBox(this.props.global.customgeojson);
             var map = this.mapRef.current.getMap();
@@ -922,7 +930,10 @@ export class MapContainer extends Component  {
           this.props.setGlobalState({zoom: map.getZoom(), fittingbounds: false}).then(() => {
             if (this.state.flying) this.flyingRun();
           });
-        }  
+        } 
+        if (!(this.state.flying)) {
+          this.props.setGlobalState({centre: map.getCenter(), zoom: map.getZoom()});
+        } 
       }
   
       if (this.props.search.searchtext === '') {
@@ -1052,6 +1063,14 @@ export class MapContainer extends Component  {
         // We remove 'plan' parameter after edit as customgeojson may diverge from saved plan
         modifyURLParameter({plan: null}, this.props.history, this.props.location);
         this.setState({plan: ''});
+
+        if (this.props.global.drawer) {
+          var customentity = {
+            name: 'Manually-added renewables',
+            customgeojson: customgeojson
+          }
+          this.props.setGlobalState({entities: {entities: [customentity]}});
+        }
       }
 
       if (map) {

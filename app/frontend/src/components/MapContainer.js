@@ -39,6 +39,66 @@ import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 
 export const isDev = () =>  !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
+export class ExtrusionControl extends Component{
+    
+  constructor(props) {
+      super(props);
+      this.options = props.options;
+      this._mapcontainer = props.mapcontainer;
+  }
+
+  onAdd(map) {
+      this._map = map;
+      this._extrusionButton = document.createElement('button');
+      this._extrusionButton.className = 'maplibregl-ctrl-extrusion';
+      this._extrusionButton.type = 'button';
+      this._extrusionButton.setAttribute('data-tooltip-id', 'ctrlpanel-tooltip');
+      this._extrusionButton.onclick = this._toggleExtrusion;   
+      this._ctrlIcon = document.createElement('span');
+      this._ctrlIcon.className = 'maplibregl-ctrl-icon';
+      this._extrusionButton.appendChild(this._ctrlIcon);
+      this._container = document.createElement('div');
+      this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+      this._container.appendChild(this._extrusionButton);
+      this._updateExtrusionIcon();
+      this._map.on('sourcedata', (e) => {if (e.sourceId === 'openmaptiles') {this._updateExtrusionIcon()}});
+      this._extrusionButton.onmouseleave = this._onMouseLeave;
+
+      return this._container;
+  }
+
+  _onMouseLeave = () => {
+    this._mapcontainer.setState({showtooltip: true});
+  }
+
+  onRemove() {
+    this._container.parentNode.removeChild(this._container);
+    this._map = undefined;
+  }
+
+  _toggleExtrusion = () => {
+    this._mapcontainer.setState({showtooltip: false});
+    if (this._map.getLayoutProperty("3d-buildings", "visibility") === 'visible') {
+      this._map.setLayoutProperty("3d-buildings", 'visibility', 'none');
+    } else {
+      this._map.setLayoutProperty("3d-buildings", 'visibility', 'visible');
+    }
+    this._updateExtrusionIcon();
+  };
+  
+  _updateExtrusionIcon = () => {
+      this._extrusionButton.classList.remove('maplibregl-ctrl-extrusion');
+      this._extrusionButton.classList.remove('maplibregl-ctrl-extrusion-enabled');
+      if (this._map.getLayoutProperty("3d-buildings", "visibility") === 'visible') {
+          this._extrusionButton.classList.add('maplibregl-ctrl-extrusion-enabled');
+          this._extrusionButton.setAttribute('data-tooltip-content', 'Set 3D buildings OFF - better for mobiles');
+      } else {
+          this._extrusionButton.classList.add('maplibregl-ctrl-extrusion');
+          this._extrusionButton.setAttribute('data-tooltip-content', 'Set 3D buildings ON - may slow / cause problems');
+      }
+  };
+}
+
 export class TerrainControl extends Component{
     
   constructor(props) {
@@ -105,6 +165,7 @@ export class PitchToggle extends Component{
     super(props);
     this._pitch = props.pitch;
     this._mapcontainer = props.mapcontainer;
+    this._extrusioncontrol = props.extrusioncontrol;
   }
 
   onAdd(map) {
@@ -467,7 +528,8 @@ export class MapContainer extends Component  {
       if (params.satellite === "yes") this.state.satellite = true;
     }
 
-    this.pitchtoggle = new PitchToggle({mapcontainer: this, pitch: 80});
+    this.extrusiontoggle = new ExtrusionControl({mapcontainer: this});
+    this.pitchtoggle = new PitchToggle({mapcontainer: this, pitch: 80, extrusiontoggle: this.extrusiontoggle});
     this.terraintoggle = new TerrainControl({mapcontainer: this, options: this.state.terrain});
     this.flytoggle = new FlyToggle({mapcontainer: this});
     this.recordvideo = new RecordVideo({mapcontainer: this});
@@ -690,6 +752,7 @@ export class MapContainer extends Component  {
         
     map.addControl(this.pitchtoggle, 'top-left'); 
     map.addControl(this.terraintoggle, 'top-left');
+    map.addControl(this.extrusiontoggle, 'top-left');
     map.addControl(this.flytoggle, this.props.isMobile ? 'top-right' : 'top-left'); 
     map.addControl(this.recordvideo, this.props.isMobile ? 'top-right' : 'top-left'); 
     map.setPadding(this.props.isMobile ? MOBILE_PADDING : DESKTOP_PADDING);
@@ -864,6 +927,8 @@ export class MapContainer extends Component  {
       map.addControl(this.pitchtoggle, this.props.isMobile ? 'top-left' : 'top-left'); 
       map.removeControl(this.terraintoggle);
       map.addControl(this.terraintoggle, this.props.isMobile ? 'top-left' : 'top-left'); 
+      map.removeControl(this.extrusiontoggle);
+      map.addControl(this.extrusiontoggle, this.props.isMobile ? 'top-left' : 'top-left'); 
       map.removeControl(this.flytoggle);
       map.addControl(this.flytoggle, this.props.isMobile ? 'top-right' : 'top-left'); 
       map.removeControl(this.recordvideo);

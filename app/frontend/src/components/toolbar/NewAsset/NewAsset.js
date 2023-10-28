@@ -105,7 +105,7 @@ export class NewAsset extends Component {
                     <IonHeader>
                         <IonToolbar>
                             <IonButtons slot="start">
-                                <IonIcon onClick={() => this.onWillDismiss()} icon={closeOutline} className="editcustomgeojson-icon"/>
+                                <IonIcon onClick={() => this.onWillDismiss()} icon={closeOutline} className="close-icon"/>
                             </IonButtons>
                             <IonTitle className="message-title">Select wind / solar</IonTitle>
                         </IonToolbar>

@@ -7,6 +7,10 @@
             "tileSize": 256,
             "attribution": "Imagery ©2023 Google, Imagery ©2023 Bluesky, Getmapping plc, Infoterra Ltd & Bluesky, Maxar Technologies, Map data ©2023"
         },
+        "openmaptiles": {
+            "type": "vector",
+            "url": "https://tiles.positivefarms.org/data/openmaptiles.json"
+        },        
         "positivefarms": {
             "type": "vector",
             "url": "https://tiles.positivefarms.org/data/positivefarms.json"
@@ -53,6 +57,36 @@
             "layout": { "visibility": "visible" },
             "paint": { "hillshade-shadow-color": "#473B24" }
         },
+        {
+            "id": "3d-buildings",
+            "source": "openmaptiles",
+            "source-layer": "building",
+            "type": "fill-extrusion",
+            "minzoom": 15,
+            "layout": {
+                "visibility": "none"
+            },             
+            "paint": {
+                "fill-extrusion-color": [
+                    "interpolate",
+                    ["linear"],
+                    ["get", "render_height"], 0, "lightgray", 200, "royalblue", 400, "lightblue"
+                ],
+                "fill-extrusion-height": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    15,
+                    0,
+                    16,
+                    ["get", "render_height"]
+                ],
+                "fill-extrusion-base": ["case",
+                    [">=", ["get", "zoom"], 16],
+                    ["get", "render_min_height"], 0
+                ]
+            }
+        },        
         {
             "filter": [
               "all"

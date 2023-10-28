@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { nanoid } from 'nanoid';
 import queryString from "query-string";
+import { closeOutline } from 'ionicons/icons';
 import { global } from "../../actions";
 import { modifyURLParameter } from "../../functions/urlstate";
 
@@ -69,7 +70,7 @@ export class Share extends Component {
                 <IonHeader>
                     <IonToolbar>
                         <IonButtons slot="start">
-                            <IonButton onClick={() => this.onWillDismiss()}>Close</IonButton>
+                            <IonIcon onClick={() => this.onWillDismiss()} icon={closeOutline} className="close-icon"/>
                         </IonButtons>
                         <IonTitle className="message-title">Shareable link</IonTitle>
                     </IonToolbar>

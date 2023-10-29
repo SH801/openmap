@@ -1,0 +1,466 @@
+{
+    "version": 8,
+    "sources": {
+        "background": {
+            "type": "raster",
+            "tiles": ["https://www.google.com/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}"],
+            "tileSize": 256,
+            "attribution": "Imagery ©2023 Google, Imagery ©2023 Bluesky, Getmapping plc, Infoterra Ltd & Bluesky, Maxar Technologies, Map data ©2023"
+        },
+        "openmaptiles": {
+            "type": "vector",
+            "url": "/data/openmaptiles.json"
+        },      
+        "terrainSource": {
+            "type": "raster-dem",
+            "url": "/data/terrain.json",
+            "tileSize": 256,
+            "attribution": "PR data by Japan Aerospace Exploration Agency."
+        },
+        "hillshadeSource": {
+            "type": "raster-dem",
+            "url": "/data/terrain.json",
+            "attribution": "PR data by Japan Aerospace Exploration Agency."
+        },
+        "renewables": {
+            "type": "vector",
+            "url": "/data/renewables.json",
+            "attribution": "Renewables data from © OpenStreetMap contributors"
+        },  
+        "positivefarms": {
+            "type": "vector",
+            "url": "/data/positivefarms.json"
+        },  
+        "customgeojson": {
+            "type": "geojson",
+            "data": {"type": "FeatureCollection", "features": []}
+        }
+    },
+    "glyphs": "/fonts/{fontstack}/{range}.pbf",
+    "sprite": "/styles/basic/sprite",
+    "layers": [
+        {
+            "id": "background",
+            "type": "raster",
+            "source": "background",
+            "minzoom": 5,
+            "maxzoom": 24,
+            "paint": {
+                "raster-saturation": 0,
+                "raster-brightness-min": 0.1
+            }
+        },
+        {
+            "id": "hills",
+            "type": "hillshade",
+            "source": "hillshadeSource",
+            "layout": { "visibility": "visible" },
+            "paint": { "hillshade-shadow-color": "#473B24" }
+        },
+        {
+            "filter": [
+              "all",
+              [
+                "==",
+                "$type",
+                "Point"
+              ],
+              [
+                "!in",
+                "class",
+                "city",
+                "state",
+                "country",
+                "continent"
+              ]
+            ],
+            "id": "place_label_other",
+            "layout": {
+              "icon-image": "leader_line",
+              "icon-anchor": "bottom",
+              "text-offset": [0, -12.5],
+              "text-anchor": "center",
+              "text-field": "{name}",
+              "text-font": [
+                "Noto Sans Regular"
+              ],
+              "text-max-width": 6,
+              "text-size": {
+                "stops": [
+                  [
+                    6,
+                    10
+                  ],
+                  [
+                    12,
+                    14
+                  ]
+                ]
+              }
+            },
+            "minzoom": 8,
+            "paint": {
+              "text-color": "hsl(0, 0%,0%)",
+              "text-halo-blur": 2,
+              "text-halo-color": "hsla(0, 0%, 100%, 0.75)",
+              "text-halo-width": 2
+            },
+            "source": "openmaptiles",
+            "source-layer": "place",
+            "type": "symbol"
+          },
+          {
+            "filter": [
+              "all",
+              [
+                "==",
+                "$type",
+                "Point"
+              ],
+              [
+                "==",
+                "class",
+                "city"
+              ]
+            ],
+            "id": "place_label_city",
+            "layout": {
+              "text-field": "{name}",
+              "text-font": [
+                "Noto Sans Regular"
+              ],
+              "text-max-width": 10,
+              "text-size": {
+                "stops": [
+                  [
+                    3,
+                    12
+                  ],
+                  [
+                    8,
+                    16
+                  ]
+                ]
+              }
+            },
+            "maxzoom": 16,
+            "paint": {
+              "text-color": "hsl(0, 0%, 0%)",
+              "text-halo-blur": 0,
+              "text-halo-color": "hsla(0, 0%, 100%, 0.75)",
+              "text-halo-width": 2
+            },
+            "source": "openmaptiles",
+            "source-layer": "place",
+            "type": "symbol"
+          },
+          {
+            "filter": [
+              "all",
+              [
+                "==",
+                "$type",
+                "Point"
+              ],
+              [
+                "==",
+                "class",
+                "country"
+              ],
+              [
+                "!has",
+                "iso_a2"
+              ]
+            ],
+            "id": "country_label-other",
+            "layout": {
+              "text-field": "{name:latin}",
+              "text-font": [
+                "Noto Sans Regular"
+              ],
+              "text-max-width": 10,
+              "text-size": {
+                "stops": [
+                  [
+                    3,
+                    12
+                  ],
+                  [
+                    8,
+                    22
+                  ]
+                ]
+              }
+            },
+            "maxzoom": 12,
+            "paint": {
+              "text-color": "hsl(0, 0%, 13%)",
+              "text-halo-blur": 0,
+              "text-halo-color": "rgba(255,255,255,0.75)",
+              "text-halo-width": 2
+            },
+            "source": "openmaptiles",
+            "source-layer": "place",
+            "type": "symbol"
+          },
+          {
+            "filter": [
+              "all",
+              [
+                "==",
+                "$type",
+                "Point"
+              ],
+              [
+                "==",
+                "class",
+                "country"
+              ],
+              [
+                "has",
+                "iso_a2"
+              ]
+            ],
+            "id": "country_label",
+            "layout": {
+              "text-field": "{name:latin}",
+              "text-font": [
+                "Noto Sans Regular"
+              ],
+              "text-max-width": 10,
+              "text-size": {
+                "stops": [
+                  [
+                    3,
+                    12
+                  ],
+                  [
+                    8,
+                    22
+                  ]
+                ]
+              }
+            },
+            "maxzoom": 12,
+            "paint": {
+              "text-color": "hsl(0, 0%, 13%)",
+              "text-halo-blur": 0,
+              "text-halo-color": "rgba(255,255,255,0.75)",
+              "text-halo-width": 2
+            },
+            "source": "openmaptiles",
+            "source-layer": "place",
+            "type": "symbol"
+        },         
+        {
+            "id": "3d-buildings",
+            "source": "openmaptiles",
+            "source-layer": "building",
+            "type": "fill-extrusion",
+            "minzoom": 15,
+            "layout": {
+                "visibility": "none"
+            },             
+            "paint": {
+                "fill-extrusion-color": [
+                    "interpolate",
+                    ["linear"],
+                    ["get", "render_height"], 0, "lightgray", 200, "royalblue", 400, "lightblue"
+                ],
+                "fill-extrusion-height": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    15,
+                    0,
+                    16,
+                    ["get", "render_height"]
+                ],
+                "fill-extrusion-base": ["case",
+                    [">=", ["get", "zoom"], 16],
+                    ["get", "render_min_height"], 0
+                ]
+            }
+        },               
+        {
+            "filter": [
+              "all"
+            ], 
+            "id": "positivefarms_background",
+            "paint": {
+              "fill-color": "green",
+              "fill-opacity": 0.6          
+            },
+            "source": "positivefarms",
+            "source-layer": "positivefarms",
+            "type": "fill"
+        },
+        {
+            "filter": [
+                "in",
+                "id",
+                ""
+            ],
+            "id": "positivefarms_active",
+            "paint": {
+                "fill-color": "orange",
+                "fill-opacity": 0.6
+            },
+            "source": "positivefarms",
+            "source-layer": "positivefarms",
+            "type": "fill"
+        },
+        {
+            "filter": [
+                "all"
+            ],
+            "id": "positivefarms_outlined",
+            "paint": {
+                "line-color": "orange",
+                "line-width": 3,
+                "line-opacity": [
+                "case",
+                ["boolean", ["feature-state", "hover"], false],
+                1,
+                0
+                ]          
+            },
+            "source": "positivefarms",
+            "source-layer": "positivefarms",
+            "type": "line"
+        },
+        {
+            "filter": [
+              "all"
+            ], 
+            "id": "renewables_background",
+            "paint": {
+              "fill-color": "#ffffff",
+              "fill-opacity": 0.3          
+            },
+            "source": "renewables",
+            "source-layer": "renewables",
+            "type": "fill"
+        },
+        {
+            "filter": [
+                "in",
+                "id",
+                ""
+            ],
+            "id": "renewables_active",
+            "paint": {
+              "fill-color": "orange",
+              "fill-opacity": 0.5
+            },
+            "source": "renewables",
+            "source-layer": "renewables",
+            "type": "fill"
+        },
+        {
+            "filter": [
+                "all"
+            ],
+            "id": "renewables_outlined",
+            "paint": {
+              "line-color": "orange",
+              "line-width": 3,
+              "line-opacity": [
+                "case",
+                ["boolean", ["feature-state", "hover"], false],
+                1,
+                0
+                ]          
+            },
+            "source": "renewables",
+            "source-layer": "renewables",
+            "type": "line"
+        },
+        {
+            "id": "renewables_windturbine",
+            "type": "symbol",
+            "source": "renewables",
+            "source-layer": "renewables",
+            "layout": {
+                "icon-image": "windturbine_white", 
+                "icon-size": ["interpolate", ["exponential", 2], ["zoom"], 
+                    0, 0.000007, 
+                    20, 8
+                ],
+                "icon-anchor": "bottom",
+                "icon-allow-overlap": [
+    
+                  "step",
+                  ["zoom"],
+                  false,
+                  11,
+                  true
+    
+                ]            
+            },
+            "filter": [
+                "all",
+                [
+                    "==",
+                    "$type",
+                    "Point"
+                ],
+                [
+                    "==",
+                    "renewabletype",
+                    "wind"
+                ]
+            ]
+        },
+        {
+            "id": "customgeojson_solarfarm",
+            "source": "customgeojson",
+            "type": "fill",
+            "layout": {},
+            "filter": [
+              "all",
+              [
+                "==",
+                "$type",
+                "Polygon"
+              ]
+            ],
+            "paint": {
+              "fill-pattern": "solarpanel"
+            }
+        },    
+        {
+            "id": "customgeojson_windturbine",
+            "type": "symbol",
+            "source": "customgeojson",
+            "layout": {
+                "icon-image": "windturbine_white", 
+                "icon-size": [
+                  "interpolate", ["exponential", 2], ["zoom"], 
+                  12, 0.03125,
+                  20, 8
+                ],
+                "icon-anchor": "bottom",
+                "icon-allow-overlap": [
+                  "step",
+                  ["zoom"],
+                  false,
+                  12,
+                  true
+                ]            
+            },
+            "filter": [
+              "all",
+              [
+                "==",
+                "$type",
+                "Point"
+              ]
+            ]
+        }          
+    ],
+    "terrain": {
+        "source": "terrainSource",
+        "exaggeration": 1
+    }
+}

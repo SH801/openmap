@@ -14,7 +14,8 @@
 export const isDev = () =>  !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 console.log("Development machine", isDev());
 
-export const POSITIVE_DEFAULT = "positivefarms.org";
+// export const POSITIVE_DEFAULT = "positivefarms.org";
+export const POSITIVE_DEFAULT = "positiveplaces.org";
 
 // Array of possible sites
 export const POSITIVE_SITES = {
@@ -33,6 +34,9 @@ export const POSITIVE_SITE = (BASEDOMAIN in POSITIVE_SITES) ? POSITIVE_SITES[BAS
 // URL of backend system
 export const API_URL = isDev() ? "http://localhost:80" : "";
 // export const API_URL = isDev() ? "http://192.168.1.29:80" : "";
+
+// Base url of tile server
+export const TILESERVER_BASEURL = isDev() ? "http://localhost:8080" : ("https://tiles." + POSITIVE_SITE.shortcode + '.org');
 
 // Height of wind turbine in metres in order to calculate bounding box for wind turbine points
 export const WINDTURBINE_HEIGHT = 150;

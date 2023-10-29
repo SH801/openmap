@@ -22,6 +22,7 @@ import {
 import { initShaders, initVertexBuffers, renderImage } from './webgl';
 import { setURLState, modifyURLParameter, getURLSubdomain, getExternalReference } from "../functions/urlstate";
 import { 
+  TILESERVER_BASEURL,
   POSITIVE_SITE,
   POSITIVE_SITES,
   DEFAULT_LAT, 
@@ -457,24 +458,55 @@ export class MapContainer extends Component  {
 
   hoveredPolygonId = null;
 
+  incorporateBaseDomain = (baseurl, json) => {
+    let newjson = JSON.parse(JSON.stringify(json));
+    const sources_list = ['openmaptiles', 'terrainSource', 'hillshadeSource', 'renewables', 'positivefarms'];
+
+    for(let i = 0; i < sources_list.length; i++) {
+      var id = sources_list[i];
+      if (id in newjson['sources']) newjson['sources'][id]['url'] = baseurl + newjson['sources'][id]['url'];
+    }
+
+    newjson['glyphs'] = baseurl + newjson['glyphs'];
+    newjson['sprite'] = baseurl + newjson['sprite'];
+
+    // Delete farms from positiveplaces.org
+    if (POSITIVE_SITE.shortcode === 'positiveplaces') {
+      var newlayers = [];
+      for(let i = 0; i < newjson['layers'].length; i++) {
+        if (newjson['layers'][i]['source'] !== 'positivefarms') newlayers.push(newjson['layers'][i]);
+      }
+      delete newjson['sources']['positivefarms'];
+      newjson['layers'] = newlayers;
+    }
+
+    return newjson;
+  }
+
+
   constructor(props) {
     super(props);
     this.mapRef = React.createRef();
     this.popupRef = React.createRef();
-    // this.customgeojsonStyle = require('../constants/customgeojson.json');
-    
     this.maxTileCacheSize = this.getMaxTileCacheSize();
-    this.placessatellitelayer = require(isDev() ? '../constants/placesterrainstyletest.json' : '../constants/placesterrainstyle.json');
-    this.farmssatellitelayer = require(isDev() ? '../constants/farmsterrainstyletest.json' : '../constants/farmsterrainstyle.json');    
-    this.positiveplaceslayer = require(isDev() ? '../constants/positiveplacestest.json' : '../constants/positiveplaces.json');
-    this.positivefarmslayer = require(isDev() ? '../constants/positivefarmstest.json' : '../constants/positivefarms.json');
+    this.style_twodimensions = require('../constants/style_twodimensions.json');
+    this.style_threedimensions = require('../constants/style_threedimensions.json');
 
-    this.satellitelayer = this.placessatellitelayer;
-    this.nonsatellitelayer = this.positiveplaceslayer;
-    if (POSITIVE_SITE.shortcode === 'positivefarms') {
-      this.satellitelayer = this.farmssatellitelayer;
-      this.nonsatellitelayer = this.positivefarmslayer;
-    }
+    // this.placessatellitelayer = require(isDev() ? '../constants/placesterrainstyletest.json' : '../constants/placesterrainstyle.json');
+    // this.farmssatellitelayer = require(isDev() ? '../constants/farmsterrainstyletest.json' : '../constants/farmsterrainstyle.json');    
+    // this.positiveplaceslayer = require(isDev() ? '../constants/positiveplacestest.json' : '../constants/positiveplaces.json');
+    // this.positivefarmslayer = require(isDev() ? '../constants/positivefarmstest.json' : '../constants/positivefarms.json');
+
+    // this.satellitelayer = this.placessatellitelayer;
+    // this.nonsatellitelayer = this.positiveplaceslayer;
+    // if (POSITIVE_SITE.shortcode === 'positivefarms') {
+    //   this.satellitelayer = this.farmssatellitelayer;
+    //   this.nonsatellitelayer = this.positivefarmslayer;
+    // }
+
+    this.satellitelayer = this.incorporateBaseDomain(TILESERVER_BASEURL, this.style_threedimensions);
+    this.nonsatellitelayer = this.incorporateBaseDomain(TILESERVER_BASEURL, this.style_twodimensions);
+
     // Add other explicit conditionals as 'require' requires explicit filenames during build
 
     this.props.fetchAllProperties();

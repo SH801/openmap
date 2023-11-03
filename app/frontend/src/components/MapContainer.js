@@ -4,15 +4,19 @@ import { withRouter } from 'react-router-dom';
 import { global, search } from "../actions";
 import { Tooltip } from 'react-tooltip';
 import { Map, Popup, NavigationControl, GeolocateControl }  from 'react-map-gl/maplibre';
-import { centroid } from '@turf/turf';
+import { booleanOverlap, bboxPolygon, centroid } from '@turf/turf';
 import queryString from "query-string";
 import 'maplibre-gl/dist/maplibre-gl.css';
 // import loadEncoder from 'https://unpkg.com/mp4-h264@1.0.7/build/mp4-encoder.js';
 // import { Muxer, ArrayBufferTarget, FileSystemWritableFileStreamTarget } from 'mp4-muxer';
 import toast from 'react-hot-toast';
 import { Toaster } from 'react-hot-toast';
+import { closeOutline } from 'ionicons/icons';
 import { IonLoading } from '@ionic/react';
 import { 
+  IonList,
+  IonItem,
+  IonIcon,
   IonGrid,
   IonRow,
   IonCol,
@@ -22,6 +26,7 @@ import {
 import { initShaders, initVertexBuffers, renderImage } from './webgl';
 import { setURLState, modifyURLParameter, getURLSubdomain, getExternalReference } from "../functions/urlstate";
 import { 
+  PLANNING_CONSTRAINTS,
   TILESERVER_BASEURL,
   POSITIVE_SITE,
   POSITIVE_SITES,
@@ -35,7 +40,7 @@ import {
   DESKTOP_PADDING,
   DEFAULT_MAXBOUNDS
 } from "../constants";
-import { getBoundingBox, mapSelectEntity } from '../functions/map';
+import { getBoundingBox, mapSelectEntity, mapRefreshPlanningConstraints} from '../functions/map';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 
 export const isDev = () =>  !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
@@ -186,7 +191,12 @@ export class PitchToggle extends Component{
     this._btn.onclick = function() { 
       var currsatellite = _this._mapcontainer.state.satellite;
       var newsatellite = !currsatellite;
-      _this._mapcontainer.setState({showtooltip: false, idle: false, satellite: newsatellite});
+      _this._mapcontainer.setState({showtooltip: false, idle: false, satellite: newsatellite}, () => {
+        mapRefreshPlanningConstraints(
+          _this._mapcontainer.props.global.showplanningconstraints, 
+          _this._mapcontainer.props.global.planningconstraints, 
+          _this._map);
+      });
       if (newsatellite) {
           map.easeTo({pitch: _this._pitch});
           _this._btn.className = 'maplibregl-ctrl-icon maplibregl-ctrl-pitchtoggle-2d';
@@ -458,15 +468,49 @@ export class MapContainer extends Component  {
 
   hoveredPolygonId = null;
 
-  incorporateBaseDomain = (baseurl, json) => {
+  addColoursToPlanningConstraints = (planningconstraints) => {
+    // Set colours of planning constraints according to globals
+    var colourlookup = {}
+    var planningconstraints_list = Object.keys(PLANNING_CONSTRAINTS);
+    for(let i = 0; i < planningconstraints_list.length; i++) {
+      for(let j = 0; j < PLANNING_CONSTRAINTS[planningconstraints_list[i]]['layers'].length; j++) {
+        var id = PLANNING_CONSTRAINTS[planningconstraints_list[i]]['layers'][j];
+        colourlookup[id] = PLANNING_CONSTRAINTS[planningconstraints_list[i]]['colour'];
+      }
+    }
+    for(let i = 0; i < planningconstraints.length; i++) {
+      var id = planningconstraints[i]['id'];
+      if ('line-color' in planningconstraints[i]['paint']) planningconstraints[i]['paint']['line-color'] = colourlookup[id];
+      if ('fill-color' in planningconstraints[i]['paint']) planningconstraints[i]['paint']['fill-color'] = colourlookup[id];
+    }
+    return planningconstraints;
+  }
+
+  incorporateBaseDomain = (baseurl, planningconstraints, json) => {
+
     let newjson = JSON.parse(JSON.stringify(json));
-    const sources_list = ['openmaptiles', 'terrainSource', 'hillshadeSource', 'renewables', 'positivefarms'];
+    const sources_list = ['openmaptiles', 'terrainSource', 'hillshadeSource', 'powerlines', 'renewables', 'positivefarms'];
 
     for(let i = 0; i < sources_list.length; i++) {
       var id = sources_list[i];
-      if (id in newjson['sources']) newjson['sources'][id]['url'] = baseurl + newjson['sources'][id]['url'];
+      if (id in newjson['sources']) {
+        if ('url' in newjson['sources'][id]) {
+          if (!(newjson['sources'][id]['url'].startsWith('http'))) {
+            newjson['sources'][id]['url'] = baseurl + newjson['sources'][id]['url'];
+          }       
+        }
+      }
     }
 
+    var newlayers = [];
+    for(let i = 0; i < newjson['layers'].length; i++) {
+      if (newjson['layers'][i]['id'] === 'planning-constraints') {
+        for(let j = 0; j < planningconstraints.length; j++) newlayers.push(planningconstraints[j]);
+      } else {
+        newlayers.push(newjson['layers'][i]);
+      }
+    }
+    newjson['layers'] = newlayers;
     newjson['glyphs'] = baseurl + newjson['glyphs'];
     newjson['sprite'] = baseurl + newjson['sprite'];
 
@@ -489,23 +533,12 @@ export class MapContainer extends Component  {
     this.mapRef = React.createRef();
     this.popupRef = React.createRef();
     this.maxTileCacheSize = this.getMaxTileCacheSize();
+    this.ukgeojson = require('../constants/UK.json');
     this.style_twodimensions = require('../constants/style_twodimensions.json');
     this.style_threedimensions = require('../constants/style_threedimensions.json');
-
-    // this.placessatellitelayer = require(isDev() ? '../constants/placesterrainstyletest.json' : '../constants/placesterrainstyle.json');
-    // this.farmssatellitelayer = require(isDev() ? '../constants/farmsterrainstyletest.json' : '../constants/farmsterrainstyle.json');    
-    // this.positiveplaceslayer = require(isDev() ? '../constants/positiveplacestest.json' : '../constants/positiveplaces.json');
-    // this.positivefarmslayer = require(isDev() ? '../constants/positivefarmstest.json' : '../constants/positivefarms.json');
-
-    // this.satellitelayer = this.placessatellitelayer;
-    // this.nonsatellitelayer = this.positiveplaceslayer;
-    // if (POSITIVE_SITE.shortcode === 'positivefarms') {
-    //   this.satellitelayer = this.farmssatellitelayer;
-    //   this.nonsatellitelayer = this.positivefarmslayer;
-    // }
-
-    this.satellitelayer = this.incorporateBaseDomain(TILESERVER_BASEURL, this.style_threedimensions);
-    this.nonsatellitelayer = this.incorporateBaseDomain(TILESERVER_BASEURL, this.style_twodimensions);
+    this.style_planningconstraints = this.addColoursToPlanningConstraints(require('../constants/style_planningconstraints.json'));
+    this.satellitelayer = this.incorporateBaseDomain(TILESERVER_BASEURL, this.style_planningconstraints, this.style_threedimensions);
+    this.nonsatellitelayer = this.incorporateBaseDomain(TILESERVER_BASEURL, this.style_planningconstraints, this.style_twodimensions);
 
     // Add other explicit conditionals as 'require' requires explicit filenames during build
 
@@ -727,12 +760,16 @@ export class MapContainer extends Component  {
     setTimeout(this.animateIcons, intervalmsecs);
   }
 
-
   onLoad = (event) => {
     this.props.setGlobalState({"mapref": this.mapRef}).then(() => {
       setInterval(this.fetchLastExport, 15000);
     });
     var map = this.mapRef.current.getMap();
+
+    mapRefreshPlanningConstraints(
+      this.props.global.showplanningconstraints, 
+      this.props.global.planningconstraints,
+      map);
 
     if (this.state.plan !== '') this.props.fetchCustomGeoJSON('', this.state.plan);
     else if (this.props.positivecookie !== '') this.props.fetchCustomGeoJSON(this.props.positivecookie, '');
@@ -1180,6 +1217,52 @@ export class MapContainer extends Component  {
     this.props.setGlobalState({editcustomgeojson: null});
   }
 
+  closePlanningConstraints = () => {
+    this.props.setGlobalState({showplanningconstraints: false}).then(() => {
+      mapRefreshPlanningConstraints(
+        this.props.global.showplanningconstraints, 
+        this.props.global.planningconstraints,
+        this.mapRef.current.getMap());
+    });
+  }
+
+  togglePlanningConstraint = (planningconstraint) => {
+    var planningconstraints = this.props.global.planningconstraints;
+    planningconstraints[planningconstraint] = !(planningconstraints[planningconstraint]);
+    this.props.setGlobalState({planningconstraints: planningconstraints}).then(() => {
+      mapRefreshPlanningConstraints(
+        this.props.global.showplanningconstraints, 
+        this.props.global.planningconstraints,
+        this.mapRef.current.getMap());
+    });
+  }
+
+  transformRequest = (url, resourceType) => {
+    // if (url.indexOf('s3.amazonaws.com/elevation-tiles-prod') !== -1) {
+    //   var urlelements = url.split('/');
+    //   var zoom = parseInt(urlelements[5]);
+    //   var xtile_tl = parseInt(urlelements[6]);
+    //   var ytile_tl = parseInt(urlelements[7]);
+    //   var xtile_br = (xtile_tl + 1);
+    //   var ytile_br = (ytile_tl + 1);
+    //   var n = Math.pow(2, zoom);
+    //   var lon_deg_tl = parseFloat(360.0 * xtile_tl / n)  - 180.0;
+    //   var lon_deg_br = parseFloat(360.0 * xtile_br / n)  - 180.0;
+    //   var lat_rad_tl = Math.atan(Math.sinh(Math.PI * (1 - (2 * ytile_tl / n))));
+    //   var lat_rad_br = Math.atan(Math.sinh(Math.PI * (1 - (2 * ytile_br / n))));
+    //   var lat_deg_tl = (lat_rad_tl * 180.0 / Math.PI);
+    //   var lat_deg_br = (lat_rad_br * 180.0 / Math.PI);
+    //   var tilegeojson = bboxPolygon([lon_deg_tl, lat_deg_tl, lon_deg_br, lat_deg_br]);
+    //   if ((!booleanOverlap(this.ukgeojson.geometry, tilegeojson.geometry)) && 
+    //       true ) {
+    //     console.log("Tile not in UK", lat_deg_tl, lon_deg_tl, lat_deg_br, lon_deg_br);
+    //   } else {
+    //     // console.log("Tile in UK", lat_deg_tl, lon_deg_tl, lat_deg_br, lon_deg_br);
+    //   }
+    //   return {url: 'http://localhost:8080/data/terrain/' + urlelements[5] + '/' + urlelements[6] + "/" + urlelements[7]};
+    // }
+  }
+
   render () {
     return (
       <>
@@ -1220,7 +1303,8 @@ export class MapContainer extends Component  {
             zoom: this.state.zoom,
             pitch: this.state.pitch,
             bearing: this.state.bearing
-          }}    
+          }} 
+          transformRequest={this.transformRequest}
           mapStyle={this.state.satellite ? this.satellitelayer : this.nonsatellitelayer}
         >
 
@@ -1279,6 +1363,46 @@ export class MapContainer extends Component  {
 
         </Map>
       ) : null};
+
+      {this.props.global.showplanningconstraints ? (
+        <div style={{position: "absolute", bottom: "10px", left: "0px", width: "100vw", zIndex: "9999"}}>
+          <div style={{marginLeft: "10px", marginRight: this.props.isMobile ? "10px" : "calc(24% + 10px)", backgroundColor: "#ffffffff"}}>
+            <IonIcon style={{fontSize: "80%", position: "absolute", top: "10px", left: "10px"}} onClick={() => this.closePlanningConstraints()} icon={closeOutline} className="close-icon"/>
+            <div>
+              <IonGrid>
+                <IonRow class="ion-align-items-center ion-justify-content-center">
+                  <IonCol size="auto">
+                    <IonText>Unusable wind sites due to poor wind / planning constraints</IonText>
+                  </IonCol>
+                </IonRow>
+                <IonRow class="ion-align-items-center ion-justify-content-center">
+                  <IonCol size="auto">
+                    <div style={{paddingLeft: "20px", paddingRight: "20px"}}>
+                      {Object.keys(PLANNING_CONSTRAINTS).map((planningconstraint, index) => {
+                        return (
+                          <span 
+                            key={index} 
+                            onClick={() => this.togglePlanningConstraint(planningconstraint)} 
+                            style={{
+                              opacity: (this.props.global.planningconstraints[planningconstraint] ? 1 : 0.4),
+                              whiteSpace: "nowrap", 
+                              fontSize: "80%", 
+                              paddingRight: "10px"
+                            }}>
+                            <div style={{width: "25px", height: "10px", marginRight: "5px", display: "inline-block", backgroundColor: PLANNING_CONSTRAINTS[planningconstraint]['colour']}} />
+                            {planningconstraint}
+                          </span>  
+                        )
+                      })}
+                    </div>
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       </>
     )
   }

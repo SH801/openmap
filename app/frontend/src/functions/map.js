@@ -1,5 +1,5 @@
 import { bbox, point, destination } from '@turf/turf';
-import { WINDTURBINE_HEIGHT, POSITIVE_SITE } from "../constants";
+import { PLANNING_CONSTRAINTS, WINDTURBINE_HEIGHT, POSITIVE_SITE } from "../constants";
 
 function addContextFilter(context, filter) {
     if (context) return ["all", getContextFilter(context), filter];
@@ -67,3 +67,19 @@ export function mapSelectProperty(context, map, propertyid) {
     map.setFilter('renewables_active', addContextFilter(context, activeFilter));
     map.setFilter('renewables_background', addContextFilter(context, backgroundFilter));
 }
+
+export function mapRefreshPlanningConstraints(showplanningconstraints, planningconstraints, map) {
+    var planningconstraints_sections = Object.keys(PLANNING_CONSTRAINTS);
+    for(let i = 0; i < planningconstraints_sections.length; i++) {
+      var planningconstraint_section = planningconstraints_sections[i];
+      var section_status = planningconstraints[planningconstraint_section];
+      if (!showplanningconstraints) section_status = false;
+      for(let j = 0; j < PLANNING_CONSTRAINTS[planningconstraint_section]['layers'].length; j++) {
+        var id = PLANNING_CONSTRAINTS[planningconstraint_section]['layers'][j];
+        if (map.getLayer(id)) {
+          if (section_status) map.setLayoutProperty(id, 'visibility', 'visible');
+          else map.setLayoutProperty(id, 'visibility', 'none');
+        }
+      }
+    }
+  }

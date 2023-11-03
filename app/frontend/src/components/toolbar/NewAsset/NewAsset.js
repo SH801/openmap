@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { global } from "../../../actions";
 import { Tooltip } from 'react-tooltip';
-import { addCircleOutline, createOutline, closeOutline } from 'ionicons/icons';
+import { addCircleOutline, createOutline, alertCircle, closeOutline } from 'ionicons/icons';
 import { 
+    IonButton,
     IonIcon,
     IonModal, 
     IonHeader, 
@@ -16,7 +17,7 @@ import {
     IonText,
     IonList,
 } from '@ionic/react';
-import { getBoundingBox } from '../../../functions/map';
+import { getBoundingBox, mapRefreshPlanningConstraints } from '../../../functions/map';
 
 export class NewAsset extends Component {
 
@@ -29,6 +30,7 @@ export class NewAsset extends Component {
     }
 
     showMapdraw = (assettype) => {
+        if (!(this.props.global.showplanningconstraints)) this.togglePlanningRestrictions();
         if (this.props.global.mapref !== null) {
             var map = this.props.global.mapref.current.getMap();
             map.addControl(this.props.global.mapdraw, this.props.isMobile ? 'top-right' : 'top-left'); 
@@ -80,6 +82,15 @@ export class NewAsset extends Component {
         this.closeModal();
     }
 
+    togglePlanningRestrictions = () => {
+        this.props.setGlobalState({showplanningconstraints: !(this.props.global.showplanningconstraints)}).then(() => {
+            mapRefreshPlanningConstraints(
+                this.props.global.showplanningconstraints, 
+                this.props.global.planningconstraints,
+                this.props.global.mapref.current.getMap());          
+        });
+    }
+
     closeModal = () => {
         this.setState({shownewassetmodal: false});
     }
@@ -96,6 +107,7 @@ export class NewAsset extends Component {
             {this.props.global.customgeojson.features.length > 0 ? (
                 <IonIcon data-tooltip-id="actions-tooltip" data-tooltip-content="Edit wind/solar" onClick={this.enableEdit} icon={createOutline} className="editcustomgeojson-icon"/>
             ) : null}
+            <IonIcon data-tooltip-id="actions-tooltip" data-tooltip-content="Toggle site constraints" onClick={this.togglePlanningRestrictions} color="danger" slot="icon-only" icon={alertCircle} className="editcustomgeojson-icon"/>
             {this.state.shownewassetmodal ? (
                 <IonModal 
                     id="newasset-modal"

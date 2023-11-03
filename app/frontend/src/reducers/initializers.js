@@ -55,6 +55,16 @@ export const initialStateGlobal = {
         userProperties: true,
         styles: require('../constants/mapdrawstyles.json')
     }),
+    showplanningconstraints: false,
+    planningconstraints: {
+        "Inadequate wind": true,
+        "Landscape / visual impact": true,
+        "Heritage impact": true,
+        "Too close to residential": true,
+        "Ecology / wildlife": true,
+        "Unsafe distance (transportation, powerlines, etc)": true,
+        "Aviation / MOD": true
+    }
 };
 
 export const initialStateMap = {

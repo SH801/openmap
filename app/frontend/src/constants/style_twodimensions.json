@@ -11,15 +11,30 @@
         },      
         "terrainSource": {
           "type": "raster-dem",
-          "url": "/data/terrain.json",
+          "tiles": [
+              "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"
+          ],
+          "minzoom": 0,
+          "maxzoom": 15,
           "tileSize": 256,
-          "attribution": "PR data by Japan Aerospace Exploration Agency."
+          "encoding": "terrarium",
+          "attribution": "United Kingdom terrain data © Environment Agency copyright and/or database right 2015. All rights reserved;"
         },
         "hillshadeSource": {
-          "type": "raster-dem",
-          "url": "/data/terrain.json",
-          "attribution": "PR data by Japan Aerospace Exploration Agency."
+            "type": "raster-dem",
+            "tiles": [
+                "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"
+            ],
+            "minzoom": 0,
+            "maxzoom": 15,
+            "tileSize": 256,
+            "encoding": "terrarium",
+            "attribution": "United Kingdom terrain data © Environment Agency copyright and/or database right 2015. All rights reserved;"
         },
+        "powerlines": {
+          "type": "vector",
+          "url": "/data/powerlines.json"
+        },      
         "renewables": {
           "type": "vector",
           "url": "/data/renewables.json",
@@ -265,6 +280,9 @@
         "source": "openmaptiles",
         "source-layer": "landcover",
         "type": "fill"
+      },
+      {
+        "id": "planning-constraints"
       },
       {
         "filter": [
@@ -1756,7 +1774,7 @@
         "source": "openmaptiles",
         "source-layer": "place",
         "type": "symbol"
-      }, 
+      },      
       {
         "id": "3d-buildings",
         "source": "openmaptiles",
@@ -1968,9 +1986,5 @@
         ]
       }
     ],
-    "terrain": {
-        "source": "terrainSource",
-        "exaggeration": 1
-    },
     "id": "basic-preview"
 }

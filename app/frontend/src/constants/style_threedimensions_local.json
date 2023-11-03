@@ -9,35 +9,36 @@
         },
         "openmaptiles": {
             "type": "vector",
-            "url": "http://localhost:8080/data/openmaptiles.json"
+            "url": "/data/openmaptiles.json"
         },      
-        "positivefarms": {
-            "type": "vector",
-            "url": "http://localhost:8080/data/positivefarms.json"
-        },  
+        "terrainSource": {
+            "type": "raster-dem",
+            "url": "/data/terrain.json",
+            "tileSize": 256,
+            "attribution": "United Kingdom terrain data © Environment Agency copyright and/or database right 2015. All rights reserved;"
+        },
+        "hillshadeSource": {
+          "type": "raster-dem",
+          "url": "/data/terrain.json",
+          "tileSize": 256,
+          "attribution": "United Kingdom terrain data © Environment Agency copyright and/or database right 2015. All rights reserved;"
+        },
         "renewables": {
             "type": "vector",
-            "url": "http://localhost:8080/data/renewables.json",
+            "url": "/data/renewables.json",
             "attribution": "Renewables data from © OpenStreetMap contributors"
+        },  
+        "positivefarms": {
+            "type": "vector",
+            "url": "/data/positivefarms.json"
         },  
         "customgeojson": {
             "type": "geojson",
             "data": {"type": "FeatureCollection", "features": []}
-        },  
-        "terrainSource": {
-            "type": "raster-dem",
-            "url": "http://localhost:8080/data/terrain.json",
-            "tileSize": 256,
-            "attribution": "PR data by Japan Aerospace Exploration Agency."
-        },
-        "hillshadeSource": {
-            "type": "raster-dem",
-            "url": "https://tiles.positivefarms.org/data/terrain.json",
-            "attribution": "PR data by Japan Aerospace Exploration Agency."
         }
     },
-    "glyphs": "https://tiles.positivefarms.org/fonts/{fontstack}/{range}.pbf",
-    "sprite": "http://localhost:8080/styles/basic/sprite",
+    "glyphs": "/fonts/{fontstack}/{range}.pbf",
+    "sprite": "/styles/basic/sprite",
     "layers": [
         {
             "id": "background",
@@ -56,7 +57,7 @@
             "source": "hillshadeSource",
             "layout": { "visibility": "visible" },
             "paint": { "hillshade-shadow-color": "#473B24" }
-        },
+        },        
         {
             "id": "3d-buildings",
             "source": "openmaptiles",
@@ -262,10 +263,200 @@
                 "Point"
               ]
             ]
-        }          
-    ],
-    "terrain": {
-        "source": "terrainSource",
-        "exaggeration": 1
-    }
+        },
+        {
+            "filter": [
+              "all",
+              [
+                "==",
+                "$type",
+                "Point"
+              ],
+              [
+                "!in",
+                "class",
+                "city",
+                "state",
+                "country",
+                "continent"
+              ]
+            ],
+            "id": "place_label_other",
+            "layout": {
+              "icon-image": "leader_line",
+              "icon-anchor": "bottom",
+              "text-offset": [0, -8.5],
+              "text-field": "{name}",
+              "text-font": [
+                "Noto Sans Regular"
+              ],
+              "text-max-width": 6,
+              "text-size": {
+                "stops": [
+                  [
+                    6,
+                    10
+                  ],
+                  [
+                    12,
+                    14
+                  ]
+                ]
+              }
+            },
+            "minzoom": 8,
+            "paint": {
+              "text-color": "hsl(0, 0%,0%)",
+              "text-halo-blur": 2,
+              "text-halo-color": "hsla(0, 0%, 100%, 0.75)",
+              "text-halo-width": 2
+            },
+            "source": "openmaptiles",
+            "source-layer": "place",
+            "type": "symbol"
+          },
+          {
+            "filter": [
+              "all",
+              [
+                "==",
+                "$type",
+                "Point"
+              ],
+              [
+                "==",
+                "class",
+                "city"
+              ]
+            ],
+            "id": "place_label_city",
+            "layout": {
+              "text-field": "{name}",
+              "text-font": [
+                "Noto Sans Regular"
+              ],
+              "text-max-width": 10,
+              "text-size": {
+                "stops": [
+                  [
+                    3,
+                    12
+                  ],
+                  [
+                    8,
+                    16
+                  ]
+                ]
+              }
+            },
+            "maxzoom": 16,
+            "paint": {
+              "text-color": "hsl(0, 0%, 0%)",
+              "text-halo-blur": 0,
+              "text-halo-color": "hsla(0, 0%, 100%, 0.75)",
+              "text-halo-width": 2
+            },
+            "source": "openmaptiles",
+            "source-layer": "place",
+            "type": "symbol"
+          },
+          {
+            "filter": [
+              "all",
+              [
+                "==",
+                "$type",
+                "Point"
+              ],
+              [
+                "==",
+                "class",
+                "country"
+              ],
+              [
+                "!has",
+                "iso_a2"
+              ]
+            ],
+            "id": "country_label-other",
+            "layout": {
+              "text-field": "{name:latin}",
+              "text-font": [
+                "Noto Sans Regular"
+              ],
+              "text-max-width": 10,
+              "text-size": {
+                "stops": [
+                  [
+                    3,
+                    12
+                  ],
+                  [
+                    8,
+                    22
+                  ]
+                ]
+              }
+            },
+            "maxzoom": 12,
+            "paint": {
+              "text-color": "hsl(0, 0%, 13%)",
+              "text-halo-blur": 0,
+              "text-halo-color": "rgba(255,255,255,0.75)",
+              "text-halo-width": 2
+            },
+            "source": "openmaptiles",
+            "source-layer": "place",
+            "type": "symbol"
+          },
+          {
+            "filter": [
+              "all",
+              [
+                "==",
+                "$type",
+                "Point"
+              ],
+              [
+                "==",
+                "class",
+                "country"
+              ],
+              [
+                "has",
+                "iso_a2"
+              ]
+            ],
+            "id": "country_label",
+            "layout": {
+              "text-field": "{name:latin}",
+              "text-font": [
+                "Noto Sans Regular"
+              ],
+              "text-max-width": 10,
+              "text-size": {
+                "stops": [
+                  [
+                    3,
+                    12
+                  ],
+                  [
+                    8,
+                    22
+                  ]
+                ]
+              }
+            },
+            "maxzoom": 12,
+            "paint": {
+              "text-color": "hsl(0, 0%, 13%)",
+              "text-halo-blur": 0,
+              "text-halo-color": "rgba(255,255,255,0.75)",
+              "text-halo-width": 2
+            },
+            "source": "openmaptiles",
+            "source-layer": "place",
+            "type": "symbol"
+        }                  
+    ]
 }

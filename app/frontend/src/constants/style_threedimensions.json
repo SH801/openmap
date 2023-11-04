@@ -33,6 +33,11 @@
             "encoding": "terrarium",
             "attribution": "United Kingdom terrain data © Environment Agency copyright and/or database right 2015. All rights reserved;"
         },
+        "windspeed": {
+          "type": "vector",
+          "url": "/data/windspeed.json",
+          "attribution": "Estimated average wind speeds from NOABL Wind Speed Database © Department for Business, Enterprise & Regulatory Reform 1996"
+        },      
         "powerlines": {
           "type": "vector",
           "url": "/data/powerlines.json"
@@ -74,7 +79,51 @@
         }, 
         {
           "id": "planning-constraints"
-        },  
+        }, 
+        {
+          "filter": [
+            "all",
+            [
+              "==",
+              "$type",
+              "Polygon"
+            ]
+          ],
+          "id": "windspeed",
+          "layout": {
+            "visibility": "none"
+          },
+          "paint": {
+              "fill-color": [
+              "let",
+              "relativespeed",
+              ["/", ["get", "DN"], 158],
+              [
+                "interpolate",
+                ["linear"],
+                ["var", "relativespeed"],
+                0.0,
+                ["to-color", "black"],
+                0.31646,
+                ["to-color", "lightgray"],
+                0.37975,
+                ["to-color", "white"],
+                0.535,
+                ["to-color", "yellow"],
+                0.69,
+                ["to-color", "red"],
+                0.845,
+                ["to-color", "purple"],
+                1.0,
+                ["to-color", "purple"]
+            ]
+              ],
+              "fill-opacity": 0.8
+          },
+          "source": "windspeed",
+          "source-layer": "windspeed",
+          "type": "fill"
+        },          
         {
             "id": "3d-buildings",
             "source": "openmaptiles",

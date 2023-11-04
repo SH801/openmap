@@ -4,7 +4,8 @@ import { withRouter } from 'react-router-dom';
 import { global, search } from "../actions";
 import { Tooltip } from 'react-tooltip';
 import { Map, Popup, NavigationControl, GeolocateControl }  from 'react-map-gl/maplibre';
-import { booleanOverlap, bboxPolygon, centroid } from '@turf/turf';
+import { centroid } from '@turf/turf';
+// import { booleanOverlap, bboxPolygon } from '@turf/turf';
 import queryString from "query-string";
 import 'maplibre-gl/dist/maplibre-gl.css';
 // import loadEncoder from 'https://unpkg.com/mp4-h264@1.0.7/build/mp4-encoder.js';
@@ -14,8 +15,6 @@ import { Toaster } from 'react-hot-toast';
 import { closeOutline } from 'ionicons/icons';
 import { IonLoading } from '@ionic/react';
 import { 
-  IonList,
-  IonItem,
   IonIcon,
   IonGrid,
   IonRow,
@@ -40,7 +39,7 @@ import {
   DESKTOP_PADDING,
   DEFAULT_MAXBOUNDS
 } from "../constants";
-import { getBoundingBox, mapSelectEntity, mapRefreshPlanningConstraints} from '../functions/map';
+import { getBoundingBox, mapSelectEntity, mapRefreshPlanningConstraints, mapRefreshWindspeed} from '../functions/map';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 
 export const isDev = () =>  !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
@@ -196,6 +195,7 @@ export class PitchToggle extends Component{
           _this._mapcontainer.props.global.showplanningconstraints, 
           _this._mapcontainer.props.global.planningconstraints, 
           _this._map);
+        mapRefreshWindspeed(_this._mapcontainer.props.global.showwindspeed, _this._map);
       });
       if (newsatellite) {
           map.easeTo({pitch: _this._pitch});
@@ -463,6 +463,7 @@ export class MapContainer extends Component  {
     iconsloaded_grey: false,
     animationinterval: 0,
     idle: false,
+    windspeed: 0,
     terrain: {source: "terrainSource", exaggeration: 1.1 },
   }
 
@@ -472,14 +473,15 @@ export class MapContainer extends Component  {
     // Set colours of planning constraints according to globals
     var colourlookup = {}
     var planningconstraints_list = Object.keys(PLANNING_CONSTRAINTS);
+    var id;
     for(let i = 0; i < planningconstraints_list.length; i++) {
       for(let j = 0; j < PLANNING_CONSTRAINTS[planningconstraints_list[i]]['layers'].length; j++) {
-        var id = PLANNING_CONSTRAINTS[planningconstraints_list[i]]['layers'][j];
+        id = PLANNING_CONSTRAINTS[planningconstraints_list[i]]['layers'][j];
         colourlookup[id] = PLANNING_CONSTRAINTS[planningconstraints_list[i]]['colour'];
       }
     }
     for(let i = 0; i < planningconstraints.length; i++) {
-      var id = planningconstraints[i]['id'];
+      id = planningconstraints[i]['id'];
       if ('line-color' in planningconstraints[i]['paint']) planningconstraints[i]['paint']['line-color'] = colourlookup[id];
       if ('fill-color' in planningconstraints[i]['paint']) planningconstraints[i]['paint']['fill-color'] = colourlookup[id];
     }
@@ -489,7 +491,7 @@ export class MapContainer extends Component  {
   incorporateBaseDomain = (baseurl, planningconstraints, json) => {
 
     let newjson = JSON.parse(JSON.stringify(json));
-    const sources_list = ['openmaptiles', 'terrainSource', 'hillshadeSource', 'powerlines', 'renewables', 'positivefarms'];
+    const sources_list = ['openmaptiles', 'terrainSource', 'hillshadeSource', 'windspeed', 'powerlines', 'renewables', 'positivefarms'];
 
     for(let i = 0; i < sources_list.length; i++) {
       var id = sources_list[i];
@@ -516,7 +518,7 @@ export class MapContainer extends Component  {
 
     // Delete farms from positiveplaces.org
     if (POSITIVE_SITE.shortcode === 'positiveplaces') {
-      var newlayers = [];
+      newlayers = [];
       for(let i = 0; i < newjson['layers'].length; i++) {
         if (newjson['layers'][i]['source'] !== 'positivefarms') newlayers.push(newjson['layers'][i]);
       }
@@ -771,6 +773,8 @@ export class MapContainer extends Component  {
       this.props.global.planningconstraints,
       map);
 
+    mapRefreshWindspeed(this.props.global.showwindspeed, map);
+
     if (this.state.plan !== '') this.props.fetchCustomGeoJSON('', this.state.plan);
     else if (this.props.positivecookie !== '') this.props.fetchCustomGeoJSON(this.props.positivecookie, '');
     
@@ -888,6 +892,12 @@ export class MapContainer extends Component  {
 
     if (event.features.length > 0) {
       if (this.hoveredPolygonId === null) {
+        if (event.features[0].sourceLayer === 'windspeed') {
+          var windspeed = parseFloat(event.features[0].properties['DN'] / 10);
+          this.setState({windspeed: windspeed});
+          return;
+        }
+  
         map.getCanvas().style.cursor = 'pointer';
         var properties = event.features[0].properties;
         // Note unique numberical ID required for setFeatureState
@@ -926,6 +936,14 @@ export class MapContainer extends Component  {
   }
 
   onMouseMove = (event) => {
+
+    if (event.features.length > 0) {
+      if (event.features[0].sourceLayer === 'windspeed') {
+        var windspeed = parseFloat(event.features[0].properties['DN'] / 10);
+        this.setState({windspeed: windspeed});
+        return;
+      }
+    }
 
     if (this.props.global.editcustomgeojson) return;
 
@@ -1218,11 +1236,14 @@ export class MapContainer extends Component  {
   }
 
   closePlanningConstraints = () => {
+    var map = this.mapRef.current.getMap();
+    if (this.props.global.showplanningconstraints) map.removeControl(this.props.global.grid);
+    else map.addControl(this.props.global.grid);    
     this.props.setGlobalState({showplanningconstraints: false}).then(() => {
       mapRefreshPlanningConstraints(
         this.props.global.showplanningconstraints, 
         this.props.global.planningconstraints,
-        this.mapRef.current.getMap());
+        map);
     });
   }
 
@@ -1267,6 +1288,23 @@ export class MapContainer extends Component  {
     return (
       <>
         <IonLoading translucent={true} isOpen={this.state.loading} message="Loading images and data..." spinner="circles" />
+    
+        {this.props.global.showwindspeed ? (
+            <div style={{position: "absolute", top: "-45px", left: "0px", zIndex: "99", width: "100vw", pointerEvents: "none"}}>
+              <div style={{marginLeft: "0px", marginRight: "0px"}}>
+                <div>
+                  <IonGrid>
+                    <IonRow class="ion-align-items-center ion-justify-content-center">
+                      <IonCol size="auto">
+                        <IonText style={{fontSize: "100%"}}>Wind: {this.state.windspeed} metres / second
+                        </IonText>
+                      </IonCol>
+                    </IonRow>
+                  </IonGrid>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
         {this.props.global.mapinitialized ? (
           <Map ref={this.mapRef}
@@ -1295,7 +1333,8 @@ export class MapContainer extends Component  {
             'renewables_active',
             'renewables_windturbine',
             'customgeojson_windturbine',
-            'customgeojson_solarfarm'
+            'customgeojson_solarfarm',
+            'windspeed'
           ]}
           initialViewState={{
             longitude: this.state.lng,
@@ -1372,7 +1411,7 @@ export class MapContainer extends Component  {
               <IonGrid>
                 <IonRow class="ion-align-items-center ion-justify-content-center">
                   <IonCol size="auto">
-                    <IonText>Unusable wind sites due to poor wind / planning constraints</IonText>
+                    <IonText>Unusable wind sites due to low wind / planning constraints</IonText>
                   </IonCol>
                 </IonRow>
                 <IonRow class="ion-align-items-center ion-justify-content-center">
@@ -1399,6 +1438,7 @@ export class MapContainer extends Component  {
                 </IonRow>
               </IonGrid>
             </div>
+            <div style={{fontSize: "70%", paddingLeft: "10px", paddingBottom: "10px"}}>Showing 1km grid squares</div>
           </div>
         </div>
       ) : null}

@@ -12,6 +12,7 @@
  */ 
 
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import * as MaplibreGrid from 'maplibre-grid';
 import { periodstart, periodend, areascale } from "../constants";
 
 // Set up initial state of some global variables using constants
@@ -55,6 +56,16 @@ export const initialStateGlobal = {
         userProperties: true,
         styles: require('../constants/mapdrawstyles.json')
     }),
+    grid: new MaplibreGrid.Grid({
+        gridWidth: 1,
+        gridHeight: 1,
+        units: 'kilometers',
+        minZoom: 11,
+        paint: {
+          'line-opacity': 0.2
+        }
+    }),  
+    showwindspeed: false,
     showplanningconstraints: false,
     planningconstraints: {
         "Inadequate wind": true,

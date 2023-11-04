@@ -82,4 +82,9 @@ export function mapRefreshPlanningConstraints(showplanningconstraints, planningc
         }
       }
     }
-  }
+}
+
+export function mapRefreshWindspeed(showwindspeed, map) {
+    if (showwindspeed) map.setLayoutProperty('windspeed', 'visibility', 'visible');
+    else map.setLayoutProperty('windspeed', 'visibility', 'none');
+}

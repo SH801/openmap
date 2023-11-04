@@ -3,9 +3,8 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { global } from "../../../actions";
 import { Tooltip } from 'react-tooltip';
-import { addCircleOutline, createOutline, alertCircle, closeOutline } from 'ionicons/icons';
+import { addCircleOutline, createOutline, shapes, shapesOutline, speedometer, speedometerOutline, closeOutline } from 'ionicons/icons';
 import { 
-    IonButton,
     IonIcon,
     IonModal, 
     IonHeader, 
@@ -17,7 +16,7 @@ import {
     IonText,
     IonList,
 } from '@ionic/react';
-import { getBoundingBox, mapRefreshPlanningConstraints } from '../../../functions/map';
+import { getBoundingBox, mapRefreshPlanningConstraints, mapRefreshWindspeed } from '../../../functions/map';
 
 export class NewAsset extends Component {
 
@@ -83,11 +82,24 @@ export class NewAsset extends Component {
     }
 
     togglePlanningRestrictions = () => {
+        var map = this.props.global.mapref.current.getMap();
+        if (this.props.global.showplanningconstraints) map.removeControl(this.props.global.grid);
+        else {
+            map.addControl(this.props.global.grid);
+            map.setZoom(map.getZoom() + 0.001);
+        }
         this.props.setGlobalState({showplanningconstraints: !(this.props.global.showplanningconstraints)}).then(() => {
             mapRefreshPlanningConstraints(
                 this.props.global.showplanningconstraints, 
                 this.props.global.planningconstraints,
-                this.props.global.mapref.current.getMap());          
+                map);          
+        });
+    }
+
+    toggleWindspeed = () => {
+        var map = this.props.global.mapref.current.getMap();
+        this.props.setGlobalState({showwindspeed: !(this.props.global.showwindspeed)}).then(() => {
+            mapRefreshWindspeed(this.props.global.showwindspeed, map);          
         });
     }
 
@@ -107,7 +119,8 @@ export class NewAsset extends Component {
             {this.props.global.customgeojson.features.length > 0 ? (
                 <IonIcon data-tooltip-id="actions-tooltip" data-tooltip-content="Edit wind/solar" onClick={this.enableEdit} icon={createOutline} className="editcustomgeojson-icon"/>
             ) : null}
-            <IonIcon data-tooltip-id="actions-tooltip" data-tooltip-content="Toggle site constraints" onClick={this.togglePlanningRestrictions} color="danger" slot="icon-only" icon={alertCircle} className="editcustomgeojson-icon"/>
+            <IonIcon data-tooltip-id="actions-tooltip" data-tooltip-content="Toggle site constraints" onClick={this.togglePlanningRestrictions} slot="icon-only" icon={this.props.global.showplanningconstraints ? shapes: shapesOutline} className="editcustomgeojson-icon"/>
+            <IonIcon data-tooltip-id="actions-tooltip" data-tooltip-content="Toggle windspeed layer" onClick={this.toggleWindspeed} slot="icon-only" icon={this.props.global.showwindspeed ? speedometer: speedometerOutline} className="editcustomgeojson-icon"/>
             {this.state.shownewassetmodal ? (
                 <IonModal 
                     id="newasset-modal"

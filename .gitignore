@@ -36,3 +36,6 @@ updaterenewables/
 app/gis/UK.geojson
 app/gis/UK_large.geojson
 app/groups/
+app/gis/*.geojson
+app/gis/*.mbtiles
+app/gis/*.qmd

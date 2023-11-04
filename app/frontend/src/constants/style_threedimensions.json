@@ -103,7 +103,9 @@
                 ["linear"],
                 ["var", "relativespeed"],
                 0.0,
-                ["to-color", "black"],
+                ["to-color", "midnightblue"],
+                0.31645,
+                ["to-color", "blue"],
                 0.31646,
                 ["to-color", "lightgray"],
                 0.37975,
@@ -118,12 +120,12 @@
                 ["to-color", "purple"]
             ]
               ],
-              "fill-opacity": 0.8
+              "fill-opacity": 0.3
           },
           "source": "windspeed",
           "source-layer": "windspeed",
           "type": "fill"
-        },          
+        },         
         {
             "id": "3d-buildings",
             "source": "openmaptiles",

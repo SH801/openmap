@@ -1296,7 +1296,7 @@ export class MapContainer extends Component  {
                   <IonGrid>
                     <IonRow class="ion-align-items-center ion-justify-content-center">
                       <IonCol size="auto">
-                        <IonText style={{fontSize: "100%"}}>Wind: {this.state.windspeed} metres / second
+                        <IonText style={{fontSize: "100%"}}>Wind: {this.state.windspeed}m / sec {(this.state.windspeed < 5) ? "(not usable)": null}
                         </IonText>
                       </IonCol>
                     </IonRow>

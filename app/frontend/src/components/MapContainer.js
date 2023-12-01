@@ -469,22 +469,49 @@ export class MapContainer extends Component  {
 
   hoveredPolygonId = null;
 
-  addColoursToPlanningConstraints = (planningconstraints) => {
+  constructPlanningConstraints = (planningconstraints) => {
+    // Get existing ids in planning constraints stylesheet
+    var idsinstylesheet = [];
+    for(let i = 0; i < planningconstraints.length; i++) idsinstylesheet.push(planningconstraints[i]['id']);
+
     // Set colours of planning constraints according to globals
-    var colourlookup = {}
+    var colourlookup = {};
+    var layerlookup = {};
     var planningconstraints_list = Object.keys(PLANNING_CONSTRAINTS);
     var id;
     for(let i = 0; i < planningconstraints_list.length; i++) {
       for(let j = 0; j < PLANNING_CONSTRAINTS[planningconstraints_list[i]]['layers'].length; j++) {
         id = PLANNING_CONSTRAINTS[planningconstraints_list[i]]['layers'][j];
         colourlookup[id] = PLANNING_CONSTRAINTS[planningconstraints_list[i]]['colour'];
+        layerlookup[id] = PLANNING_CONSTRAINTS[planningconstraints_list[i]]['description'];
+        if (!idsinstylesheet.includes(id)) {
+          idsinstylesheet.push(id);
+          var idelements = id.split("_");
+          var layerid = idelements[1];
+          idelements.splice(0, 2);
+          var styletype = idelements.join("_");
+          var styleelement = JSON.parse(JSON.stringify(this.style_planningconstraints_defaults[styletype]));
+          styleelement['id'] = id;
+          styleelement['source-layer'] = layerid;
+          if ('line-color' in styleelement['paint']) styleelement['paint']['line-color'] = colourlookup[id];
+          if ('fill-color' in styleelement['paint']) styleelement['paint']['fill-color'] = colourlookup[id];
+          planningconstraints.push(styleelement);
+        }
       }
     }
-    for(let i = 0; i < planningconstraints.length; i++) {
-      id = planningconstraints[i]['id'];
-      if ('line-color' in planningconstraints[i]['paint']) planningconstraints[i]['paint']['line-color'] = colourlookup[id];
-      if ('fill-color' in planningconstraints[i]['paint']) planningconstraints[i]['paint']['fill-color'] = colourlookup[id];
-    }
+
+    this.layerlookup = layerlookup;
+    this.interactivelayers = [ 
+      'positivefarms_background', 
+      'positivefarms_active', 
+      'renewables_background',
+      'renewables_active',
+      'renewables_windturbine',
+      'customgeojson_windturbine',
+      'customgeojson_solarfarm',
+      'windspeed'
+    ].concat(idsinstylesheet);
+
     return planningconstraints;
   }
 
@@ -536,9 +563,10 @@ export class MapContainer extends Component  {
     this.popupRef = React.createRef();
     this.maxTileCacheSize = this.getMaxTileCacheSize();
     this.ukgeojson = require('../constants/UK.json');
+    this.style_planningconstraints_defaults = require('../constants/style_planningconstraints_defaults.json');
     this.style_twodimensions = require('../constants/style_twodimensions.json');
     this.style_threedimensions = require('../constants/style_threedimensions.json');
-    this.style_planningconstraints = this.addColoursToPlanningConstraints(require('../constants/style_planningconstraints.json'));
+    this.style_planningconstraints = this.constructPlanningConstraints(require('../constants/style_planningconstraints.json'));
     this.satellitelayer = this.incorporateBaseDomain(TILESERVER_BASEURL, this.style_planningconstraints, this.style_threedimensions);
     this.nonsatellitelayer = this.incorporateBaseDomain(TILESERVER_BASEURL, this.style_planningconstraints, this.style_twodimensions);
 
@@ -897,7 +925,16 @@ export class MapContainer extends Component  {
           this.setState({windspeed: windspeed});
           return;
         }
-  
+
+        if ((event.features[0].source === 'planningconstraints') || 
+            (event.features[0].sourceLayer === 'landuse')) {
+          // If mouse over planning constraints, disable add wind turbine
+          if (this.props.global.editcustomgeojson === 'wind') {
+            this.props.global.mapdraw.changeMode('simple_select');
+          }
+          return;
+        }
+          
         map.getCanvas().style.cursor = 'pointer';
         var properties = event.features[0].properties;
         // Note unique numberical ID required for setFeatureState
@@ -943,8 +980,17 @@ export class MapContainer extends Component  {
         this.setState({windspeed: windspeed});
         return;
       }
-    }
 
+      if ((event.features[0].source === 'planningconstraints') || 
+          (event.features[0].sourceLayer === 'landuse')) {
+        // If mouse over planning constraints, disable add wind turbine
+        if (this.props.global.editcustomgeojson === 'wind') {
+          this.props.global.mapdraw.changeMode('simple_select');
+        }
+        return;
+      }
+    } 
+    
     if (this.props.global.editcustomgeojson) return;
 
     if (this.hoveredPolygonId) {
@@ -957,6 +1003,11 @@ export class MapContainer extends Component  {
 
     var map = this.mapRef.current.getMap();
     var popup = this.popupRef.current;
+
+    // If mouse leaving feature, enable add wind turbine
+    if (this.props.global.editcustomgeojson === 'wind') {
+      this.props.global.mapdraw.changeMode('draw_point');
+    }
 
     if (this.hoveredPolygonId) {
       if (POSITIVE_SITE.shortcode === "positivefarms") {
@@ -977,6 +1028,16 @@ export class MapContainer extends Component  {
 
   onClick = (event) => {
     // Don't select features if adding asset
+    if (event.features.length > 0) {
+      var id = event.features[0]['layer']['id'];
+      if ((id === 'constraint_windspeed_fill_colour') ||
+          (event.features[0].source === 'planningconstraints') || 
+          (event.features[0].sourceLayer === 'landuse')) {
+          alert("Non-optimal site for wind turbine due to: " + this.layerlookup[id]);
+          return;
+      }
+    }
+
     if (this.props.global.editcustomgeojson === null) {
       if (event.features.length > 0) {
         if (event.features[0].properties.type === 'custom') {
@@ -999,6 +1060,7 @@ export class MapContainer extends Component  {
           }
 
         } else {
+          console.log(event.features[0]);
           var entityid = event.features[0].properties.id;
           this.selectEntity(entityid);
         }
@@ -1326,16 +1388,7 @@ export class MapContainer extends Component  {
           preserveDrawingBuffer={true} 
           maxTileCacheSize={this.maxTileCacheSize}
           terrain={this.state.terrain}
-          interactiveLayerIds={[
-            'positivefarms_background', 
-            'positivefarms_active', 
-            'renewables_background',
-            'renewables_active',
-            'renewables_windturbine',
-            'customgeojson_windturbine',
-            'customgeojson_solarfarm',
-            'windspeed'
-          ]}
+          interactiveLayerIds={this.interactivelayers}
           initialViewState={{
             longitude: this.state.lng,
             latitude: this.state.lat,
@@ -1411,7 +1464,7 @@ export class MapContainer extends Component  {
               <IonGrid>
                 <IonRow class="ion-align-items-center ion-justify-content-center">
                   <IonCol size="auto">
-                    <IonText>Unusable wind sites due to low wind / planning constraints</IonText>
+                    <IonText>Non-optimal wind sites due to low wind / planning constraints</IonText>
                   </IonCol>
                 </IonRow>
                 <IonRow class="ion-align-items-center ion-justify-content-center">
@@ -1429,7 +1482,7 @@ export class MapContainer extends Component  {
                               paddingRight: "10px"
                             }}>
                             <div style={{width: "25px", height: "10px", marginRight: "5px", display: "inline-block", backgroundColor: PLANNING_CONSTRAINTS[planningconstraint]['colour']}} />
-                            {planningconstraint}
+                            {PLANNING_CONSTRAINTS[planningconstraint]['description']}
                           </span>  
                         )
                       })}

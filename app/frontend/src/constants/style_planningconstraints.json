@@ -1,521 +1,48 @@
 [
-    {
-    "filter": [
-      "all",
-      [
-        "==",
-        "$type",
-        "LineString"
-      ],
-      [
-        "in",
-        "class",
-        "motorway",
-        "primary",
-        "secondary",
-        "trunk"
-      ]
+  {
+    "id": "constraint_windspeed_fill_colour",
+    "source": "windspeed",
+    "source-layer": "windspeed",
+    "type": "fill",
+      "filter": [
+        "all",
+        [
+          "==",
+          "$type",
+          "Polygon"
+        ],
+        ["<", "DN", 50]
     ],
-    "id": "constraint_roads_buffer_line_colour",
     "layout": {
-      "line-cap": "butt",
-      "line-join": "round",
       "visibility": "none"
     },
     "paint": {
-      "line-opacity": 0.5,
-      "line-color": "",
-      "line-offset": 0,
-      "line-width": {
-        "base": 1.4,
-        "stops": [
+        "fill-color": [
+          "let",
+          "relativespeed",
+          ["/", ["get", "DN"], 158],
           [
-            8,
-            1
-          ],
-          [
-            16,
-            100
-          ]
+            "interpolate",
+            ["linear"],
+            ["var", "relativespeed"],
+            0.0,
+            ["to-color", "blue"],
+            0.31645,
+            ["to-color", "blue"],
+            0.31646,
+            ["to-color", "blue"],
+            1.0,
+            ["to-color", "blue"]
         ]
-      }
-    },
-    "source": "openmaptiles",
-    "source-layer": "transportation",
-    "type": "line"
-  },  
-  {
-    "filter": [
-      "all",
-      [
-        "==",
-        "$type",
-        "LineString"
       ],
-      [
-        "in",
-        "class",
-        "motorway",
-        "primary",
-        "secondary",
-        "trunk"
-      ]
-    ],
-    "id": "constraint_roads_buffer_line_pattern",
-    "layout": {
-      "line-cap": "butt",
-      "line-join": "round",
-      "visibility": "none"
-    },
-    "paint": {
-      "line-pattern": "hatching_transparent",
-      "line-opacity": 1,
-      "line-offset": 0,
-      "line-width": {
-        "base": 1.4,
-        "stops": [
-          [
-            8,
-            1
-          ],
-          [
-            16,
-            100
-          ]
-        ]
-      }
-    },
-    "source": "openmaptiles",
-    "source-layer": "transportation",
-    "type": "line"
-  },  
-  {
-    "filter": [
-      "all",
-      [
-        "==",
-        "$type",
-        "LineString"
-      ],
-      [
-        "in",
-        "class",
-        "rail"
-      ]
-    ],
-    "id": "constraint_railwaylines_buffer_line_colour",
-    "layout": {
-      "line-cap": "butt",
-      "line-join": "round",
-      "visibility": "none"
-    },
-    "paint": {
-      "line-opacity": 0.5,
-      "line-color": "",
-      "line-offset": 0,
-      "line-width": {
-        "base": 1.4,
-        "stops": [
-          [
-            8,
-            1
-          ],
-          [
-            16,
-            100
-          ]
-        ]
-      }
-    },
-    "source": "openmaptiles",
-    "source-layer": "transportation",
-    "type": "line"
-  },      
-  {
-    "filter": [
-      "all",
-      [
-        "==",
-        "$type",
-        "LineString"
-      ],
-      [
-        "in",
-        "class",
-        "rail"
-      ]
-    ],
-    "id": "constraint_railwaylines_buffer_line_pattern",
-    "layout": {
-      "line-cap": "butt",
-      "line-join": "round",
-      "visibility": "none"
-    },
-    "paint": {
-      "line-pattern": "hatching_transparent",
-      "line-opacity": 1,
-      "line-offset": 0,
-      "line-width": {
-        "base": 1.4,
-        "stops": [
-          [
-            8,
-            1
-          ],
-          [
-            16,
-            100
-          ]
-        ]
-      }
-    },
-    "source": "openmaptiles",
-    "source-layer": "transportation",
-    "type": "line"
-  },  
-  {
-    "filter": [
-      "==",
-      "$type",
-      "LineString"
-    ],
-    "id": "constraint_powerlines_buffer_line_colour",
-    "layout": {
-      "line-cap": "butt",
-      "line-join": "round",
-      "visibility": "none"
-    },
-    "paint": {
-      "line-opacity": 0.5,
-      "line-color": "",
-      "line-offset": 0,
-      "line-width": {
-        "base": 1.4,
-        "stops": [
-          [
-            8,
-            1
-          ],
-          [
-            16,
-            100
-          ]
-        ]
-      }
-    },
-    "source": "powerlines",
-    "source-layer": "powerlines",
-    "type": "line"
-  },      
-  {
-    "filter": [
-      "==",
-      "$type",
-      "LineString"
-    ],
-    "id": "constraint_powerlines_buffer_line_pattern",
-    "layout": {
-      "line-cap": "butt",
-      "line-join": "round",
-      "visibility": "none"
-    },
-    "paint": {
-      "line-pattern": "hatching_transparent",
-      "line-opacity": 1,
-      "line-offset": 0,
-      "line-width": {
-        "base": 1.4,
-        "stops": [
-          [
-            8,
-            1
-          ],
-          [
-            16,
-            100
-          ]
-        ]
-      }
-    },
-    "source": "powerlines",
-    "source-layer": "powerlines",
-    "type": "line"
-  },
-  {
-    "filter": [
-      "all",
-      [
-        "==",
-        "$type",
-        "LineString"
-      ],
-      [
-        "in",
-        "class",
-        "track",
-        "path"
-      ],
-      [
-        "in",
-        "foot",
-        "yes",
-        "designated"
-      ]
-    ],
-    "id": "constraint_footpaths_buffer_line_colour",
-    "layout": {
-      "line-cap": "butt",
-      "line-join": "round",
-      "visibility": "none"
-    },
-    "paint": {
-      "line-opacity": 0.5,
-      "line-color": "",
-      "line-offset": 0,
-      "line-width": {
-        "base": 1.4,
-        "stops": [
-          [
-            8,
-            1
-          ],
-          [
-            16,
-            100
-          ]
-        ]
-      }
-    },
-    "source": "openmaptiles",
-    "source-layer": "transportation",
-    "type": "line"
-  },    
-  {
-    "filter": [
-      "all",
-      [
-        "==",
-        "$type",
-        "LineString"
-      ],
-      [
-        "in",
-        "class",
-        "track",
-        "path"
-      ],
-      [
-        "in",
-        "foot",
-        "yes",
-        "designated"
-      ]
-    ],
-    "id": "constraint_footpaths_buffer_line_pattern",
-    "layout": {
-      "line-cap": "butt",
-      "line-join": "round",
-      "visibility": "none"
-    },
-    "paint": {
-      "line-pattern": "hatching_transparent",
-      "line-opacity": 1,
-      "line-offset": 0,
-      "line-width": {
-        "base": 1.4,
-        "stops": [
-          [
-            8,
-            1
-          ],
-          [
-            16,
-            100
-          ]
-        ]
-      }
-    },
-    "source": "openmaptiles",
-    "source-layer": "transportation",
-    "type": "line"
-  },
-  {
-    "filter": [
-      "all",
-      [
-        "==",
-        "$type",
-        "LineString"
-      ],
-      [
-        "in",
-        "class",
-        "track",
-        "path"
-      ],
-      [
-        "in",
-        "horse",
-        "yes",
-        "designated"
-      ]
-    ],
-    "id": "constraint_bridleways_buffer_line_colour",
-    "layout": {
-      "line-cap": "butt",
-      "line-join": "round",
-      "visibility": "none"
-    },
-    "paint": {
-      "line-opacity": 0.5,
-      "line-color": "",
-      "line-offset": 0,
-      "line-width": {
-        "base": 1.4,
-        "stops": [
-          [
-            8,
-            1
-          ],
-          [
-            16,
-            100
-          ]
-        ]
-      }
-    },
-    "source": "openmaptiles",
-    "source-layer": "transportation",
-    "type": "line"
-  },
-  {
-    "filter": [
-      "all",
-      [
-        "==",
-        "$type",
-        "LineString"
-      ],
-      [
-        "in",
-        "class",
-        "track",
-        "path"
-      ],
-      [
-        "in",
-        "horse",
-        "yes",
-        "designated"
-      ]
-    ],
-    "id": "constraint_bridleways_buffer_line_pattern",
-    "layout": {
-      "line-cap": "butt",
-      "line-join": "round",
-      "visibility": "none"
-    },
-    "paint": {
-      "line-pattern": "hatching_transparent",
-      "line-opacity": 1,
-      "line-offset": 0,
-      "line-width": {
-        "base": 1.4,
-        "stops": [
-          [
-            8,
-            1
-          ],
-          [
-            16,
-            100
-          ]
-        ]
-      }
-    },
-    "source": "openmaptiles",
-    "source-layer": "transportation",
-    "type": "line"
-  },        
-  {
-    "filter": [
-      "all",
-      [
-        "==",
-        "$type",
-        "Polygon"
-      ],
-      [
-        "==",
-        "class",
-        "national_park"
-      ]
-    ],
-    "id": "constraint_nationalpark_fill_colour",
-    "layout": {
-        "visibility": "none"
-    },
-    "paint": {
-      "fill-opacity": 0.8,
-      "fill-color": ""
-    },
-    "source": "openmaptiles",
-    "source-layer": "park",
-    "type": "fill"
-  },       
-  {
-    "filter": [
-      "all",
-      [
-        "==",
-        "$type",
-        "Polygon"
-      ],
-      [
-        "==",
-        "class",
-        "national_park"
-      ]
-    ],
-    "id": "constraint_nationalpark_fill_pattern",
-    "layout": {
-        "visibility": "none"
-    },
-    "paint": {
-      "fill-pattern": "hatching_transparent",
       "fill-opacity": 0.8
-    },
-    "source": "openmaptiles",
-    "source-layer": "park",
-    "type": "fill"
+    }
   },
   {
-    "filter": [
-      "all",
-      [
-        "==",
-        "$type",
-        "Polygon"
-      ],
-      [
-        "==",
-        "class",
-        "residential"
-      ]
-    ],
     "id": "constraint_separationresidential_fill_colour",
-    "layout": {
-        "visibility": "none"
-    },
-    "paint": {
-      "fill-opacity": 0.5,
-      "fill-color": ""
-    },
     "source": "openmaptiles",
     "source-layer": "landuse",
-    "type": "fill"
-  },
-  {
+    "type": "fill",
     "filter": [
       "all",
       [
@@ -529,7 +56,32 @@
         "residential"
       ]
     ],
+      "layout": {
+          "visibility": "none"
+      },
+      "paint": {
+          "fill-opacity": 0.5,
+          "fill-color": "darkorange"
+      }
+  },
+  {
     "id": "constraint_separationresidential_buffer_line_colour",
+    "source": "openmaptiles",
+    "source-layer": "landuse",
+    "type": "line",
+    "filter": [
+      "all",
+      [
+        "==",
+        "$type",
+        "Polygon"
+      ],
+      [
+        "==",
+        "class",
+        "residential"
+      ]
+    ],
     "layout": {
       "line-cap": "butt",
       "line-join": "round",
@@ -537,25 +89,47 @@
     },
     "paint": {
       "line-opacity": 0.5,
-      "line-color": "",
+      "line-color": "darkorange",
       "line-offset": 0,
       "line-width": {
         "base": 1.4,
         "stops": [
-          [
-            8,
-            1
-          ],
-          [
-            16,
-            100
-          ]
+          [8, 4],
+          [16, 400]
         ]
       }
+    }
+  },
+  {
+    "id": "constraint_bridleways_buffer_line_colour",
+    "source": "planningconstraints",
+    "source-layer": "bridleways",
+    "type": "line",
+    "filter": [
+      "all",
+      [
+        "==",
+        "$type",
+        "LineString"
+      ]
+    ],
+    "layout": {
+      "line-cap": "butt",
+      "line-join": "round",
+      "visibility": "none"
     },
-    "source": "openmaptiles",
-    "source-layer": "landuse",
-    "type": "line"
-  } 
+    "paint": {
+      "line-opacity": 0.5,
+      "line-color": "red",
+      "line-offset": 0,
+      "line-width": {
+        "base": 1.4,
+        "stops": [
+          [8, 2],
+          [16, 200]
+        ]
+      }
+    }
+  }     
 ]
 

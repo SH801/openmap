@@ -1,0 +1,111 @@
+{
+    "fill_colour": {
+        "id": "",
+        "source": "planningconstraints",
+        "source-layer": "",
+        "type": "fill",
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "Polygon"
+            ]
+        ],
+        "layout": {
+            "visibility": "none"
+        },
+        "paint": {
+            "fill-opacity": 0.8,
+            "fill-color": ""
+        }
+    },
+    "fill_pattern": {
+        "id": "",
+        "source": "planningconstraints",
+        "source-layer": "",
+        "type": "fill",
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "Polygon"
+            ]
+        ],
+        "layout": {
+            "visibility": "none"
+        },
+        "paint": {
+            "fill-pattern": "hatching_transparent",
+            "fill-opacity": 0.8
+        }
+    },
+    "buffer_line_colour": {
+        "id": "",
+        "source": "planningconstraints",
+        "source-layer": "",
+        "type": "line",
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ]
+        ],
+        "layout": {
+          "line-cap": "butt",
+          "line-join": "round",
+          "visibility": "none"
+        },
+        "paint": {
+          "line-opacity": 0.5,
+          "line-color": "",
+          "line-offset": 0,
+          "line-width": {
+            "base": 1.4,
+            "stops": [
+                [8, 3],
+                [16, 300]
+            ]
+          }
+        }    
+    },
+    "buffer_line_pattern": {
+        "id": "",
+        "source": "planningconstraints",
+        "source-layer": "",
+        "type": "line",
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ]
+        ],
+        "layout": {
+            "line-cap": "butt",
+            "line-join": "round",
+            "visibility": "none"
+        },
+        "paint": {
+            "line-pattern": "hatching_transparent",
+            "line-opacity": 1,
+            "line-offset": 0,
+            "line-width": {
+                "base": 1.4,
+                "stops": [
+                    [8, 3],
+                    [16, 300]
+                ]
+            }
+        }
+    }
+}
+
+
+
+  
+

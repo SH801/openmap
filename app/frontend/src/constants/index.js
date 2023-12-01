@@ -46,30 +46,32 @@ export const FLYINGTOUR_LINGERTIME = 25000;
 
 // Planning constraints
 export const PLANNING_CONSTRAINTS = {
-    "Inadequate wind": 
+    "wind": 
     {
+        "description": "Inadequate wind",
         "colour": "blue",
         "layers":
         [
-            "constraint_windspeed_fill_colour",
-            "constraint_windspeed_fill_pattern",
+            "constraint_windspeed_fill_colour"
         ]
     },
-    "Landscape / visual impact": 
+    "landscape": 
     {
+        "description": "Landscape / visual impact",
         "colour": "chartreuse",
         "layers": 
         [
-            "constraint_nationalpark_fill_colour",
-            "constraint_nationalpark_fill_pattern",
+            "constraint_nationalparks_fill_colour",
+            "constraint_nationalparks_fill_pattern",
             "constraint_aonb_fill_colour",
             "constraint_aonb_fill_pattern",
             "constraint_heritagecoasts_fill_colour",
             "constraint_heritagecoasts_fill_pattern"
         ]
     },
-    "Heritage impact":
+    "heritage":
     {
+        "description": "Heritage impact",
         "colour": "darkgoldenrod",
         "layers": 
         [
@@ -77,29 +79,29 @@ export const PLANNING_CONSTRAINTS = {
             "constraint_listedbuildings_fill_pattern",
             "constraint_conservationareas_fill_colour",
             "constraint_conservationareas_fill_pattern",
-            "constraint_worldheritagesites_fill_colour",
-            "constraint_worldheritagesites_fill_pattern",
-            "constraint_scheduledancientmonuments_fill_colour",
-            "constraint_scheduledancientmonuments_fill_pattern",
-            "constraint_registeredparksgardens_fill_colour",
-            "constraint_registeredparksgardens_fill_pattern",
-            "constraint_historicbattlefields_fill_colour",
-            "constraint_historicbattlefields_fill_pattern"
+            "constraint_worldheritage_fill_colour",
+            "constraint_worldheritage_fill_pattern",
+            "constraint_scheduledmonuments_fill_colour",
+            "constraint_scheduledmonuments_fill_pattern",
+            "constraint_registeredparksandgardens_fill_colour",
+            "constraint_registeredparksandgardens_fill_pattern",
+            "constraint_registeredbattlefields_fill_colour",
+            "constraint_registeredbattlefields_fill_pattern"
         ]
     },
-    "Too close to residential":
+    "residential":
     {
+        "description": "Too close to residential",
         "colour": "darkorange",
         "layers":
         [
             "constraint_separationresidential_fill_colour",
-            "constraint_separationresidential_fill_pattern",
-            "constraint_separationresidential_buffer_line_colour",
-            "constraint_separationresidential_buffer_line_pattern"
+            "constraint_separationresidential_buffer_line_colour"
         ]
     },
-    "Ecology / wildlife":
+    "ecology":
     {
+        "description": "Ecology / wildlife",
         "colour": "darkgreen",
         "layers":
         [
@@ -113,18 +115,19 @@ export const PLANNING_CONSTRAINTS = {
             "constraint_spa_fill_pattern",
             "constraint_nnr_fill_colour",
             "constraint_nnr_fill_pattern",
-            "constraint_ancientwoodland_fill_colour",
-            "constraint_ancientwoodland_fill_pattern",
-            "constraint_localwildlifereserve_fill_colour",
-            "constraint_localwildlifereserve_fill_pattern",
+            "constraint_ancientwoodlands_fill_colour",
+            "constraint_ancientwoodlands_fill_pattern",
+            "constraint_lnr_fill_colour",
+            "constraint_lnr_fill_pattern",
             "constraint_hedgerows_fill_colour",
             "constraint_hedgerows_fill_pattern",
             "constraint_hedgerows_buffer_line_colour",
             "constraint_hedgerows_buffer_line_pattern"
         ]
     },
-    "Unsafe distance (transportation, powerlines, etc)":
+    "safety":
     {
+        "description": "Unsafe distance (transportation, powerlines, etc)",
         "colour": "red",
         "layers": 
         [
@@ -132,10 +135,10 @@ export const PLANNING_CONSTRAINTS = {
             "constraint_roads_fill_pattern",
             "constraint_roads_buffer_line_colour",
             "constraint_roads_buffer_line_pattern",
-            "constraint_railwaylines_fill_colour",
-            "constraint_railwaylines_fill_pattern",
-            "constraint_railwaylines_buffer_line_colour",
-            "constraint_railwaylines_buffer_line_pattern",
+            "constraint_railways_fill_colour",
+            "constraint_railways_fill_pattern",
+            "constraint_railways_buffer_line_colour",
+            "constraint_railways_buffer_line_pattern",
             "constraint_inlandwaters_fill_colour",
             "constraint_inlandwaters_fill_pattern",
             "constraint_inlandwaters_buffer_line_colour",
@@ -158,43 +161,24 @@ export const PLANNING_CONSTRAINTS = {
             "constraint_bridleways_buffer_line_pattern"        
         ]
     },
-    "Aviation / MOD":
+    "aviation_mod":
     {
+        "description": "Aviation / MOD",
         "colour": "purple",
         "layers": 
         [
-            "constraint_flightpaths_fill_colour",
-            "constraint_flightpaths_fill_pattern",
-            "constraint_flightpaths_buffer_line_colour",
-            "constraint_flightpaths_buffer_line_pattern",        
-            "constraint_civilianairports_fill_colour",
-            "constraint_civilianairports_fill_pattern",
-            "constraint_civilianairports_buffer_line_colour",
-            "constraint_civilianairports_buffer_line_pattern",        
-            "constraint_aerodromes_fill_colour",
-            "constraint_aerodromes_fill_pattern",
-            "constraint_aerodromes_buffer_line_colour",
-            "constraint_aerodromes_buffer_line_pattern",        
-            "constraint_modairports_fill_colour",
-            "constraint_modairports_fill_pattern",
-            "constraint_modairports_buffer_line_colour",
-            "constraint_modairports_buffer_line_pattern",        
-            "constraint_modtrainingareas_fill_colour",
-            "constraint_modtrainingareas_fill_pattern",
-            "constraint_modtrainingareas_buffer_line_colour",
-            "constraint_modtrainingareas_buffer_line_pattern",        
-            "constraint_explosivesafeguardedareas_fill_colour",
-            "constraint_explosivesafeguardedareas_fill_pattern",
-            "constraint_explosivesafeguardedareas_buffer_line_colour",
-            "constraint_explosivesafeguardedareas_buffer_line_pattern",        
-            "constraint_dangerareasnearranges_fill_colour",
-            "constraint_dangerareasnearranges_fill_pattern",
-            "constraint_dangerareasnearranges_buffer_line_colour",
-            "constraint_dangerareasnearranges_buffer_line_pattern",        
-            "constraint_modexclusionareas_fill_colour",
-            "constraint_modexclusionareas_fill_pattern",
-            "constraint_modexclusionareas_buffer_line_colour",
-            "constraint_modexclusionareas_buffer_line_pattern"        
+            "constraint_airspace_fill_colour",
+            "constraint_airspace_fill_pattern",
+            "constraint_airspace_buffer_line_colour",
+            "constraint_airspace_buffer_line_pattern",        
+            "constraint_dangerareas_fill_colour",
+            "constraint_dangerareas_fill_pattern",
+            "constraint_dangerareas_buffer_line_colour",
+            "constraint_dangerareas_buffer_line_pattern",        
+            "constraint_military_fill_colour",
+            "constraint_military_fill_pattern",
+            "constraint_military_buffer_line_colour",
+            "constraint_military_buffer_line_pattern"            
         ]    
     }
 };

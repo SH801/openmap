@@ -68,13 +68,13 @@ export const initialStateGlobal = {
     showwindspeed: false,
     showplanningconstraints: false,
     planningconstraints: {
-        "Inadequate wind": true,
-        "Landscape / visual impact": true,
-        "Heritage impact": true,
-        "Too close to residential": true,
-        "Ecology / wildlife": true,
-        "Unsafe distance (transportation, powerlines, etc)": true,
-        "Aviation / MOD": true
+        "wind": true,
+        "landscape": true,
+        "heritage": true,
+        "residential": true,
+        "ecology": true,
+        "safety": true,
+        "aviation_mod": true
     }
 };
 

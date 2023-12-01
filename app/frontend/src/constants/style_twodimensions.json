@@ -31,14 +31,15 @@
             "encoding": "terrarium",
             "attribution": "United Kingdom terrain data © Environment Agency copyright and/or database right 2015. All rights reserved;"
         },
+        "planningconstraints": {
+          "type": "vector",
+          "url": "http://localhost:8080/data/planningconstraints.json",
+          "attribution": "##DETAILED ATTRIBUTION TO COME##"
+        },  
         "windspeed": {
           "type": "vector",
           "url": "/data/windspeed.json",
           "attribution": "Estimated average wind speeds from NOABL Wind Speed Database © Department for Business, Enterprise & Regulatory Reform 1996"
-        },      
-        "powerlines": {
-          "type": "vector",
-          "url": "/data/powerlines.json"
         },      
         "renewables": {
           "type": "vector",

@@ -28,6 +28,7 @@ app/frontend/node_modules/
 app/frontend/upload.sh
 app/backend/googlesearch.py
 app/backend/googlesearch_test.py
+app/osm/data/*.*
 app/osm/renewables.geojson
 app/osm/renewables_output.geojson
 app/osm/renewables.mbtiles
@@ -39,3 +40,4 @@ app/groups/
 app/gis/*.geojson
 app/gis/*.mbtiles
 app/gis/*.qmd
+app/osm/wildlifereserves.geojson

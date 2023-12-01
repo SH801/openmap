@@ -16,6 +16,12 @@ increment = 400
 x = boundingbox[0][0]
 y = boundingbox[0][1]
 while( y < boundingbox[1][1]):
+    # If last file for this iteration exists, skip to next iteration
+    lastfile = baseexport + "655600," + str(y) + ",656000," + str(y + increment) + '.tif'
+    if os.path.isfile(lastfile) is True: 
+        print("Found last file, skipping to next row", y)
+        y += increment
+        continue
     while (x < boundingbox[1][0]):
         bbox = str(x) + "," + str(y) + "," + str(x + increment) + "," + str(y + increment)
         url = baseurl + '&bbox=' + bbox

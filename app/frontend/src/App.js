@@ -40,6 +40,7 @@ import { withCookies, Cookies } from 'react-cookie';
 import './theme/variables.css';
 import './theme/app.css';
 import BasicPage from "./views/BasicPage/BasicPage";
+import DatasetsPage from "./views/DatasetsPage/DatasetsPage";
 // import Login from './views/BasicPage/Login';
 import { loadReCaptcha } from 'react-recaptcha-google'
 
@@ -103,6 +104,7 @@ class App extends Component {
         <BrowserRouter>
           <Switch>
             {/* <Route exact path="/login" render={(props) => (<Login isMobile={this.state.isMobile} />)} /> */}
+            <Route exact path="/datasets" render={(props) => (<DatasetsPage positivecookie={this.state.positivecookie} isMobile={this.state.isMobile} />)} />
             <Route path="/" render={(props) => (<BasicPage positivecookie={this.state.positivecookie} isMobile={this.state.isMobile} />)} />
           </Switch>
         </BrowserRouter>

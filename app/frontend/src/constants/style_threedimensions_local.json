@@ -23,6 +23,16 @@
           "tileSize": 256,
           "attribution": "United Kingdom terrain data © Environment Agency copyright and/or database right 2015. All rights reserved;"
         },
+        "planningconstraints": {
+          "type": "vector",
+          "url": "/data/planningconstraints.json",
+          "attribution": "Source data copyright of multiple organisations - for list of data sources, see https://positiveplaces.org/datasets"
+        },  
+        "windspeed": {
+          "type": "vector",
+          "url": "/data/windspeed.json",
+          "attribution": "Estimated average wind speeds from NOABL Wind Speed Database © Department for Business, Enterprise & Regulatory Reform 1996"
+        },      
         "renewables": {
             "type": "vector",
             "url": "/data/renewables.json",

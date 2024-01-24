@@ -35,8 +35,8 @@
         },
         "planningconstraints": {
           "type": "vector",
-          "url": "http://localhost:8080/data/planningconstraints.json",
-          "attribution": "##DETAILED ATTRIBUTION TO COME##"
+          "url": "/data/planningconstraints.json",
+          "attribution": "Source data copyright of multiple organisations - for list of data sources, see https://positiveplaces.org/datasets"
         },  
         "windspeed": {
           "type": "vector",

@@ -518,7 +518,7 @@ export class MapContainer extends Component  {
   incorporateBaseDomain = (baseurl, planningconstraints, json) => {
 
     let newjson = JSON.parse(JSON.stringify(json));
-    const sources_list = ['openmaptiles', 'terrainSource', 'hillshadeSource', 'windspeed', 'powerlines', 'renewables', 'positivefarms'];
+    const sources_list = ['openmaptiles', 'terrainSource', 'hillshadeSource', 'planningconstraints', 'windspeed', 'renewables', 'positivefarms'];
 
     for(let i = 0; i < sources_list.length; i++) {
       var id = sources_list[i];
@@ -1491,7 +1491,7 @@ export class MapContainer extends Component  {
                 </IonRow>
               </IonGrid>
             </div>
-            <div style={{fontSize: "70%", paddingLeft: "10px", paddingBottom: "10px"}}>Showing 1km grid squares</div>
+            <div style={{fontSize: "70%", paddingLeft: "10px", paddingBottom: "10px"}}>Showing 1km grid squares. Source data copyright of multiple organisations - <a href="/datasets" target="_new" style={{color: "black"}}>see full list of source datasets</a></div>
           </div>
         </div>
       ) : null}

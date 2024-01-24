@@ -1,0 +1,602 @@
+[
+ {
+   "topic": "Wind Speed Data",
+   "feature": "Wind Speed Data",
+   "area": "UK",
+   "dataseturl": "https://webarchive.nationalarchives.gov.uk/ukgwa/20090608233228/http://www.berr.gov.uk/cgi-bin/nre/noabl4.pl",
+   "licence": "UK Open Government Licence. Disclaimer: The DEPARTMENT OF TRADE AND INDUSTRY wind speed data is provided free of charge and is not warranted as suitable for any particular purpose or use. The User shall assume full responsibility for his use of the data.",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Aviation and exclusion areas",
+   "feature": "Aerodromes",
+   "area": "UK",
+   "dataseturl": "https://planet.openstreetmap.org/",
+   "licence": "© OpenStreetMap contributors licensed under the Open Data Commons Open Database License (ODbL)",
+   "licenceurl": "https://opendatacommons.org/licenses/odbl/"
+ },
+ {
+   "topic": "Aviation and exclusion areas",
+   "feature": "Airspace",
+   "area": "UK",
+   "dataseturl": "https://nats-uk.ead-it.com/cms-nats/opencms/en/uas-restriction-zones/",
+   "licence": "UAS Flight Restriction Zones © NATS Limited 2023",
+   "licenceurl": ""
+ },
+ {
+   "topic": "Aviation and exclusion areas",
+   "feature": "Civilian airports",
+   "area": "UK",
+   "dataseturl": "https://planet.openstreetmap.org/",
+   "licence": "© OpenStreetMap contributors licensed under the Open Data Commons Open Database License (ODbL)",
+   "licenceurl": "https://opendatacommons.org/licenses/odbl/"
+ },
+ {
+   "topic": "Aviation and exclusion areas",
+   "feature": "Explosive safeguarded areas, danger areas near ranges",
+   "area": "UK",
+   "dataseturl": "https://planet.openstreetmap.org/",
+   "licence": "© OpenStreetMap contributors licensed under the Open Data Commons Open Database License (ODbL)",
+   "licenceurl": "https://opendatacommons.org/licenses/odbl/"
+ },
+ {
+   "topic": "Aviation and exclusion areas",
+   "feature": "Military airfields and airbases",
+   "area": "UK",
+   "dataseturl": "https://planet.openstreetmap.org/",
+   "licence": "© OpenStreetMap contributors licensed under the Open Data Commons Open Database License (ODbL)",
+   "licenceurl": "https://opendatacommons.org/licenses/odbl/"
+ },
+ {
+   "topic": "Aviation and exclusion areas",
+   "feature": "MOD exclusion areas",
+   "area": "UK",
+   "dataseturl": "https://planet.openstreetmap.org/",
+   "licence": "© OpenStreetMap contributors licensed under the Open Data Commons Open Database License (ODbL)",
+   "licenceurl": "https://opendatacommons.org/licenses/odbl/"
+ },
+ {
+   "topic": "Aviation and exclusion areas",
+   "feature": "MOD training areas",
+   "area": "UK",
+   "dataseturl": "https://planet.openstreetmap.org/",
+   "licence": "© OpenStreetMap contributors licensed under the Open Data Commons Open Database License (ODbL)",
+   "licenceurl": "https://opendatacommons.org/licenses/odbl/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Ancient woodlands",
+   "area": "England",
+   "dataseturl": "https://naturalengland-defra.opendata.arcgis.com/datasets/ancient-woodland-england/explore",
+   "licence": "Contains public sector information licensed under the Open Government Licence v3.0",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Ancient woodlands",
+   "area": "Scotland",
+   "dataseturl": "https://opendata.nature.scot/datasets/ancient-woodland-inventory/explore",
+   "licence": "Available under the Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Ancient woodlands",
+   "area": "Wales",
+   "dataseturl": "https://datamap.gov.wales/layers/inspire-nrw:NRW_ANCIENT_WOODLAND_INVENTORY_2021",
+   "licence": "Contains Natural Resources Wales information © Natural Resources Wales and Database Right. All rights Reserved. Contains Ordnance Survey Data. Ordnance Survey Licence number 100019741. Crown Copyright and Database Right. Licensed under Open Government Licence for Public Sector Information (OGL)",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Priority Habitats - Woodland",
+   "area": "Northern Ireland",
+   "dataseturl": "https://www.opendatani.gov.uk/@northern-ireland-environment-agency-natural-environment-division/priorityhabitats_woodland",
+   "licence": "UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Hedgerows",
+   "area": "UK",
+   "dataseturl": "https://planet.openstreetmap.org/",
+   "licence": "© OpenStreetMap contributors licensed under the Open Data Commons Open Database License (ODbL)",
+   "licenceurl": "https://opendatacommons.org/licenses/odbl/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Local wildlife reserves",
+   "area": "England",
+   "dataseturl": "https://naturalengland-defra.opendata.arcgis.com/datasets/Defra::local-nature-reserves-england/explore",
+   "licence": "Contains public sector information licensed under the Open Government Licence v3.0",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Local wildlife reserves",
+   "area": "Scotland",
+   "dataseturl": "https://data.spatialhub.scot/dataset/local_nature_reserves-is/resource/bd395f49-95ed-4c30-8dc2-0eeb0be7b7c8",
+   "licence": "Available under the Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Local Nature Reserves",
+   "area": "Wales",
+   "dataseturl": "https://datamap.gov.wales/layers/inspire-nrw:NRW_LNR",
+   "licence": "Contains Natural Resources Wales information © Natural Resources Wales and Database Right. All rights Reserved. Contains Ordnance Survey Data. Ordnance Survey Licence number AC0000849444. Crown Copyright and Database Right. Licensed under Open Government Licence for Public Sector Information (OGL)",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Local wildlife reserves",
+   "area": "UK",
+   "dataseturl": "https://planet.openstreetmap.org/",
+   "licence": "© OpenStreetMap contributors licensed under the Open Data Commons Open Database License (ODbL)",
+   "licenceurl": "https://opendatacommons.org/licenses/odbl/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "National nature reserves",
+   "area": "England",
+   "dataseturl": "https://naturalengland-defra.opendata.arcgis.com/datasets/Defra::national-nature-reserves-england/explore",
+   "licence": "Contains public sector information licensed under the Open Government Licence v3.0",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "National nature reserves",
+   "area": "Scotland",
+   "dataseturl": "https://opendata.nature.scot/datasets/snh::national-nature-reserves/explore",
+   "licence": "Available under the Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "National Nature Reserves",
+   "area": "Wales",
+   "dataseturl": "https://datamap.gov.wales/layers/inspire-nrw:NRW_NNR",
+   "licence": "Contains Natural Resources Wales information © Natural Resources Wales and Database Right. All rights Reserved. Contains Ordnance Survey Data. Ordnance Survey Licence number AC0000849444. Crown Copyright and Database Right. Licensed under Open Government Licence for Public Sector Information (OGL)",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "National nature reserves",
+   "area": "Northern Ireland",
+   "dataseturl": "https://www.opendatani.gov.uk/@northern-ireland-environment-agency-natural-environment-division/national-nature-reserves",
+   "licence": "UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Ramsar sites",
+   "area": "England",
+   "dataseturl": "https://naturalengland-defra.opendata.arcgis.com/datasets/ramsar-england/explore",
+   "licence": "Contains public sector information licensed under the Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Ramsar sites",
+   "area": "Scotland",
+   "dataseturl": "https://opendata.nature.scot/datasets/ramsar-wetlands-of-international-importance/explore",
+   "licence": "Available under the Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Ramsar Wetlands of international importance",
+   "area": "Wales",
+   "dataseturl": "https://datamap.gov.wales/layers/inspire-nrw:NRW_RAMSAR",
+   "licence": "Contains Natural Resources Wales information © Natural Resources Wales and Database Right. All rights Reserved. Contains Ordnance Survey Data. Ordnance Survey Licence number AC0000849444. Crown Copyright and Database Right. Licensed under Open Government Licence for Public Sector Information (OGL)",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Ramsar sites",
+   "area": "Northern Ireland",
+   "dataseturl": "https://www.opendatani.gov.uk/@northern-ireland-environment-agency-natural-environment-division/ramsar-sites",
+   "licence": "UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Sites of Special Scientific Interest",
+   "area": "England",
+   "dataseturl": "https://naturalengland-defra.opendata.arcgis.com/datasets/sites-of-special-scientific-interest-england/explore",
+   "licence": "Contains public sector information licensed under the Open Government Licence v3.0",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Sites of Special Scientific Interest",
+   "area": "Scotland",
+   "dataseturl": "https://opendata.nature.scot/datasets/sites-of-special-scientific-interest/explore",
+   "licence": "Available under the Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Sites of Special Scientific Interest (SSSI)",
+   "area": "Wales",
+   "dataseturl": "https://datamap.gov.wales/layers/inspire-nrw:NRW_SSSI",
+   "licence": "Contains Natural Resources Wales information © Natural Resources Wales and Database Right. All rights Reserved. Contains Ordnance Survey Data. Ordnance Survey Licence number AC0000849444. Crown Copyright and Database Right. Licensed under Open Government Licence for Public Sector Information (OGL)",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Areas of Special Scientific Interest",
+   "area": "Northern Ireland",
+   "dataseturl": "https://www.opendatani.gov.uk/@northern-ireland-environment-agency-natural-environment-division/areas-of-special-scientific-interest",
+   "licence": "UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Special Areas of Conservation",
+   "area": "England",
+   "dataseturl": "https://naturalengland-defra.opendata.arcgis.com/datasets/special-areas-of-conservation-england/explore",
+   "licence": "Contains public sector information licensed under the Open Government Licence v3.0",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Special Areas of Conservation",
+   "area": "Scotland",
+   "dataseturl": "https://opendata.nature.scot/datasets/special-areas-of-conservation/explore",
+   "licence": "Available under the Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Special Areas of Conservation (SAC)",
+   "area": "Wales",
+   "dataseturl": "https://datamap.gov.wales/layers/inspire-nrw:NRW_SAC",
+   "licence": "Contains Natural Resources Wales information © Natural Resources Wales and Database Right. All rights Reserved. Contains Ordnance Survey Data. Ordnance Survey Licence number AC0000849444. Crown Copyright and Database Right. Licensed under Open Government Licence for Public Sector Information (OGL)",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Special Areas of Conservation",
+   "area": "Northern Ireland",
+   "dataseturl": "https://www.opendatani.gov.uk/@northern-ireland-environment-agency-natural-environment-division/special-areas-of-conservation",
+   "licence": "UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Special Protection Areas",
+   "area": "England",
+   "dataseturl": "https://naturalengland-defra.opendata.arcgis.com/datasets/special-protection-areas-england/explore",
+   "licence": "Contains public sector information licensed under the Open Government Licence v3.0",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Special Protection Areas",
+   "area": "Scotland",
+   "dataseturl": "https://opendata.nature.scot/datasets/special-protection-areas/explore",
+   "licence": "Available under the Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Special Protection Areas (SPA)",
+   "area": "Wales",
+   "dataseturl": "https://datamap.gov.wales/layers/inspire-nrw:NRW_SPA",
+   "licence": "Contains Natural Resources Wales information © Natural Resources Wales and Database Right. All rights Reserved. Contains Ordnance Survey Data. Ordnance Survey Licence number AC0000849444. Crown Copyright and Database Right. Licensed under Open Government Licence for Public Sector Information (OGL)",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Ecology and wildlife",
+   "feature": "Special Protection Areas",
+   "area": "Northern Ireland",
+   "dataseturl": "https://www.opendatani.gov.uk/@northern-ireland-environment-agency-natural-environment-division/special-protection-areas",
+   "licence": "UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Conservation areas",
+   "area": "England",
+   "dataseturl": "https://opendata-historicengland.hub.arcgis.com/datasets/446bc9bf8b5b440386d0c504caa3dac5_1/explore",
+   "licence": "The National Heritage List for England © Historic England 2023 Contains Ordnance Survey data © Crown copyright and database right 2023",
+   "licenceurl": "https://historicengland.org.uk/terms/website-terms-conditions/open-data-hub/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Conservation areas",
+   "area": "Scotland",
+   "dataseturl": "https://www.spatialdata.gov.scot/geonetwork/srv/eng/catalog.search#/metadata/06199e73-895c-4650-be8b-120c6bfd866c",
+   "licence": "Contains Historic Environment Scotland and Ordnance Survey data © Historic Environment Scotland - Scottish Charity No. SC045925 © Crown copyright and database right 2020. Data is licensed under the UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Conservation Area Boundaries",
+   "area": "Wales",
+   "dataseturl": "https://datamap.gov.wales/layers/inspire-wg:conservation_areas",
+   "licence": "Open Government Licence for Public Sector Information (OGL)",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Listed buildings",
+   "area": "England",
+   "dataseturl": "https://opendata-historicengland.hub.arcgis.com/datasets/listed-building-polygons/explore",
+   "licence": "The National Heritage List for England © Historic England 2023 Contains Ordnance Survey data © Crown copyright and database right 2023",
+   "licenceurl": "https://historicengland.org.uk/terms/website-terms-conditions/open-data-hub/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Listed buildings",
+   "area": "Scotland",
+   "dataseturl": "https://www.spatialdata.gov.scot/geonetwork/srv/eng/catalog.search#/metadata/06199e73-895c-4650-be8b-120c6bfd866c",
+   "licence": "Contains Historic Environment Scotland and Ordnance Survey data © Historic Environment Scotland - Scottish Charity No. SC045925 © Crown copyright and database right 2020. Data is licensed under the UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Listed Buildings",
+   "area": "Wales",
+   "dataseturl": "https://datamap.gov.wales/layers/inspire-wg:Cadw_ListedBuildings",
+   "licence": "Designated Historic Asset GIS Data, The Welsh Historic Environment Service (Cadw), 2023, licensed under the Open Government Licence",
+   "licenceurl": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Listed buildings",
+   "area": "Northern Ireland",
+   "dataseturl": "https://www.opendatani.gov.uk/@department-for-communities-historic-environment-division/listed-buildings-northern-ireland",
+   "licence": "UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Registered historic battlefields",
+   "area": "England",
+   "dataseturl": "https://opendata-historicengland.hub.arcgis.com/datasets/registered-battlefields/explore",
+   "licence": "The National Heritage List for England © Historic England 2023 Contains Ordnance Survey data © Crown copyright and database right 2023",
+   "licenceurl": "https://historicengland.org.uk/terms/website-terms-conditions/open-data-hub/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Registered historic battlefields",
+   "area": "Scotland",
+   "dataseturl": "https://www.spatialdata.gov.scot/geonetwork/srv/eng/catalog.search#/metadata/06199e73-895c-4650-be8b-120c6bfd866c",
+   "licence": "Contains Historic Environment Scotland and Ordnance Survey data © Historic Environment Scotland - Scottish Charity No. SC045925 © Crown copyright and database right 2020. Data is licensed under the UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Registered parks and gardens",
+   "area": "England",
+   "dataseturl": "https://opendata-historicengland.hub.arcgis.com/datasets/registered-parks-and-gardens/explore",
+   "licence": "The National Heritage List for England © Historic England 2023 Contains Ordnance Survey data © Crown copyright and database right 2023",
+   "licenceurl": "https://historicengland.org.uk/terms/website-terms-conditions/open-data-hub/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Registered parks and gardens",
+   "area": "Scotland",
+   "dataseturl": "https://www.spatialdata.gov.scot/geonetwork/srv/eng/catalog.search#/metadata/06199e73-895c-4650-be8b-120c6bfd866c",
+   "licence": "Contains Historic Environment Scotland and Ordnance Survey data © Historic Environment Scotland - Scottish Charity No. SC045925 © Crown copyright and database right 2020. Data is licensed under the UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Registered Historic Parks and Gardens",
+   "area": "Wales",
+   "dataseturl": "https://datamap.gov.wales/layergroups/geonode:registered_historic_parks_and_gardens",
+   "licence": "Designated Historic Asset GIS Data, The Welsh Historic Environment Service (Cadw), 2023, licensed under the Open Government Licence",
+   "licenceurl": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Historic Parks and Gardens",
+   "area": "Northern Ireland",
+   "dataseturl": "https://www.opendatani.gov.uk/@department-for-communities-historic-environment-division/historic-parks-and-gardens",
+   "licence": "UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Scheduled Ancient Monuments",
+   "area": "England",
+   "dataseturl": "https://opendata-historicengland.hub.arcgis.com/datasets/scheduled-monuments/explore",
+   "licence": "The National Heritage List for England © Historic England 2023 Contains Ordnance Survey data © Crown copyright and database right 2023",
+   "licenceurl": "https://historicengland.org.uk/terms/website-terms-conditions/open-data-hub/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Scheduled Ancient Monuments",
+   "area": "Scotland",
+   "dataseturl": "https://www.spatialdata.gov.scot/geonetwork/srv/eng/catalog.search#/metadata/06199e73-895c-4650-be8b-120c6bfd866c",
+   "licence": "Contains Historic Environment Scotland and Ordnance Survey data © Historic Environment Scotland - Scottish Charity No. SC045925 © Crown copyright and database right 2020. Data is licensed under the UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Scheduled Monuments",
+   "area": "Wales",
+   "dataseturl": "https://datamap.gov.wales/layers/inspire-wg:Cadw_SAM",
+   "licence": "Designated Historic Asset GIS Data, The Welsh Historic Environment Service (Cadw), 2023, licensed under the Open Government Licence",
+   "licenceurl": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "Scheduled Historic Monument Areas",
+   "area": "Northern Ireland",
+   "dataseturl": "https://www.opendatani.gov.uk/@department-for-communities-historic-environment-division/scheduled-historic-monument-areas",
+   "licence": "UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "World Heritage Sites",
+   "area": "England",
+   "dataseturl": "https://opendata-historicengland.hub.arcgis.com/datasets/world-heritage-sites/explore",
+   "licence": "The National Heritage List for England © Historic England 2023 Contains Ordnance Survey data © Crown copyright and database right 2023",
+   "licenceurl": "https://historicengland.org.uk/terms/website-terms-conditions/open-data-hub/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "World Heritage Sites",
+   "area": "Scotland",
+   "dataseturl": "https://www.spatialdata.gov.scot/geonetwork/srv/eng/catalog.search#/metadata/06199e73-895c-4650-be8b-120c6bfd866c",
+   "licence": "Contains Historic Environment Scotland and Ordnance Survey data © Historic Environment Scotland - Scottish Charity No. SC045925 © Crown copyright and database right 2020. Data is licensed under the UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "World Heritage Sites in Wales",
+   "area": "Wales",
+   "dataseturl": "https://datamap.gov.wales/layergroups/inspire-wg:WorldHeritageSites",
+   "licence": "Designated Historic Asset GIS Data, The Welsh Historic Environment Service (Cadw), 2023, licensed under the Open Government Licence",
+   "licenceurl": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Heritage Impacts",
+   "feature": "World Heritage Site",
+   "area": "Northern Ireland",
+   "dataseturl": "https://www.opendatani.gov.uk/@northern-ireland-environment-agency-natural-environment-division/world-heritage-site",
+   "licence": "UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Landscape and visual impacts",
+   "feature": "AONB",
+   "area": "England",
+   "dataseturl": "https://naturalengland-defra.opendata.arcgis.com/datasets/areas-of-outstanding-natural-beauty-england/explore",
+   "licence": "Contains public sector information licensed under the Open Government Licence v3.0",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Landscape and visual impacts",
+   "feature": "National Scenic Areas",
+   "area": "Scotland",
+   "dataseturl": "https://www.spatialdata.gov.scot/geonetwork/srv/eng/catalog.search#/metadata/13396739-7602-4428-85fd-95a5d7e208a1",
+   "licence": "Available under the terms of the Open Government Licence © Scottish Government, contains Ordnance Survey data © Crown copyright and database right 1998",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Landscape and visual impacts",
+   "feature": "Area of Outstanding Natural Beauty (AONB)",
+   "area": "Wales",
+   "dataseturl": "https://datamap.gov.wales/layers/inspire-nrw:NRW_AONB",
+   "licence": "Contains Natural Resources Wales information © Natural Resources Wales and Database Right. All rights Reserved. Contains Ordnance Survey Data. Ordnance Survey Licence number AC0000849444 . Crown Copyright and Database Right. Licensed under Open Government Licence for Public Sector Information (OGL)",
+   "licenceurl": "https://datamap.gov.wales/layers/inspire-nrw:NRW_HERITAGE_COAST"
+ },
+ {
+   "topic": "Landscape and visual impacts",
+   "feature": "AONB",
+   "area": "Northern Ireland",
+   "dataseturl": "https://www.opendatani.gov.uk/@northern-ireland-environment-agency-natural-environment-division/areas-of-outstanding-natural-beauty",
+   "licence": "UK Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Landscape and visual impacts",
+   "feature": "Heritage Coasts",
+   "area": "England",
+   "dataseturl": "https://naturalengland-defra.opendata.arcgis.com/datasets/heritage-coasts-england/explore",
+   "licence": "Contains public sector information licensed under the Open Government Licence v3.0",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Landscape and visual impacts",
+   "feature": "Heritage Coasts",
+   "area": "Scotland",
+   "dataseturl": "https://opendata.nature.scot/datasets/marine-protected-areas/explore",
+   "licence": "Available under the Open Government Licence",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Landscape and visual impacts",
+   "feature": "Heritage Coasts",
+   "area": "Wales",
+   "dataseturl": "https://datamap.gov.wales/layers/inspire-nrw:NRW_HERITAGE_COAST",
+   "licence": "Contains Natural Resources Wales information © Natural Resources Wales and Database Right. All rights Reserved. Contains Ordnance Survey Data. Ordnance Survey Licence number AC0000849444. Crown Copyright and Database Right. Licensed under Open Government Licence for Public Sector Information (OGL)",
+   "licenceurl": "https://datamap.gov.wales/layers/inspire-nrw:NRW_HERITAGE_COAST"
+ },
+ {
+   "topic": "Landscape and visual impacts",
+   "feature": "National Parks",
+   "area": "England",
+   "dataseturl": "https://naturalengland-defra.opendata.arcgis.com/datasets/Defra::national-parks-england/explore",
+   "licence": "Contains public sector information licensed under the Open Government Licence v3.0",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Landscape and visual impacts",
+   "feature": "National Parks",
+   "area": "Scotland",
+   "dataseturl": "https://hub.arcgis.com/datasets/7b8655fa3c934b7da178827fc477e7d0/explore",
+   "licence": "Available under the terms of the Open Government Licence © Scottish Government, contains Ordnance Survey data © Crown copyright and database right 2023",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Landscape and visual impacts",
+   "feature": "National Parks",
+   "area": "Wales",
+   "dataseturl": "https://datamap.gov.wales/layers/inspire-nrw:NRW_NATIONAL_PARK",
+   "licence": "Contains Natural Resources Wales information © Natural Resources Wales and Database Right. All rights Reserved. Contains Ordnance Survey Data. Ordnance Survey Licence number AC0000849444. Crown Copyright and Database Right. Licensed under Open Government Licence for Public Sector Information (OGL)",
+   "licenceurl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ },
+ {
+   "topic": "Other technical constraints",
+   "feature": "Public roads (A and B roads and motorways)",
+   "area": "UK",
+   "dataseturl": "https://planet.openstreetmap.org/",
+   "licence": "© OpenStreetMap contributors licensed under the Open Data Commons Open Database License (ODbL)",
+   "licenceurl": "https://opendatacommons.org/licenses/odbl/"
+ },
+ {
+   "topic": "Other technical constraints",
+   "feature": "Railway lines",
+   "area": "UK",
+   "dataseturl": "https://planet.openstreetmap.org/",
+   "licence": "© OpenStreetMap contributors licensed under the Open Data Commons Open Database License (ODbL)",
+   "licenceurl": "https://opendatacommons.org/licenses/odbl/"
+ },
+ {
+   "topic": "Other technical constraints",
+   "feature": "Inland waters",
+   "area": "UK",
+   "dataseturl": "https://planet.openstreetmap.org/",
+   "licence": "© OpenStreetMap contributors licensed under the Open Data Commons Open Database License (ODbL)",
+   "licenceurl": "https://opendatacommons.org/licenses/odbl/"
+ },
+ {
+   "topic": "Other technical constraints",
+   "feature": "Pipelines",
+   "area": "UK",
+   "dataseturl": "https://planet.openstreetmap.org/",
+   "licence": "© OpenStreetMap contributors licensed under the Open Data Commons Open Database License (ODbL)",
+   "licenceurl": "https://opendatacommons.org/licenses/odbl/"
+ },
+ {
+   "topic": "Other technical constraints",
+   "feature": "Power lines",
+   "area": "UK",
+   "dataseturl": "https://planet.openstreetmap.org/",
+   "licence": "© OpenStreetMap contributors licensed under the Open Data Commons Open Database License (ODbL)",
+   "licenceurl": "https://opendatacommons.org/licenses/odbl/"
+ },
+ {
+   "topic": "Other technical constraints",
+   "feature": "Public footpaths",
+   "area": "UK",
+   "dataseturl": "https://planet.openstreetmap.org/",
+   "licence": "© OpenStreetMap contributors licensed under the Open Data Commons Open Database License (ODbL)",
+   "licenceurl": "https://opendatacommons.org/licenses/odbl/"
+ },
+ {
+   "topic": "Other technical constraints",
+   "feature": "Bridleways",
+   "area": "UK",
+   "dataseturl": "https://planet.openstreetmap.org/",
+   "licence": "© OpenStreetMap contributors licensed under the Open Data Commons Open Database License (ODbL)",
+   "licenceurl": "https://opendatacommons.org/licenses/odbl/"
+ }
+]

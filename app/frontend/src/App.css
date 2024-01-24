@@ -79,6 +79,35 @@
   pointer-events: none;
 }
 
+/* Datasets table */
+
+#datasets {
+  font-size: 80%;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#datasets a {
+  color: black;
+}
+
+#datasets td, #datasets th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#datasets tr:nth-child(even){background-color: #f2f2f2;}
+
+#datasets tr:hover {background-color: #ddd;}
+
+#datasets th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #04AA6D;
+  color: white;
+}
+
 .loading-wrapper {
   color: white;
   position: absolute !important;

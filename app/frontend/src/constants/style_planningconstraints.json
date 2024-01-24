@@ -83,20 +83,21 @@
       ]
     ],
     "layout": {
-      "line-cap": "butt",
+      "line-cap": "round",
       "line-join": "round",
       "visibility": "none"
     },
     "paint": {
-      "line-opacity": 0.5,
+      "line-opacity": 0.3,
       "line-color": "darkorange",
       "line-offset": 0,
       "line-width": {
-        "base": 1.4,
+        "type": "exponential",
+        "base": 2,
         "stops": [
-          [8, 4],
-          [16, 400]
-        ]
+            [7, 2.250],
+            [20, 18432]
+        ]            
       }
     }
   },
@@ -123,11 +124,13 @@
       "line-color": "red",
       "line-offset": 0,
       "line-width": {
-        "base": 1.4,
-        "stops": [
-          [8, 2],
-          [16, 200]
-        ]
+        "type": "exponential",
+        "base": 2,
+        "stops": 
+        [
+            [7, 1.125],
+            [20, 9216]
+        ]            
       }
     }
   }     

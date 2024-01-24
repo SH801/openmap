@@ -46,33 +46,52 @@ class DatasetsPage extends Component {
           <IonGrid>
               <IonRow class="ion-align-items-left ion-justify-content-left">
                 <IonCol size="auto">
-                  <IonText><h1>Datasets used</h1> [<a style={{color: "black"}} href="/static/datasets.json" target="_download">Download list as JSON</a>]
+                  <IonText><h1><a style={{color: "black"}} target="_datasets" href="/static/datasets.json">Datasets used</a></h1> 
                   </IonText>
                 </IonCol>
               </IonRow>
 
-              <table id="datasets" style={{border: "1px black"}}>
-                <thead>
-                  <tr>
-                    <th align="left">Topic</th>
-                    <th align="left">Feature</th>
-                    <th align="left">Area</th>
-                    <th align="left">URL</th>
-                    <th align="left">Licence</th>
-                  </tr>
-                </thead>
-              <tbody>
-                {this.datasets.map((dataset, index) => (
-                  <tr key={index}>
-                    <td style={{whiteSpace: "nowrap"}}><IonText>{dataset.topic}</IonText></td>
-                    <td><IonText>{dataset.feature}</IonText></td>
-                    <td><IonText>{dataset.area}</IonText></td>
-                    <td><IonText><a target="_dataset" href={dataset.dataseturl}>{dataset.dataseturl}</a></IonText></td>
-                    <td><IonText><a target="_licence" href={dataset.licenceurl}>{dataset.licence}</a></IonText></td>
-                  </tr>
-                ))} 
-              </tbody>
-              </table>
+              <IonRow class="ion-align-items-left ion-justify-content-left">
+                <IonCol size="auto">
+                  <IonText style={{fontSize: "80%"}}>Dataset selection based on <a style={{color: "black"}} target="_cse" href="https://www.cse.org.uk/">Centre for Sustainable Energy's</a> publication <a style={{color: "black"}} target="_windfarmguide" href="https://www.cse.org.uk/resource/identifing-suitable-areas-for-onshore-wind-development-in-your-neighbourhood-plan/">"How to identify suitable areas for onshore wind development in your neighbourhood plan"</a></IonText>
+                </IonCol>
+              </IonRow>
+
+              <IonRow class="ion-align-items-left ion-justify-content-left">
+                <IonCol size="auto">
+
+                <table id="datasets" style={{border: "1px black"}}>
+                  <thead>
+                    <tr>
+                      <th align="left">Topic</th>
+                      <th align="left">Feature</th>
+                      <th align="left">Area</th>
+                      <th align="left">URL</th>
+                      <th align="left">Licence</th>
+                    </tr>
+                  </thead>
+                <tbody>
+                  {this.datasets.map((dataset, index) => (
+                    <tr key={index}>
+                      <td style={{whiteSpace: "nowrap"}}><IonText>{dataset.topic}</IonText></td>
+                      <td><IonText>{dataset.feature}</IonText></td>
+                      <td><IonText>{dataset.area}</IonText></td>
+                      <td><IonText><a target="_dataset" href={dataset.dataseturl}>{dataset.dataseturl}</a></IonText></td>
+                      <td><IonText><a target="_licence" href={dataset.licenceurl}>{dataset.licence}</a></IonText></td>
+                    </tr>
+                  ))} 
+                </tbody>
+                </table>
+
+                </IonCol>
+              </IonRow>
+
+              <IonRow class="ion-align-items-left ion-justify-content-left" style={{paddingBottom: "30px"}}>
+                <IonCol size="auto">
+                  <IonText>[<a style={{color: "black"}} href="/static/datasets.json" target="_download">Download list as JSON</a>]
+                  </IonText>
+                </IonCol>
+              </IonRow>
 
           </IonGrid>
         </IonContent>

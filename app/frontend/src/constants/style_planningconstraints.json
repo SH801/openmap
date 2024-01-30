@@ -128,11 +128,110 @@
         "base": 2,
         "stops": 
         [
-            [7, 1.125],
-            [20, 9216]
+            [7, 1],
+            [20, 8185]          
         ]            
       }
     }
-  }     
+  },
+  {
+    "id": "constraint_bridleways_buffer_line_pattern",
+    "source": "planningconstraints",
+    "source-layer": "bridleways",
+    "type": "line",
+    "filter": [
+      "all",
+      [
+        "==",
+        "$type",
+        "LineString"
+      ]
+    ],
+    "layout": {
+      "line-cap": "butt",
+      "line-join": "round",
+      "visibility": "none"
+    },
+    "paint": {
+        "line-pattern": "hatching_transparent",
+        "line-opacity": 0.2,
+        "line-offset": 0,
+        "line-width": {
+            "type": "exponential",
+            "base": 2,
+            "stops": 
+            [
+              [7, 1],
+              [20, 8185]          
+            ]            
+        }
+    }
+  },  
+  {
+    "id": "constraint_hedgerows_buffer_line_colour",
+    "source": "planningconstraints",
+    "source-layer": "hedgerows",
+    "type": "line",
+    "filter": [
+      "all",
+      [
+        "==",
+        "$type",
+        "LineString"
+      ]
+    ],
+    "layout": {
+      "line-cap": "butt",
+      "line-join": "round",
+      "visibility": "none"
+    },
+    "paint": {
+      "line-opacity": 0.5,
+      "line-color": "darkgreen",
+      "line-offset": 0,
+      "line-width": {
+        "type": "exponential",
+        "base": 2,
+        "stops": 
+        [
+            [7, 0.25],
+            [20, 2046]
+        ]            
+      }
+    }
+  },
+  {
+    "id": "constraint_hedgerows_buffer_line_pattern",
+    "source": "planningconstraints",
+    "source-layer": "hedgerows",
+    "type": "line",
+    "filter": [
+      "all",
+      [
+        "==",
+        "$type",
+        "LineString"
+      ]
+    ],
+    "layout": {
+      "line-cap": "butt",
+      "line-join": "round",
+      "visibility": "none"
+    },
+    "paint": {
+        "line-pattern": "hatching_transparent",
+        "line-opacity": 0.2,
+        "line-offset": 0,
+        "line-width": {
+            "type": "exponential",
+            "base": 2,
+            "stops": 
+            [
+              [7, 0.25],
+              [20, 2046]
+            ]            
+        }
+    }
+  }      
 ]
 

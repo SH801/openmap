@@ -922,7 +922,7 @@ export class MapContainer extends Component  {
       if (this.hoveredPolygonId === null) {
         if (event.features[0].sourceLayer === 'windspeed') {
           var windspeed = parseFloat(event.features[0].properties['DN'] / 10);
-          this.setState({windspeed: windspeed});
+          this.props.setGlobalState({'windspeed': windspeed});
           return;
         }
 
@@ -977,7 +977,7 @@ export class MapContainer extends Component  {
     if (event.features.length > 0) {
       if (event.features[0].sourceLayer === 'windspeed') {
         var windspeed = parseFloat(event.features[0].properties['DN'] / 10);
-        this.setState({windspeed: windspeed});
+        this.props.setGlobalState({'windspeed': windspeed});
         return;
       }
 
@@ -1035,6 +1035,12 @@ export class MapContainer extends Component  {
           (event.features[0].sourceLayer === 'landuse')) {
           alert("Non-optimal site for wind turbine due to: " + this.layerlookup[id]);
           return;
+      }
+
+      if (event.features[0].sourceLayer === 'windspeed') {
+        var windspeed = parseFloat(event.features[0].properties['DN'] / 10);
+        this.props.setGlobalState({'windspeed': windspeed});
+        return;
       }
     }
 
@@ -1351,23 +1357,6 @@ export class MapContainer extends Component  {
       <>
         <IonLoading translucent={true} isOpen={this.state.loading} message="Loading images and data..." spinner="circles" />
     
-        {this.props.global.showwindspeed ? (
-            <div style={{position: "absolute", top: "-45px", left: "0px", zIndex: "99", width: "100vw", pointerEvents: "none"}}>
-              <div style={{marginLeft: "0px", marginRight: "0px"}}>
-                <div>
-                  <IonGrid>
-                    <IonRow class="ion-align-items-center ion-justify-content-center">
-                      <IonCol size="auto">
-                        <IonText style={{fontSize: "100%"}}>Wind: {this.state.windspeed}m / sec {(this.state.windspeed < 5) ? "(not usable)": null}
-                        </IonText>
-                      </IonCol>
-                    </IonRow>
-                  </IonGrid>
-                </div>
-              </div>
-            </div>
-          ) : null}
-
         {this.props.global.mapinitialized ? (
           <Map ref={this.mapRef}
           onLoad={this.onLoad}
@@ -1464,7 +1453,7 @@ export class MapContainer extends Component  {
               <IonGrid>
                 <IonRow class="ion-align-items-center ion-justify-content-center">
                   <IonCol size="auto">
-                    <IonText>Non-optimal wind sites due to low wind / planning constraints</IonText>
+                    <IonText className="planning-key-title">Non-optimal wind sites due to low wind / planning constraints</IonText>
                   </IonCol>
                 </IonRow>
                 <IonRow class="ion-align-items-center ion-justify-content-center">
@@ -1475,11 +1464,9 @@ export class MapContainer extends Component  {
                           <span 
                             key={index} 
                             onClick={() => this.togglePlanningConstraint(planningconstraint)} 
+                            className="planning-key-item"
                             style={{
                               opacity: (this.props.global.planningconstraints[planningconstraint] ? 1 : 0.4),
-                              whiteSpace: "nowrap", 
-                              fontSize: "80%", 
-                              paddingRight: "10px"
                             }}>
                             <div style={{width: "25px", height: "10px", marginRight: "5px", display: "inline-block", backgroundColor: PLANNING_CONSTRAINTS[planningconstraint]['colour']}} />
                             {PLANNING_CONSTRAINTS[planningconstraint]['description']}

@@ -61,7 +61,10 @@ export class Share extends Component {
     render() {
         return (
             <>
-            <IonIcon onClick={this.showShare} icon={shareSocialOutline} className="share-icon"/>
+            <div>
+                <IonIcon onClick={this.showShare} icon={shareSocialOutline} className="share-icon toolbar-button"/>
+                <div className="toolbar-button-caption">Share</div>
+            </div>
             <IonModal 
                 id="share-modal"
                 isOpen={this.state.showsharemodal} 

@@ -9,15 +9,19 @@
 }
 
 .close-icon,
-.editcustomgeojson-icon,
 .login-icon,
-.share-icon {
+.share-icon,
+.editcustomgeojson-icon {
   font-size: 28px;
   padding-top: 2px;
-  padding-left: 6px;
-  padding-right:8px;
-  /* color: white; */
   color: #666;
+}
+
+.close-icon,
+.login-icon,
+.share-icon {
+  padding-left: 6px;
+  padding-right: 6px;
 }
 
 .close-icon {

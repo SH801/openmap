@@ -66,6 +66,7 @@ export const initialStateGlobal = {
         }
     }),  
     showwindspeed: false,
+    windspeed: 0,
     showplanningconstraints: false,
     planningconstraints: {
         "wind": true,

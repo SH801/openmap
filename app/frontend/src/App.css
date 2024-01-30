@@ -17,6 +17,36 @@
   background-color: #87b6c2;
 } */
 
+.planning-key-item {
+  white-space: nowrap; 
+  font-size: 80%;
+  padding-right: 10px;
+}
+
+@media only screen and (max-width: 600px) {
+  .planning-key-title,
+  .planning-key-item {
+    font-size: 60%;
+  }
+}
+
+.toolbar-button-container {
+  padding-right: 10px;
+}
+
+.toolbar-button {
+  font-size: 145%;
+  width: 100%;
+  margin: auto;
+}
+
+.toolbar-button-caption {
+  font-size: 65%; 
+  text-transform: uppercase; 
+  position: relative; 
+  text-wrap: nowrap;
+}
+
 .maplibregl-ctrl-pitchtoggle-3d {
   background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCI+ICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkeT0iLjM1ZW0iIHN0eWxlPSJmb250LXNpemU6IDE0cHg7IGZvbnQtZmFtaWx5OiAnSGVsdmV0aWNhIE5ldWUnLEFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmOyBmb250LXdlaWdodDogYm9sZDsgdGV4dC1hbmNob3I6IG1pZGRsZTsiPjNEPC90ZXh0Pjwvc3ZnPg==);
 }

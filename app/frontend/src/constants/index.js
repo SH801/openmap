@@ -169,16 +169,10 @@ export const PLANNING_CONSTRAINTS = {
         [
             "constraint_airspace_fill_colour",
             "constraint_airspace_fill_pattern",
-            "constraint_airspace_buffer_line_colour",
-            "constraint_airspace_buffer_line_pattern",        
             "constraint_dangerareas_fill_colour",
             "constraint_dangerareas_fill_pattern",
-            "constraint_dangerareas_buffer_line_colour",
-            "constraint_dangerareas_buffer_line_pattern",        
             "constraint_military_fill_colour",
             "constraint_military_fill_pattern",
-            "constraint_military_buffer_line_colour",
-            "constraint_military_buffer_line_pattern"            
         ]    
     }
 };

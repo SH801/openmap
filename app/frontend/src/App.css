@@ -17,6 +17,12 @@
   background-color: #87b6c2;
 } */
 
+.add-instructions {
+  font-size: 120%;
+  width: auto;
+  text-align: center;
+}
+
 .planning-key-item {
   white-space: nowrap; 
   font-size: 80%;
@@ -28,6 +34,11 @@
   .planning-key-item {
     font-size: 60%;
   }
+
+  .add-instructions {
+    font-size: 100%;
+    text-align: left;
+  }  
 }
 
 .toolbar-button-container {
@@ -134,7 +145,7 @@
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: left;
-  background-color: #04AA6D;
+  background-color: #4CBB17;
   color: white;
 }
 

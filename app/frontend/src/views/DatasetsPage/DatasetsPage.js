@@ -14,8 +14,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { IonApp, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonText } from '@ionic/react';
-import Toolbar from './../../components/toolbar';
+import { IonApp, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonText, IonButton } from '@ionic/react';
 import { POSITIVE_SITE } from '../../constants';
 
 class DatasetsPage extends Component {
@@ -46,7 +45,7 @@ class DatasetsPage extends Component {
           <IonGrid>
               <IonRow class="ion-align-items-left ion-justify-content-left">
                 <IonCol size="auto">
-                  <IonText><h1><a style={{color: "black"}} target="_datasets" href="/static/datasets.json">Datasets used</a></h1> 
+                  <IonText><h1>Datasets used</h1> 
                   </IonText>
                 </IonCol>
               </IonRow>
@@ -54,6 +53,13 @@ class DatasetsPage extends Component {
               <IonRow class="ion-align-items-left ion-justify-content-left">
                 <IonCol size="auto">
                   <IonText style={{fontSize: "80%"}}>Dataset selection based on <a style={{color: "black"}} target="_cse" href="https://www.cse.org.uk/">Centre for Sustainable Energy's</a> publication <a style={{color: "black"}} target="_windfarmguide" href="https://www.cse.org.uk/resource/identifing-suitable-areas-for-onshore-wind-development-in-your-neighbourhood-plan/">"How to identify suitable areas for onshore wind development in your neighbourhood plan"</a></IonText>
+                </IonCol>
+              </IonRow>
+
+              <IonRow class="ion-align-items-left ion-justify-content-left" style={{paddingBottom: "30px"}}>
+                <IonCol size="auto">
+                  <IonButton href="/static/datasets.json" target="_download">Download list as JSON</IonButton>                                        
+                  <IonButton href="https://ckan.positiveplaces.org" target="_ckan">Access CKAN data catalogue</IonButton>                                        
                 </IonCol>
               </IonRow>
 
@@ -83,13 +89,6 @@ class DatasetsPage extends Component {
                 </tbody>
                 </table>
 
-                </IonCol>
-              </IonRow>
-
-              <IonRow class="ion-align-items-left ion-justify-content-left" style={{paddingBottom: "30px"}}>
-                <IonCol size="auto">
-                  <IonText>[<a style={{color: "black"}} href="/static/datasets.json" target="_download">Download list as JSON</a>]
-                  </IonText>
                 </IonCol>
               </IonRow>
 

@@ -120,7 +120,7 @@ export class NewAsset extends Component {
             {this.props.global.customgeojson.features.length > 0 ? (
                 <div className="toolbar-button-container">
                     <IonIcon data-tooltip-id="actions-tooltip" onClick={this.enableEdit} icon={createOutline} className="editcustomgeojson-icon toolbar-button"/>
-                    <div className="toolbar-button-caption">Edit renewables</div>
+                    <div className="toolbar-button-caption">Edit</div>
                 </div>
             ) : null}
              <div className="toolbar-button-container">           
@@ -133,7 +133,7 @@ export class NewAsset extends Component {
                     
                 {this.props.global.showwindspeed ? (
                     <><b style={{fontSize: "125%", textTransform:"none"}}>{this.props.global.windspeed} m/s {(this.props.global.windspeed < 5) ? "(not usable)": null}</b></>
-                ) : (<>Wind speed</>)}            
+                ) : (<>Wind</>)}            
                     
                 </div>
             </div>

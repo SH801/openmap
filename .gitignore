@@ -41,3 +41,4 @@ app/gis/*.geojson
 app/gis/*.mbtiles
 app/gis/*.qmd
 app/osm/wildlifereserves.geojson
+downloadinglargeOSM.txt

@@ -1397,8 +1397,8 @@ export class MapContainer extends Component  {
                 <div>
                   <IonGrid>
                     <IonRow class="ion-align-items-center ion-justify-content-center">
-                      <IonCol size="auto">
-                        <IonText style={{fontSize: "120%"}}>
+                      <IonCol className="add-instructions">
+                        <IonText>
                           {(this.props.global.editcustomgeojson === 'wind') ? (
                             <>Click on map to add one or more wind turbines then select "Finish" when complete</>
                           ) : null}
@@ -1411,7 +1411,7 @@ export class MapContainer extends Component  {
                         </IonText>
                       </IonCol>
                       <IonCol size="auto">
-                        <IonButton onClick={this.editcustomgeojsonFinish}>Finish</IonButton>                                        
+                        <IonButton size="small" onClick={this.editcustomgeojsonFinish}>Finish</IonButton>                                        
                       </IonCol>
                     </IonRow>
                   </IonGrid>

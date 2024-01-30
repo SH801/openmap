@@ -12,3 +12,4 @@ app/.env.dev
 app/.env.prod
 app/backend/migrations
 app/frontend/node_modules
+ckan/

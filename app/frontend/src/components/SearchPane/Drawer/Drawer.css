@@ -261,6 +261,7 @@ ion-modal#drawer::part(content) {
   --height: 270px!important;
 }
 
+.alert-wrapper,
 ion-modal#newasset-modal::part(content),
 ion-modal#message-modal::part(content),
 ion-modal#share-modal::part(content) {

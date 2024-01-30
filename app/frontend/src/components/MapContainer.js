@@ -21,6 +21,7 @@ import {
   IonCol,
   IonButton, 
   IonText,
+  IonAlert
 } from '@ionic/react';
 import { initShaders, initVertexBuffers, renderImage } from './webgl';
 import { setURLState, modifyURLParameter, getURLSubdomain, getExternalReference } from "../functions/urlstate";
@@ -464,6 +465,8 @@ export class MapContainer extends Component  {
     animationinterval: 0,
     idle: false,
     windspeed: 0,
+    alertIsOpen: false,
+    alertText: '',
     terrain: {source: "terrainSource", exaggeration: 1.1 },
   }
 
@@ -1033,7 +1036,11 @@ export class MapContainer extends Component  {
       if ((id === 'constraint_windspeed_fill_colour') ||
           (event.features[0].source === 'planningconstraints') || 
           (event.features[0].sourceLayer === 'landuse')) {
-          alert("Non-optimal site for wind turbine due to: " + this.layerlookup[id]);
+            this.setState(
+              {
+                alertIsOpen: true, 
+                alertText: "<p>Non-optimal site for wind turbine due to: </p><p><b>" + this.layerlookup[id] + "</b></p>"
+              });
           return;
       }
 
@@ -1356,7 +1363,7 @@ export class MapContainer extends Component  {
     return (
       <>
         <IonLoading translucent={true} isOpen={this.state.loading} message="Loading images and data..." spinner="circles" />
-    
+
         {this.props.global.mapinitialized ? (
           <Map ref={this.mapRef}
           onLoad={this.onLoad}
@@ -1482,6 +1489,15 @@ export class MapContainer extends Component  {
           </div>
         </div>
       ) : null}
+
+      <IonAlert
+        id="alert-modal"
+        isOpen={this.state.alertIsOpen}
+        header="Problem with location"
+        message={this.state.alertText}
+        buttons={['OK']}
+        onDidDismiss={() => this.setState({alertIsOpen: false})} >
+      </IonAlert>
 
       </>
     )

@@ -132,7 +132,7 @@ export class NewAsset extends Component {
                 <div className="toolbar-button-caption">
                     
                 {this.props.global.showwindspeed ? (
-                    <><b style={{fontSize: "125%", textTransform:"none"}}>{this.props.global.windspeed} m/s {(this.props.global.windspeed < 5) ? "(not usable)": null}</b></>
+                    <><b style={{fontSize: "125%", textTransform:"none"}}>{this.props.global.windspeed} m/s</b> {(this.props.global.windspeed < 5) ? " - TOO LOW": null}</>
                 ) : (<>Wind</>)}            
                     
                 </div>

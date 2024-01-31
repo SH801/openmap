@@ -1453,8 +1453,8 @@ export class MapContainer extends Component  {
       ) : null};
 
       {this.props.global.showplanningconstraints ? (
-        <div style={{position: "absolute", bottom: "10px", left: "0px", width: "100vw", zIndex: "9999"}}>
-          <div style={{marginLeft: "10px", marginRight: this.props.isMobile ? "10px" : "calc(24% + 10px)", backgroundColor: "#ffffffff"}}>
+        <div style={{position: "absolute", bottom: "0px", left: "0px", width: "100vw", zIndex: "9999"}}>
+          <div style={{marginLeft: "0px", marginRight: this.props.isMobile ? "0px" : "calc(24% + 10px)", backgroundColor: "#ffffffff"}}>
             <IonIcon style={{fontSize: "80%", position: "absolute", top: "10px", left: "10px"}} onClick={() => this.closePlanningConstraints()} icon={closeOutline} className="close-icon"/>
             <div>
               <IonGrid>
@@ -1485,7 +1485,7 @@ export class MapContainer extends Component  {
                 </IonRow>
               </IonGrid>
             </div>
-            <div style={{fontSize: "70%", paddingLeft: "10px", paddingBottom: "10px"}}>Showing 1km grid squares. Source data copyright of multiple organisations - <a href="/datasets" target="_new" style={{color: "black"}}>see full list of source datasets</a></div>
+            <div className="planning-key-footnote">Showing 1km grid squares. Source data copyright of multiple organisations - <a href="/datasets" target="_new" style={{color: "black"}}>see full list of source datasets</a></div>
           </div>
         </div>
       ) : null}

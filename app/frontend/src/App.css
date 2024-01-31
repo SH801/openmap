@@ -29,12 +29,26 @@
   padding-right: 10px;
 }
 
+.planning-key-footnote {
+  font-size: 70%;
+  padding-left: 10px;
+  padding-bottom: 10px;
+}
+
 @media only screen and (max-width: 600px) {
   .planning-key-title {
     font-size: 70%;
   }
 
+  .close-icon {
+    display: none;
+  }
+
   .planning-key-item {
+    font-size: 60%;
+  }
+
+  .planning-key-footnote {
     font-size: 60%;
   }
 

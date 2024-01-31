@@ -1465,7 +1465,7 @@ export class MapContainer extends Component  {
                 </IonRow>
                 <IonRow class="ion-align-items-center ion-justify-content-center">
                   <IonCol size="auto">
-                    <div style={{paddingLeft: "20px", paddingRight: "20px"}}>
+                    <div style={{paddingRight: "20px"}}>
                       {Object.keys(PLANNING_CONSTRAINTS).map((planningconstraint, index) => {
                         return (
                           <span 

@@ -30,14 +30,18 @@
 }
 
 @media only screen and (max-width: 600px) {
-  .planning-key-title,
+  .planning-key-title {
+    font-size: 70%;
+  }
+
   .planning-key-item {
     font-size: 60%;
   }
 
   .add-instructions {
-    font-size: 100%;
+    font-size: 80%;
     text-align: left;
+    line-height: normal;
   }  
 }
 

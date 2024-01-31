@@ -115,7 +115,7 @@ export class NewAsset extends Component {
             <>
             <div className="toolbar-button-container">
                 <IonIcon onClick={this.showNewAssetSelector} icon={addCircleOutline} className="editcustomgeojson-icon toolbar-button"/>
-                <div className="toolbar-button-caption">Add renewables</div>
+                <div className="toolbar-button-caption">Add</div>
             </div>
             {this.props.global.customgeojson.features.length > 0 ? (
                 <div className="toolbar-button-container">

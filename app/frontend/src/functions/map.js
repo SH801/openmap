@@ -26,7 +26,7 @@ export function getBoundingBox(geojson) {
     }
 
     if (maxturbinepos) {
-        var maxturbinefeature = destination(point(maxturbinepos), (WINDTURBINE_HEIGHT / 1000), 0, {units: 'kilometres'});
+        var maxturbinefeature = destination(point(maxturbinepos), (1.1 * WINDTURBINE_HEIGHT / 1000), 0, {units: 'kilometres'});
         maxturbinepos = maxturbinefeature.geometry.coordinates;
         // If maxturbinepos is outside bounding box, modify bounding box to include it
         if (boundingbox[3] < maxturbinepos[1]) boundingbox[3] = maxturbinepos[1];

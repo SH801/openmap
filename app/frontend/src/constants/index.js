@@ -39,7 +39,7 @@ export const API_URL = isDev() ? "http://localhost:80" : "";
 export const TILESERVER_BASEURL = isDev() ? "http://localhost:8080" : ("https://tiles." + POSITIVE_SITE.shortcode + '.org');
 
 // Height of wind turbine in metres in order to calculate bounding box for wind turbine points
-export const WINDTURBINE_HEIGHT = 150;
+export const WINDTURBINE_HEIGHT = 160;
 
 // Number of milliseconds to stay at each entity during flying tour
 export const FLYINGTOUR_LINGERTIME = 25000;

@@ -1,5 +1,5 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis version="3.34.3-Prizren" saveUserFull="Stefan Haselwimmer" projectname="" saveUser="stefanhaselwimmer" saveDateTime="2024-02-01T09:31:01">
+<qgis version="3.34.3-Prizren" saveUserFull="Stefan Haselwimmer" projectname="" saveUser="stefanhaselwimmer" saveDateTime="2024-02-01T18:58:08">
   <homePath path=""/>
   <title></title>
   <transaction mode="Disabled"/>
@@ -321,7 +321,7 @@
       <customproperties>
         <Option/>
       </customproperties>
-      <layer-tree-group checked="Qt::Checked" expanded="0" groupLayer="" name="National Parks">
+      <layer-tree-group checked="Qt::Unchecked" expanded="0" groupLayer="" name="National Parks">
         <customproperties>
           <Option/>
         </customproperties>
@@ -509,10 +509,10 @@
   <mapcanvas annotationsVisible="1" name="theMapCanvas">
     <units>degrees</units>
     <extent>
-      <xmin>-4.52739501703781588</xmin>
-      <ymin>50.89101433079913761</ymin>
-      <xmax>-3.52564580540011985</xmax>
-      <ymax>51.36434711526580088</ymax>
+      <xmin>-5.83260999225515775</xmin>
+      <ymin>49.88440786429963225</ymin>
+      <xmax>-4.05581076349239211</xmax>
+      <ymax>50.72395664219544642</ymax>
     </extent>
     <rotation>0</rotation>
     <destinationsrs>
@@ -773,20 +773,20 @@
       </legendgroup>
     </legendgroup>
     <legendgroup checked="Qt::Checked" open="true" name="Landscape and visual impacts">
-      <legendgroup checked="Qt::Checked" open="false" name="National Parks">
+      <legendgroup checked="Qt::Unchecked" open="false" name="National Parks">
         <legendlayer showFeatureCount="0" checked="Qt::Checked" drawingOrder="-1" open="false" name="National Parks - Wales">
           <filegroup open="false" hidden="false">
-            <legendlayerfile layerid="_099563c6_b7fd_4a3f_bae8_056f64e993e8" isInOverview="0" visible="1"/>
+            <legendlayerfile layerid="_099563c6_b7fd_4a3f_bae8_056f64e993e8" isInOverview="0" visible="0"/>
           </filegroup>
         </legendlayer>
         <legendlayer showFeatureCount="0" checked="Qt::Checked" drawingOrder="-1" open="true" name="National Parks - Scotland">
           <filegroup open="true" hidden="false">
-            <legendlayerfile layerid="National_Parks___Scotland_5a958057_39e2_4629_8217_59f31de42d84" isInOverview="0" visible="1"/>
+            <legendlayerfile layerid="National_Parks___Scotland_5a958057_39e2_4629_8217_59f31de42d84" isInOverview="0" visible="0"/>
           </filegroup>
         </legendlayer>
         <legendlayer showFeatureCount="0" checked="Qt::Checked" drawingOrder="-1" open="false" name="National Parks (England) © Natural England">
           <filegroup open="false" hidden="false">
-            <legendlayerfile layerid="National_Parks__England____Natural_England_a308a1be_ec4b_4002_97b0_5db816bed502" isInOverview="0" visible="1"/>
+            <legendlayerfile layerid="National_Parks__England____Natural_England_a308a1be_ec4b_4002_97b0_5db816bed502" isInOverview="0" visible="0"/>
           </filegroup>
         </legendlayer>
       </legendgroup>
@@ -21625,7 +21625,7 @@ Please note: this dataset represents Historic England’s interpretation of the 
   <Sensors/>
   <ProjectViewSettings UseProjectScales="0" rotation="0">
     <Scales/>
-    <DefaultViewExtent xmin="-4.52739501703781588" xmax="-3.52564580540011985" ymax="51.42798865769009353" ymin="50.82737278837484496">
+    <DefaultViewExtent xmin="-5.83260999225515775" xmax="-4.05581076349239211" ymax="50.83683743329871163" ymin="49.77152707319636704">
       <spatialrefsys nativeFormat="Wkt">
         <wkt>GEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],CS[ellipsoidal,2],AXIS["geodetic latitude (Lat)",north,ORDER[1],ANGLEUNIT["degree",0.0174532925199433]],AXIS["geodetic longitude (Lon)",east,ORDER[2],ANGLEUNIT["degree",0.0174532925199433]],USAGE[SCOPE["Horizontal component of 3D system."],AREA["World."],BBOX[-90,-180,90,180]],ID["EPSG",4326]]</wkt>
         <proj4>+proj=longlat +datum=WGS84 +no_defs</proj4>

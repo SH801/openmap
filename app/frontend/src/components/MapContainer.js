@@ -41,6 +41,7 @@ import {
   DEFAULT_MAXBOUNDS
 } from "../constants";
 import { getBoundingBox, mapSelectEntity, mapRefreshPlanningConstraints, mapRefreshWindspeed} from '../functions/map';
+import { convertMapDraw2GeoJSON } from '../functions/mapdraw';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 
 export const isDev = () =>  !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
@@ -1056,7 +1057,7 @@ export class MapContainer extends Component  {
         if (event.features[0].properties.type === 'custom') {
 
           var customentity = {
-            name: 'Manually-added renewables',
+            name: 'Your renewables',
             customgeojson: this.props.global.customgeojson
           }
 
@@ -1260,51 +1261,27 @@ export class MapContainer extends Component  {
 
     if (this.mapRef) {
       var map = this.mapRef.current.getMap();
-      var customgeojson = JSON.parse(JSON.stringify(this.props.global.mapdraw.getAll()));
-      var outputfeatures = [];
-      var postfeatures = [];
-      // Add turbines to end of GeoJSON featurecollection to ensure they overwrite solar farms when rendering
-      for(let i = 0; i < customgeojson.features.length; i++) {
-        if (customgeojson.features[i].geometry.type === 'Point') {
-          customgeojson.features[i].properties = {
-            type: 'custom', 
-            subtype: 'wind', 
-            name: 'Manually-added wind turbine'
-          };
-          // Weird anomaly where MapbowDraw sometimes adds point with no coordinates
-          if (customgeojson.features[i].geometry.coordinates.length === 2) postfeatures.push(customgeojson.features[i]);          
-        } else {
-          customgeojson.features[i].properties = {
-            type: 'custom', 
-            subtype: 'solar', 
-            name: 'Manually-added solar farm'
-          };
-          outputfeatures.push(customgeojson.features[i]);
-        }
-      }
-      for(let i = 0; i < postfeatures.length; i++) outputfeatures.push(postfeatures[i]);
-      customgeojson = {type: 'FeatureCollection', features: outputfeatures};
-      var oldcustomgeojson = JSON.stringify(this.props.global.customgeojson);
-      // Compare old with new to determine whether to save and invalidate plan shortcode
-      if (oldcustomgeojson !== JSON.stringify(customgeojson)) {
-        this.props.updateCustomGeoJSON(this.props.positivecookie, '', customgeojson);
-        this.props.setGlobalState({customgeojson: customgeojson});
-        // We remove 'plan' parameter after edit as customgeojson may diverge from saved plan
-        modifyURLParameter({plan: null}, this.props.history, this.props.location);
-        this.setState({plan: ''});
+      var customgeojson = convertMapDraw2GeoJSON(this.props.global.mapdraw.getAll());
+      // If finishing edit, invalidate plan shortcode just to be safe
+      this.props.updateCustomGeoJSON(this.props.positivecookie, '', customgeojson);
+      this.props.setGlobalState({customgeojson: customgeojson});
+      // We remove 'plan' parameter after edit as customgeojson may diverge from saved plan
+      modifyURLParameter({plan: null}, this.props.history, this.props.location);
+      this.setState({plan: ''});
 
-        if (this.props.global.drawer) {
-          var customentity = {
-            name: 'Manually-added renewables',
-            customgeojson: customgeojson
-          }
-          this.props.setGlobalState({entities: {entities: [customentity]}});
+      if (this.props.global.drawer) {
+        var customentity = {
+          name: 'Your renewables',
+          customgeojson: customgeojson
         }
+        this.props.setGlobalState({entities: {entities: [customentity]}});
       }
 
       if (map) {
         map.removeControl(this.props.global.mapdraw);
         map.getSource("customgeojson").setData(customgeojson);
+        map.setLayoutProperty('customgeojson_windturbine', 'visibility', 'visible');
+        map.setLayoutProperty('customgeojson_solarfarm', 'visibility', 'visible');
       }    
     }
     this.props.setGlobalState({editcustomgeojson: null});
@@ -1454,7 +1431,7 @@ export class MapContainer extends Component  {
 
       {this.props.global.showplanningconstraints ? (
         <div style={{position: "absolute", bottom: "0px", left: "0px", width: "100vw", zIndex: "9999"}}>
-          <div style={{marginLeft: "0px", marginRight: this.props.isMobile ? "0px" : "calc(24% + 10px)", backgroundColor: "#ffffffff"}}>
+          <div style={{marginLeft: "0px", marginRight: this.props.isMobile ? "0px" : "24%", backgroundColor: "#ffffffff"}}>
             <IonIcon style={{fontSize: "80%", position: "absolute", top: "10px", left: "10px"}} onClick={() => this.closePlanningConstraints()} icon={closeOutline} className="close-icon"/>
             <div>
               <IonGrid>

@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { global } from "../../../actions";
+import { global, search } from "../../../actions";
 import { addCircleOutline, createOutline, shapes, shapesOutline, speedometer, speedometerOutline, closeOutline } from 'ionicons/icons';
 import { 
     IonIcon,
@@ -16,6 +16,7 @@ import {
     IonList,
 } from '@ionic/react';
 import { getBoundingBox, mapRefreshPlanningConstraints, mapRefreshWindspeed } from '../../../functions/map';
+import { convertMapDraw2GeoJSON } from '../../../functions/mapdraw';
 
 export class NewAsset extends Component {
 
@@ -29,19 +30,49 @@ export class NewAsset extends Component {
 
     showMapdraw = (assettype) => {
         if (!(this.props.global.showplanningconstraints)) this.togglePlanningRestrictions();
+
+        if (!this.props.isMobile) {
+            var customentity = {
+                name: 'Your renewables',
+                customgeojson: this.props.global.customgeojson
+              }
+    
+              this.props.setGlobalState({'drawer': true, 'searching': false, entities: {entities: [customentity]}});
+              this.props.resetGeosearch();
+              this.props.setSearchText(customentity.name);                
+        }
+
         if (this.props.global.mapref !== null) {
             var map = this.props.global.mapref.current.getMap();
             map.addControl(this.props.global.mapdraw, this.props.isMobile ? 'top-right' : 'top-left'); 
+            this._map = map;      
+            // Update customgeojson after every change
+            this._map.on('draw.create', (e) => {
+                var customgeojson = convertMapDraw2GeoJSON(this.props.global.mapdraw.getAll());
+                this.props.setGlobalState({customgeojson: customgeojson});        
+            });
+            this._map.on('draw.delete', (e) => {
+                var customgeojson = convertMapDraw2GeoJSON(this.props.global.mapdraw.getAll());
+                this.props.setGlobalState({customgeojson: customgeojson});        
+            });
+            this._map.on('draw.update', (e) => {
+                var customgeojson = convertMapDraw2GeoJSON(this.props.global.mapdraw.getAll());
+                this.props.setGlobalState({customgeojson: customgeojson});        
+            });
             map._mapdraw = this.props.global.mapdraw;
             this.props.global.mapdraw.set(this.props.global.customgeojson);
             if (assettype === 'edit') {
                 if (this.props.global.customgeojson.features.length > 0) {
                     var overallboundingbox = getBoundingBox(this.props.global.customgeojson);
                     this.props.setGlobalState({fittingbounds: true});
-                    map.fitBounds(overallboundingbox, {animate: true});
+                    map.fitBounds(overallboundingbox, {
+                        animate: true,
+                        padding: {top: 10, bottom:100, left: 50, right: 50}
+                    });
                 }
             }
-            map.getSource("customgeojson").setData({type: "FeatureCollection", features: []});
+            map.setLayoutProperty('customgeojson_windturbine', 'visibility', 'none');
+            map.setLayoutProperty('customgeojson_solarfarm', 'visibility', 'none');
             document.getElementsByClassName('mapboxgl-ctrl-group')[0].classList.add('maplibregl-ctrl');                      
             document.getElementsByClassName('mapboxgl-ctrl-group')[0].classList.add('maplibregl-ctrl-group');  
             if (assettype === 'solar') {
@@ -173,6 +204,7 @@ export const mapStateToProps = state => {
       global: state.global,
       auth: state.auth,
       map: state.map,
+      search: state.search,
     }
 }
     
@@ -181,6 +213,12 @@ export const mapDispatchToProps = dispatch => {
       setGlobalState: (globalstate) => {
           return dispatch(global.setGlobalState(globalstate));
       },  
+      setSearchText: (searchtext) => {
+        return dispatch(search.setSearchText(searchtext));
+      },      
+      resetGeosearch: () => {
+        return dispatch(search.resetGeosearch());
+      },                  
   }
 }  
 

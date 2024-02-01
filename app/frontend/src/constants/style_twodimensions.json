@@ -18,7 +18,7 @@
           "maxzoom": 15,
           "tileSize": 256,
           "encoding": "terrarium",
-          "attribution": "United Kingdom terrain data © Environment Agency copyright and/or database right 2015. All rights reserved;"
+          "attribution": "United Kingdom terrain data © Environment Agency copyright and/or database right 2015. All rights reserved"
         },
         "hillshadeSource": {
             "type": "raster-dem",
@@ -29,7 +29,7 @@
             "maxzoom": 15,
             "tileSize": 256,
             "encoding": "terrarium",
-            "attribution": "United Kingdom terrain data © Environment Agency copyright and/or database right 2015. All rights reserved;"
+            "attribution": "United Kingdom terrain data © Environment Agency copyright and/or database right 2015. All rights reserved"
         },
         "planningconstraints": {
           "type": "vector",
@@ -1957,7 +1957,9 @@
         "id": "customgeojson_solarfarm",
         "source": "customgeojson",
         "type": "fill",
-        "layout": {},
+        "layout": {
+          "visibility": "visible"
+        },
         "filter": [
           "all",
           [
@@ -1975,6 +1977,7 @@
         "type": "symbol",
         "source": "customgeojson",
         "layout": {
+            "visibility": "visible",
             "icon-image": "windturbine_grey", 
             "icon-size": [
               "interpolate", ["exponential", 2], ["zoom"], 

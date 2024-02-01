@@ -125,6 +125,20 @@ export const PLANNING_CONSTRAINTS = {
             "constraint_hedgerows_buffer_line_pattern"
         ]
     },
+    "aviation_mod":
+    {
+        "description": "Aviation / MOD",
+        "colour": "purple",
+        "layers": 
+        [
+            "constraint_airspace_fill_colour",
+            "constraint_airspace_fill_pattern",
+            "constraint_dangerareas_fill_colour",
+            "constraint_dangerareas_fill_pattern",
+            "constraint_military_fill_colour",
+            "constraint_military_fill_pattern",
+        ]    
+    },
     "safety":
     {
         "description": "Unsafe distance (transportation, powerlines, etc)",
@@ -160,20 +174,6 @@ export const PLANNING_CONSTRAINTS = {
             "constraint_bridleways_buffer_line_colour",
             "constraint_bridleways_buffer_line_pattern"        
         ]
-    },
-    "aviation_mod":
-    {
-        "description": "Aviation / MOD",
-        "colour": "purple",
-        "layers": 
-        [
-            "constraint_airspace_fill_colour",
-            "constraint_airspace_fill_pattern",
-            "constraint_dangerareas_fill_colour",
-            "constraint_dangerareas_fill_pattern",
-            "constraint_military_fill_colour",
-            "constraint_military_fill_pattern",
-        ]    
     }
 };
 

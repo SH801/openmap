@@ -13,7 +13,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import toast from 'react-hot-toast';
 import { Toaster } from 'react-hot-toast';
 import { closeOutline } from 'ionicons/icons';
-import { IonLoading } from '@ionic/react';
+// import { IonLoading } from '@ionic/react';
 import { 
   IonIcon,
   IonGrid,
@@ -44,6 +44,8 @@ import { getBoundingBox, mapSelectEntity, mapRefreshPlanningConstraints, mapRefr
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 
 export const isDev = () =>  !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+
+const ANIMATION_INTERVAL = 800;
 
 export class ExtrusionControl extends Component{
     
@@ -753,15 +755,15 @@ export class MapContainer extends Component  {
 
   animateIcons = () => {
     // const intervalmsecs = 250;
-    const intervalmsecs = 800;
-    const speedup = 2;
-    const totalduration = 50 * intervalmsecs;
+    const numframes = 5;
+    const totalduration = numframes * ANIMATION_INTERVAL;
+    setTimeout(this.animateIcons, ANIMATION_INTERVAL);
 
     if ((this.state.iconsloaded_white) && (this.state.iconsloaded_grey)) {
       const currentDate = new Date();
-      const milliseconds = speedup * currentDate.getTime(); 
+      const milliseconds = currentDate.getTime(); 
       const deltamsecs = milliseconds % totalduration;
-      const animationindex = parseInt((deltamsecs + 1) / intervalmsecs);
+      const animationindex = 1 + parseInt(deltamsecs / ANIMATION_INTERVAL);
       if ((this.mapRef !== null) && (this.mapRef.current !== null)) {
         var map = this.mapRef.current.getMap();
         if (map) {
@@ -789,8 +791,6 @@ export class MapContainer extends Component  {
         }
       }
     }  
-      
-    setTimeout(this.animateIcons, intervalmsecs);
   }
 
   onLoad = (event) => {
@@ -823,28 +823,28 @@ export class MapContainer extends Component  {
     if (!isiOS) {
       console.log("Initializing images...");
       var url = null;
-      for(let i = 1; i < 51; i++) {
+      for(let i = 1; i < 6; i++) {
         url = process.env.PUBLIC_URL + "/static/icons/windturbine_white_animated_" + i.toString() + ".png";
         map.loadImage(url, (error, image) => {
             if (error) throw error;
             var icons_white = this.state.icons_white;
             icons_white[i] = image;
             this.setState({icons_white: icons_white});
-            if (i === 50) {
+            if (i === 5) {
               console.log("Loaded turbine images (white)");
               this.setState({iconsloaded_white: true});
             }
         });            
       }
 
-      for(let i = 1; i < 51; i++) {
+      for(let i = 1; i < 6; i++) {
         url = process.env.PUBLIC_URL + "/static/icons/windturbine_grey_animated_" + i.toString() + ".png";
         map.loadImage(url, (error, image) => {
             if (error) throw error;
             var icons_grey = this.state.icons_grey;
             icons_grey[i] = image;
             this.setState({icons_grey: icons_grey});
-            if (i === 50) {
+            if (i === 5) {
               console.log("Loaded turbine images (grey)");
               this.setState({loading: false, iconsloaded_grey: true});
             }
@@ -1362,7 +1362,7 @@ export class MapContainer extends Component  {
   render () {
     return (
       <>
-        <IonLoading translucent={true} isOpen={this.state.loading} message="Loading images and data..." spinner="circles" />
+        {/* <IonLoading translucent={true} isOpen={this.state.loading} message="Loading images and data..." spinner="circles" /> */}
 
         {this.props.global.mapinitialized ? (
           <Map ref={this.mapRef}
@@ -1402,7 +1402,7 @@ export class MapContainer extends Component  {
             <div onMouseEnter={this.onMouseEnterAssetFinish} onMouseLeave={this.onMouseExitAssetFinish} style={{position: "absolute", top: this.props.isMobile ? "64px": "10px", left: "0px", width: "100vw"}}>
               <div style={{marginLeft: "50px", marginRight: this.props.isMobile ? "50px" : "calc(24% + 10px)", backgroundColor: "#ffffffaa"}}>
                 <div>
-                  <IonGrid>
+                  <IonGrid style={{padding: "0px"}}>
                     <IonRow class="ion-align-items-center ion-justify-content-center">
                       <IonCol className="add-instructions">
                         <IonText>
@@ -1459,7 +1459,7 @@ export class MapContainer extends Component  {
             <div>
               <IonGrid>
                 <IonRow class="ion-align-items-center ion-justify-content-center">
-                  <IonCol size="auto">
+                  <IonCol size="auto" className="planning-key-title-container">
                     <IonText className="planning-key-title">Non-optimal wind sites due to low wind / planning constraints</IonText>
                   </IonCol>
                 </IonRow>

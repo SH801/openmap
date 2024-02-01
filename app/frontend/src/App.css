@@ -40,6 +40,10 @@
     font-size: 70%;
   }
 
+  .planning-key-title-container {
+    padding: 0px;
+  }
+
   .close-icon {
     display: none;
   }

@@ -1,11 +1,16 @@
 import React, { Component }  from 'react';
 import { connect } from 'react-redux';
-import { IonText, IonIcon } from '@ionic/react';
+import { IonText, IonIcon, IonAlert } from '@ionic/react';
 import { closeOutline } from 'ionicons/icons';
 import { area, center, bbox, point, destination } from '@turf/turf';
 import { global } from "../../../../../../../actions";
 import { WINDTURBINE_HEIGHT } from "../../../../../../../constants";
 export class EntityCustomGeoJSON extends Component {
+
+  state = {
+    alertIsOpen: false,
+    assetindex: null,
+  }
 
   selectAsset = (featureindex) => {
     var feature = this.props.global.customgeojson['features'][featureindex];
@@ -26,19 +31,22 @@ export class EntityCustomGeoJSON extends Component {
 
   deleteAsset = (ev, featureindex) => {
     ev.stopPropagation();
+    this.setState({assetindex: featureindex, alertIsOpen: true});
+  }
 
-    if (window.confirm("Are you sure you want to delete that asset?")) {
-      var customgeojson = JSON.parse(JSON.stringify(this.props.global.customgeojson));
-      customgeojson.features.splice(featureindex, 1);
-      if (this.props.global.mapref !== null) {
-        var map = this.props.global.mapref.current.getMap();
-        map.getSource("customgeojson").setData(customgeojson);
-      }
-      this.props.setGlobalState({customgeojson: customgeojson}); 
-      if (this.props.global.editcustomgeojson !== null) {
-        this.props.global.mapdraw.set(customgeojson);
-      } 
+  confirmDelete = (featureindex) => {
+    if (featureindex === null) return;
+    var customgeojson = JSON.parse(JSON.stringify(this.props.global.customgeojson));
+    customgeojson.features.splice(featureindex, 1);
+    if (this.props.global.mapref !== null) {
+      var map = this.props.global.mapref.current.getMap();
+      map.getSource("customgeojson").setData(customgeojson);
     }
+    this.props.setGlobalState({customgeojson: customgeojson}); 
+    if (this.props.global.editcustomgeojson !== null) {
+      this.props.global.mapdraw.set(customgeojson);
+    } 
+    this.setState({assetindex: null, alertIsOpen: false});
   }
 
   runcalculations = (customgeojson) => {
@@ -105,6 +113,28 @@ export class EntityCustomGeoJSON extends Component {
 
     return (
       <div>
+
+      <IonAlert
+        id="alert-modal"
+        isOpen={this.state.alertIsOpen}
+        header="Confirm deletion"
+        message="Are you sure you want to delete this asset?"
+        buttons={[
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            handler: () => {this.setState({assetindex: null, alertIsOpen: false})},
+          },
+          {
+            text: 'OK',
+            role: 'confirm',
+            handler: () => {this.confirmDelete(this.state.assetid);},
+          },
+        ]}
+
+        onDidDismiss={() => this.setState({assetindex: null, alertIsOpen: false})} >
+      </IonAlert>
+
           <div>
             <div className="entity-identification-details">
               <div>
@@ -148,7 +178,7 @@ export class EntityCustomGeoJSON extends Component {
                               className="ion-text-capitalize entity-business-type">
                               <span className="tablist-tab">
                               {asset.coordinates}
-                              <IonIcon style={{fontSize: "120%", position: "relative", top: "2px", color: "white"}} onClick={(e) => this.deleteAsset(e, asset['index'])} icon={closeOutline} className="close-icon"/>
+                              <IonIcon style={{fontSize: "120%", position: "relative", top: "2px", color: "white"}} onClick={(e) => this.deleteAsset(e, asset['index'])} icon={closeOutline} className="delete-icon"/>
                               </span>
                             </IonText> 
                             </div>  
@@ -178,7 +208,7 @@ export class EntityCustomGeoJSON extends Component {
                               className="ion-text-capitalize entity-business-type">
                               <span className="tablist-tab">
                               {asset.coordinates}
-                              <IonIcon style={{fontSize: "120%", position: "relative", top: "2px", color: "white"}} onClick={(e) => this.deleteAsset(e, asset['index'])} icon={closeOutline} className="close-icon"/>
+                              <IonIcon style={{fontSize: "120%", position: "relative", top: "2px", color: "white"}} onClick={(e) => this.deleteAsset(e, asset['index'])} icon={closeOutline} className="delete-icon"/>
                               </span>
                             </IonText> 
                             </div>  

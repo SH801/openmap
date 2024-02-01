@@ -8,6 +8,7 @@
   justify-content: space-between;
 }
 
+.delete-icon,
 .close-icon,
 .login-icon,
 .share-icon,
@@ -17,6 +18,7 @@
   color: #666;
 }
 
+.delete-icon,
 .close-icon,
 .login-icon,
 .share-icon {
@@ -24,6 +26,7 @@
   padding-right: 6px;
 }
 
+.delete-icon,
 .close-icon {
   padding-right: 3px;
 }

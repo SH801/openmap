@@ -2,6 +2,11 @@
   position: relative;
   background-color: #EEE;
 }
+
+.toolbar-button-container {
+  cursor: pointer;
+}
+
 .toolbar-content {
   display: flex;
   flex-direction: row;

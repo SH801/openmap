@@ -1383,13 +1383,13 @@ export class MapContainer extends Component  {
                       <IonCol className="add-instructions">
                         <IonText>
                           {(this.props.global.editcustomgeojson === 'wind') ? (
-                            <>Click on map to add one or more wind turbines then select "Finish" when complete. Click "Planning" to see wind planning constraints</>
+                            <>Click on map to add one or more wind turbines then select "Finish" when complete. Click "Siting" to see wind planning constraints</>
                           ) : null}
                           {(this.props.global.editcustomgeojson === 'solar') ? (
                             <>Click on map to draw outline of one or more solar farms then select "Finish" when complete</>
                           ) : null}
                           {(this.props.global.editcustomgeojson === 'edit') ? (
-                            <>Click on existing wind/solar to select - then edit points, drag to move or select trash to delete. Click "Planning" for wind planning constraints</>
+                            <>Click on existing wind/solar to select - then edit points, drag to move or select trash to delete. Click "Siting" for wind planning constraints</>
                           ) : null}
                         </IonText>
                       </IonCol>

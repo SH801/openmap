@@ -2,7 +2,7 @@ import React, { Component }  from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { global, search } from "../../../actions";
-import { addCircleOutline, createOutline, shapes, shapesOutline, speedometer, speedometerOutline, closeOutline } from 'ionicons/icons';
+import { addCircle, addCircleOutline, create, createOutline, shapes, shapesOutline, speedometer, speedometerOutline, closeOutline } from 'ionicons/icons';
 import { 
     IonIcon,
     IonModal, 
@@ -144,22 +144,22 @@ export class NewAsset extends Component {
     render() {
         return (
             <>
-            <div className="toolbar-button-container">
-                <IonIcon onClick={this.showNewAssetSelector} icon={addCircleOutline} title="Add renewables" className="editcustomgeojson-icon toolbar-button"/>
+            <div className="toolbar-button-container" onClick={this.showNewAssetSelector}>
+                <IonIcon icon={((this.props.global.editcustomgeojson === 'wind') || (this.props.global.editcustomgeojson === 'solar')) ? addCircle: addCircleOutline} title="Add renewables" className="editcustomgeojson-icon toolbar-button"/>
                 <div className="toolbar-button-caption">Add</div>
             </div>
             {this.props.global.customgeojson.features.length > 0 ? (
-                <div className="toolbar-button-container">
-                    <IonIcon data-tooltip-id="actions-tooltip" onClick={this.enableEdit} title="Edit renewables" icon={createOutline} className="editcustomgeojson-icon toolbar-button"/>
+                <div className="toolbar-button-container" onClick={this.enableEdit}>
+                    <IonIcon data-tooltip-id="actions-tooltip" title="Edit renewables" icon={(this.props.global.editcustomgeojson === 'edit') ? create: createOutline} className="editcustomgeojson-icon toolbar-button"/>
                     <div className="toolbar-button-caption">Edit</div>
                 </div>
             ) : null}
-             <div className="toolbar-button-container">           
-                <IonIcon title="Toggle site constraints" onClick={this.togglePlanningRestrictions} slot="icon-only" icon={this.props.global.showplanningconstraints ? shapes: shapesOutline} className="editcustomgeojson-icon toolbar-button"/>
-                <div className="toolbar-button-caption">Planning</div>
+             <div className="toolbar-button-container" onClick={this.togglePlanningRestrictions}>           
+                <IonIcon title="Toggle site constraints" slot="icon-only" icon={this.props.global.showplanningconstraints ? shapes: shapesOutline} className="editcustomgeojson-icon toolbar-button"/>
+                <div className="toolbar-button-caption">Siting</div>
             </div>
-            <div className="toolbar-button-container">
-                <IonIcon title="View wind speed heatmap" onClick={this.toggleWindspeed} slot="icon-only" icon={this.props.global.showwindspeed ? speedometer: speedometerOutline} className="editcustomgeojson-icon toolbar-button"/>
+            <div className="toolbar-button-container" onClick={this.toggleWindspeed} >
+                <IonIcon title="View wind speed heatmap" slot="icon-only" icon={this.props.global.showwindspeed ? speedometer: speedometerOutline} className="editcustomgeojson-icon toolbar-button"/>
                 <div className="toolbar-button-caption">
                     
                 {this.props.global.showwindspeed ? (

@@ -24,6 +24,24 @@
         }
     },
     {
+        "id": "points-glow",
+        "type": "circle",
+        "filter": ["all",
+            ["==", "$type", "Point"],
+            ["==", "meta", "feature"],
+            ["==", "active", "false"]],
+        "paint": {
+            "circle-radius": [
+                "interpolate", ["exponential", 2], ["zoom"], 
+                12, 25,
+                20, 6400
+            ],
+            "circle-color": "yellow",
+            "circle-blur": 1,
+            "circle-opacity": 0.3
+        }
+    },
+    {
         "id": "points-are-blue",
         "type": "symbol",
         "filter": ["all",

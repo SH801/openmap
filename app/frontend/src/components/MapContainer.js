@@ -1432,7 +1432,7 @@ export class MapContainer extends Component  {
       {this.props.global.showplanningconstraints ? (
         <div style={{position: "absolute", bottom: "0px", left: "0px", width: "100vw", zIndex: "9999"}}>
           <div style={{marginLeft: "0px", marginRight: this.props.isMobile ? "0px" : "24%", backgroundColor: "#ffffffff"}}>
-            <IonIcon style={{fontSize: "80%", position: "absolute", top: "10px", left: "10px"}} onClick={() => this.closePlanningConstraints()} icon={closeOutline} className="close-icon"/>
+            <IonIcon style={{fontSize: "80%", position: "absolute", top: "10px", left: "10px"}} onClick={() => this.closePlanningConstraints()} icon={closeOutline} className="close-icon-hide-mobile"/>
             <div>
               <IonGrid>
                 <IonRow class="ion-align-items-center ion-justify-content-center">

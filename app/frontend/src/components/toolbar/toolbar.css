@@ -10,6 +10,7 @@
 
 .delete-icon,
 .close-icon,
+.close-icon-hide-mobile,
 .login-icon,
 .share-icon,
 .editcustomgeojson-icon {
@@ -20,6 +21,7 @@
 
 .delete-icon,
 .close-icon,
+.close-icon-hide-mobile,
 .login-icon,
 .share-icon {
   padding-left: 6px;
@@ -27,7 +29,8 @@
 }
 
 .delete-icon,
-.close-icon {
+.close-icon,
+.close-icon-hide-mobile {
   padding-right: 3px;
 }
 

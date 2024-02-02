@@ -29,7 +29,7 @@ export class NewAsset extends Component {
     }
 
     showMapdraw = (assettype) => {
-        if (!(this.props.global.showplanningconstraints)) this.togglePlanningRestrictions();
+        // if (!(this.props.global.showplanningconstraints)) this.togglePlanningRestrictions();
 
         if (!this.props.isMobile) {
             var customentity = {

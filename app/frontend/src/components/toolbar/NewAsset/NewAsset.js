@@ -145,21 +145,21 @@ export class NewAsset extends Component {
         return (
             <>
             <div className="toolbar-button-container">
-                <IonIcon onClick={this.showNewAssetSelector} icon={addCircleOutline} className="editcustomgeojson-icon toolbar-button"/>
+                <IonIcon onClick={this.showNewAssetSelector} icon={addCircleOutline} title="Add renewables" className="editcustomgeojson-icon toolbar-button"/>
                 <div className="toolbar-button-caption">Add</div>
             </div>
             {this.props.global.customgeojson.features.length > 0 ? (
                 <div className="toolbar-button-container">
-                    <IonIcon data-tooltip-id="actions-tooltip" onClick={this.enableEdit} icon={createOutline} className="editcustomgeojson-icon toolbar-button"/>
+                    <IonIcon data-tooltip-id="actions-tooltip" onClick={this.enableEdit} title="Edit renewables" icon={createOutline} className="editcustomgeojson-icon toolbar-button"/>
                     <div className="toolbar-button-caption">Edit</div>
                 </div>
             ) : null}
              <div className="toolbar-button-container">           
-                <IonIcon data-tooltip-content="Toggle site constraints" onClick={this.togglePlanningRestrictions} slot="icon-only" icon={this.props.global.showplanningconstraints ? shapes: shapesOutline} className="editcustomgeojson-icon toolbar-button"/>
+                <IonIcon title="Toggle site constraints" onClick={this.togglePlanningRestrictions} slot="icon-only" icon={this.props.global.showplanningconstraints ? shapes: shapesOutline} className="editcustomgeojson-icon toolbar-button"/>
                 <div className="toolbar-button-caption">Planning</div>
             </div>
             <div className="toolbar-button-container">
-                <IonIcon onClick={this.toggleWindspeed} slot="icon-only" icon={this.props.global.showwindspeed ? speedometer: speedometerOutline} className="editcustomgeojson-icon toolbar-button"/>
+                <IonIcon title="View wind speed heatmap" onClick={this.toggleWindspeed} slot="icon-only" icon={this.props.global.showwindspeed ? speedometer: speedometerOutline} className="editcustomgeojson-icon toolbar-button"/>
                 <div className="toolbar-button-caption">
                     
                 {this.props.global.showwindspeed ? (

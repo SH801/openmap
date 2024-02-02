@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { global, search } from "../../../actions";
 import { IonIcon, IonItem, IonText, IonToast } from '@ionic/react';
 import { arrowBack, listOutline, searchOutline, close, locationOutline, mapOutline, storefrontOutline } from 'ionicons/icons';
-import { mapReset, mapSelectEntity, mapSelectProperty } from '../../../functions/map';
+import { getBoundingBox, mapReset, mapSelectEntity, mapSelectProperty } from '../../../functions/map';
 import './searchBar.css';
 
 export class SearchBar extends Component {
@@ -36,6 +36,24 @@ export class SearchBar extends Component {
       this.props.fetchSearchResults('');
     }
   };
+
+  handleCustomGeoJSON = () => {
+    var customentity = {
+      name: 'Your renewables',
+      customgeojson: this.props.global.customgeojson
+    }
+
+    this.props.setGlobalState({'drawer': true, 'searching': false, entities: {entities: [customentity]}});
+    this.props.resetGeosearch();
+    this.props.setSearchText(customentity.name);
+
+    if (this.props.global.customgeojson.features.length > 0) {
+      var overallboundingbox = getBoundingBox(this.props.global.customgeojson);
+      var map = this.props.global.mapref.current.getMap();
+      this.props.setGlobalState({fittingbounds: true});
+      map.fitBounds(overallboundingbox, {animate: true});
+    }
+  }
 
   handleInputFocus = () => {
     this.props.setGlobalState({'searching': true});
@@ -106,7 +124,7 @@ export class SearchBar extends Component {
         if (map) {
           var centre = [(item.bounds[0] + item.bounds[2]) / 2, 
                         (item.bounds[1] + item.bounds[3]) / 2];
-          map.fitBounds([southWest, northEast], {animate: false}); 
+          map.fitBounds([southWest, northEast], {animate: true}); 
           this.setState({centre: centre});
         } 
         break;  
@@ -172,8 +190,19 @@ export class SearchBar extends Component {
 
         <div
           className="suggestion-container"
-          style={((this.props.global.searching === true) && (this.props.search.searchresults.length > 0))? this.searchStyles: this.hiddenStyles}
-        >          
+          style={((this.props.global.searching === true) && (this.props.search.searchresults.length > 0))? this.searchStyles: this.hiddenStyles} >
+
+          {((this.props.global.searching === true) && (this.props.global.customgeojson.features.length !== 0)) ? (
+            <div onClick={() => this.handleCustomGeoJSON()}>
+              <IonItem className="search-suggestion-el">
+                <IonIcon className="search-suggestion-icon" icon={this.selectIcon('selection')}/>
+                <IonText style={{width:"100%"}}>
+                  Your renewables
+                </IonText>
+              </IonItem>
+            </div>
+          ) : null}      
+
           {(this.props.global.searching === true) &&
             this.props.search.searchresults &&
             this.props.search.searchresults.map((result, index) => {

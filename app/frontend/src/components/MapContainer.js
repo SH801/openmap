@@ -1074,7 +1074,6 @@ export class MapContainer extends Component  {
           }
 
         } else {
-          console.log(event.features[0]);
           var entityid = event.features[0].properties.id;
           this.selectEntity(entityid);
         }

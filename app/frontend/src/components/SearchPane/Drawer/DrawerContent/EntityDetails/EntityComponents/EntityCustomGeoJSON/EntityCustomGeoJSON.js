@@ -128,7 +128,7 @@ export class EntityCustomGeoJSON extends Component {
           {
             text: 'OK',
             role: 'confirm',
-            handler: () => {this.confirmDelete(this.state.assetid);},
+            handler: () => {this.confirmDelete(this.state.assetindex);},
           },
         ]}
 
@@ -175,10 +175,13 @@ export class EntityCustomGeoJSON extends Component {
                             <div key={index} className="tablist-container">
                             <IonText 
                               onClick={() => this.selectAsset(asset['index'])}
-                              className="ion-text-capitalize entity-business-type">
+                              className="ion-text-capitalize entity-asset-wind">
                               <span className="tablist-tab">
                               {asset.coordinates}
-                              <IonIcon style={{fontSize: "120%", position: "relative", top: "2px", color: "white"}} onClick={(e) => this.deleteAsset(e, asset['index'])} icon={closeOutline} className="delete-icon"/>
+                              {(this.props.global.editcustomgeojson !== null) ? (
+                                <IonIcon style={{fontSize: "120%", position: "relative", top: "4px", color: "black"}} title="Delete wind turbine" onClick={(e) => this.deleteAsset(e, asset['index'])} icon={closeOutline} className="delete-icon"/>
+                              ):
+                              null}
                               </span>
                             </IonText> 
                             </div>  
@@ -205,10 +208,13 @@ export class EntityCustomGeoJSON extends Component {
                             <div key={index} className="tablist-container">
                             <IonText 
                               onClick={() => this.selectAsset(asset['index'])}
-                              className="ion-text-capitalize entity-business-type">
+                              className="ion-text-capitalize entity-asset-solar">
                               <span className="tablist-tab">
                               {asset.coordinates}
-                              <IonIcon style={{fontSize: "120%", position: "relative", top: "2px", color: "white"}} onClick={(e) => this.deleteAsset(e, asset['index'])} icon={closeOutline} className="delete-icon"/>
+                              {(this.props.global.editcustomgeojson !== null) ? (
+                                <IonIcon style={{fontSize: "120%", position: "relative", top: "4px", color: "white"}} title="Delete solar farm" onClick={(e) => this.deleteAsset(e, asset['index'])} icon={closeOutline} className="delete-icon"/>
+                              ):
+                              null}
                               </span>
                             </IonText> 
                             </div>  
@@ -219,32 +225,31 @@ export class EntityCustomGeoJSON extends Component {
 
                         <div className="entity-item-customgeojson">
                         <IonText className="ion-text-left">
-                        <strong>Solar area: </strong>{this.convertForDisplay(calculations.areasolar)} hectares
+                        <strong>Total area: </strong>{this.convertForDisplay(calculations.areasolar)} hectares
                         </IonText>                      
                         </div>
 
                         <div className="entity-item-customgeojson">
                         <IonText className="ion-text-left">
-                        <strong>Solar power: </strong>{this.convertForDisplay(calculations.powersolar)} MW
+                        <strong>Total power: </strong>{this.convertForDisplay(calculations.powersolar)} MW
                         </IonText>                      
                         </div>
 
                         <div className="entity-item-customgeojson">
                         <IonText className="ion-text-left">
-                        <strong>CO<sub>2</sub> reduction (solar): </strong>{this.convertForDisplay(calculations.emissionssaved)} tonnes / year
+                        <strong>CO<sub>2</sub> reduction - solar: </strong>{this.convertForDisplay(calculations.emissionssaved)} tonnes / year
                         </IonText>                      
                         </div>
 
                         <div className="entity-item-customgeojson">
                         <IonText className="ion-text-left">
-                        <strong>Capital cost (solar): </strong> > £{this.convertForDisplay(calculations.estimatedsolarcost)}M<sup><a target="_new" href="https://www.pfnexus.com/blog/starting-a-solar-farm">1</a></sup>
+                        <strong>Capital cost - solar: </strong> &gt; £{this.convertForDisplay(calculations.estimatedsolarcost)}M<sup><a target="_new" href="https://www.pfnexus.com/blog/starting-a-solar-farm">1</a></sup>
                         </IonText>                      
                         </div>
 
-
                         <div className="entity-item-customgeojson">
                         <IonText className="ion-text-left">
-                        <strong>Return (solar): </strong> £{this.convertForDisplay(calculations.estimatedsolarreturnmin)} - £{this.convertForDisplay(calculations.estimatedsolarreturnmax)} M / year<sup><a target="_new" href="https://www.pfnexus.com/blog/starting-a-solar-farm">1</a></sup>
+                        <strong>Return - solar: </strong> £{this.convertForDisplay(calculations.estimatedsolarreturnmin)} - £{this.convertForDisplay(calculations.estimatedsolarreturnmax)} M / year<sup><a target="_new" href="https://www.pfnexus.com/blog/starting-a-solar-farm">1</a></sup>
                         </IonText>                      
                         </div>
 

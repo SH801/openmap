@@ -13,18 +13,20 @@ export function convertMapDraw2GeoJSON(customgeojson) {
           name: 'Manually-added wind turbine'
         };
         // Weird anomaly where MapbowDraw sometimes adds point with no coordinates
-        if (customgeojson.features[i].geometry.coordinates.length === 2) postfeatures.push(customgeojson.features[i]);          
+        if (customgeojson.features[i].geometry.coordinates.length === 2) postfeatures.push(customgeojson.features[i]);
       } else {
         customgeojson.features[i].properties = {
           type: 'custom', 
           subtype: 'solar', 
           name: 'Manually-added solar farm'
         };
-        outputfeatures.push(customgeojson.features[i]);
+        // Weird anomaly where MapbowDraw sometimes adds point with no coordinates
+        console.log(customgeojson.features[i].geometry.coordinates[0]);
+        if (customgeojson.features[i].geometry.coordinates[0].length > 2) outputfeatures.push(customgeojson.features[i]);
       }
     }
     for(let i = 0; i < postfeatures.length; i++) outputfeatures.push(postfeatures[i]);
     customgeojson = {type: 'FeatureCollection', features: outputfeatures};
-
+    console.log(customgeojson);
     return customgeojson;
 }

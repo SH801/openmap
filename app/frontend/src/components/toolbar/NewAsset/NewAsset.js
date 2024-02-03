@@ -67,7 +67,7 @@ export class NewAsset extends Component {
                     this.props.setGlobalState({fittingbounds: true});
                     map.fitBounds(overallboundingbox, {
                         animate: true,
-                        padding: {top: 10, bottom:100, left: 50, right: 50}
+                        padding: {top: 50, bottom:10, left: 50, right: 50}
                     });
                 }
             }

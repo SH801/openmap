@@ -519,7 +519,7 @@ export const fetchCustomGeoJSON = (cookie, shortcode) => {
       shortcode: shortcode
     }
     let body = JSON.stringify(searchcriteria);
-
+    const { mapref } = getState().global; 
     return fetch(API_URL + "/customgeojson/fetch/", {headers, method: "POST", body})
       .then(res => {
         if (res.status < 500) {
@@ -533,6 +533,11 @@ export const fetchCustomGeoJSON = (cookie, shortcode) => {
       })
       .then(res => {
         if (res.status === 200) {
+          if (mapref) {
+            const map = mapref.current.getMap();   
+            map.getSource("customgeojson").setData(res.data);
+          }
+          
           return dispatch({type: 'FETCH_CUSTOMGEOJSON', customgeojson: res.data});
         }         
       })

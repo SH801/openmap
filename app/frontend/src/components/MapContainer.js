@@ -195,6 +195,10 @@ export class PitchToggle extends Component{
       var currsatellite = _this._mapcontainer.state.satellite;
       var newsatellite = !currsatellite;
       _this._mapcontainer.setState({showtooltip: false, idle: false, satellite: newsatellite}, () => {
+        if (_this._mapcontainer.props.global.editcustomgeojson === null) {
+          _this._mapcontainer.reloadCustomGeoJSON();
+        }  
+    
         mapRefreshPlanningConstraints(
           _this._mapcontainer.props.global.showplanningconstraints, 
           _this._mapcontainer.props.global.planningconstraints, 

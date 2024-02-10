@@ -1410,8 +1410,10 @@ def cleangrid():
             maxvoltage = 0
             voltage = feature['properties']['voltage'].strip()
             if voltage.isnumeric() is True:
-                maxvoltage = int(voltage)
-                if maxvoltage < 1000: maxvoltage = (1000 * maxvoltage)
+                voltage = int(voltage)
+                if voltage < 1000: voltage = (1000 * voltage)
+                maxvoltage = voltage
+                voltage = (str(int(voltage/1000)) + 'kV')
             else:
                 if voltage == 'low': maxvoltage = 11000
                 else:
@@ -1430,15 +1432,17 @@ def cleangrid():
                         voltageelements = voltage.split(";")
                         maxvoltage = 0
                         if voltageelements[0].isnumeric():
-                            maxvoltage = int(voltageelements[0])
-                            if maxvoltage < 1000: maxvoltage = (1000 * maxvoltage)
+                            newelements = []
                             for element in voltageelements:
                                 element = int(element)
                                 # If voltage is less than 1000, must be kV
                                 if element < 1000: element = (1000 * element)
+                                newelements.append(str(int(element/1000)) + 'kV')
                                 if element > maxvoltage: maxvoltage = element
+                            voltage = ";".join(newelements)
                             print(maxvoltage)
                         else: print("Couldn't parse", voltageelements[0])
+            feature['properties']['voltage'] = voltage
             feature['properties']['maxvoltage'] = maxvoltage
         outputfeatures.append(feature)
         if feature['geometry']['type'] == 'Point': outputfeatures_poles.append(feature)
@@ -1452,6 +1456,9 @@ def cleangrid():
     print("Outputting modified grid geojson")
     # with open(grid_geojson_output, "w", encoding='UTF-8') as writerfileobj:
     #     json.dump({"type": "FeatureCollection", "features": outputfeatures}, writerfileobj, indent=2)
+
+    with open(grid_geojson_lines_output, "w", encoding='UTF-8') as writerfileobj:
+        json.dump({"type": "FeatureCollection", "features": outputfeatures_lines}, writerfileobj, indent=2)
 
     with open(grid_geojson_lines_1_output, "w", encoding='UTF-8') as writerfileobj:
         json.dump({"type": "FeatureCollection", "features": outputfeatures_lines_1}, writerfileobj, indent=2)

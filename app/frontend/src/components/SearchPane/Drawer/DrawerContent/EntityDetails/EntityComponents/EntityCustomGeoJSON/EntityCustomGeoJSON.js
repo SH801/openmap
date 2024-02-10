@@ -1,10 +1,10 @@
 import React, { Component }  from 'react';
 import { connect } from 'react-redux';
-import { IonText, IonIcon, IonAlert } from '@ionic/react';
-import { closeOutline } from 'ionicons/icons';
+import { IonText, IonIcon, IonAlert, IonButton } from '@ionic/react';
+import { downloadOutline, closeOutline } from 'ionicons/icons';
 import { area, center, bbox, point, destination } from '@turf/turf';
 import { global } from "../../../../../../../actions";
-import { WINDTURBINE_HEIGHT } from "../../../../../../../constants";
+import { POSITIVE_SITE, WINDTURBINE_HEIGHT } from "../../../../../../../constants";
 export class EntityCustomGeoJSON extends Component {
 
   state = {
@@ -102,6 +102,31 @@ export class EntityCustomGeoJSON extends Component {
     }
   }
 
+  downloadFile = (type) => {
+
+    const anchor = document.createElement("a");
+    var geojson = JSON.parse(JSON.stringify(this.props.global.customgeojson));
+
+    for(var i = 0; i < geojson['features'].length; i++) {
+      geojson['features'][i]['properties']['type'] = geojson['features'][i]['properties']['subtype'];
+      delete geojson['features'][i]['properties']['subtype'];
+    }
+
+    const now = new Date();
+    const timesuffix = now.toISOString().substring(0,19).replaceAll('T', ' ').replaceAll(':', '-');
+    anchor.download = POSITIVE_SITE.shortcode + " - " + timesuffix;
+
+    switch (type) {
+      case 'qgis':
+        anchor.href =  URL.createObjectURL(new Blob([JSON.stringify(geojson, null, 2)], {type: "application/x-qgis"}));
+        break;
+      default:
+        anchor.href =  URL.createObjectURL(new Blob([JSON.stringify(geojson, null, 2)], {type: "application/geo+json"}));
+        break;
+    }
+    anchor.click();
+  }
+
   convertForDisplay = (value) => {
     var retvalue = parseFloat(value).toLocaleString('en', {minimumFractionDigits: 1,maximumFractionDigits: 1});
     return retvalue;
@@ -148,7 +173,17 @@ export class EntityCustomGeoJSON extends Component {
                   >
                     <div className="entity-title-customgeojson">
                       <IonText className="ion-text-capitalize ion-text-left entity-title-customgeojson">
-                        {this.props.entity.name} 
+                        {this.props.entity.name}&nbsp;
+
+                        {((calculations.numwind > 0) || (calculations.numsolar > 0)) ? (
+                        <>
+                          <IonButton onClick={() => {this.downloadFile('geojson')}} color="light" size="small" fill="default" style={{textTransform: "default", marginBottom: "20px"}}>
+                          <IonIcon slot="start" icon={downloadOutline}></IonIcon>GeoJSON</IonButton>
+                          <IonButton onClick={() => {this.downloadFile('qgis')}} color="light" size="small" fill="default" style={{textTransform: "default", marginBottom: "20px"}}>
+                          <IonIcon slot="start" icon={downloadOutline}></IonIcon>QGIS</IonButton>
+                        </>): null }
+
+
                       </IonText>
                     </div>                    
 

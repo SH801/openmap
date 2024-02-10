@@ -149,8 +149,10 @@ export class TerrainControl extends Component{
   _toggleTerrain = () => {
     this._mapcontainer.setState({showtooltip: false});
     if (this._mapcontainer.state.terrain) {
+      this._map.setLayoutProperty('hills', 'visibility', 'none');
       this._mapcontainer.setState({terrain: null}, () => {this._updateTerrainIcon();});
     } else {
+      this._map.setLayoutProperty('hills', 'visibility', 'visible');
       this._mapcontainer.setState({terrain: this.options}, () => {this._updateTerrainIcon();});
     }
   };
@@ -923,6 +925,10 @@ export class MapContainer extends Component  {
     this.setState({maploaded: true});
   }
 
+  capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
   onMouseEnter = (event) => {
 
     var map = this.mapRef.current.getMap();
@@ -966,13 +972,51 @@ export class MapContainer extends Component  {
 
         var featurecentroid = centroid(event.features[0]);
         var description = properties.name;
-        if (description === undefined) {
-          description = "No name available";
+        if (properties['power'] !== undefined) {
+
           var source = "";
           if (properties['plant:source'] !== undefined) source = properties['plant:source'];
           if (properties['generator:source'] !== undefined) source = properties['generator:source'];
-          if (source === "solar") description = "Solar Farm";
-          if (source === "wind") description = "Wind Farm";
+          if (description === undefined) {
+            if (source === "solar") description = "Solar Farm";
+            if (source === "wind") description = "Wind Farm";  
+          }
+
+          if (['line', 'minor_line'].includes(properties['power'])) {
+            description = 'Power line';
+          }
+          if (properties['power'] === 'substation') {
+            description = 'Substation';
+          }
+          if (properties['power'] === 'cable') {
+            description = 'Underground cable';
+          }
+
+          if (!(['solar', 'wind'].includes(source))) {
+            if (properties.name !== undefined) description += ' - ' + properties.name;
+          }
+          description = description.replaceAll('?', '');
+          description = '<h1 class="popup-h1">' + description + '</h1>';
+          var showelements = ['voltage', 'cables', 'circuits', 'operator'];
+          for(var i = 0; i < showelements.length; i++) {
+            var element = showelements[i];
+            var value = properties[element];
+            var firstcap = this.capitalizeFirstLetter(element);
+            if (value !== undefined) {
+              if (element === 'voltage') value = value.replaceAll(';', ', ');
+              description += '<p class="popup-p"><b>' + firstcap + ':</b> ' + value + '</p>';
+            }
+          }
+
+        } else {
+          if (description === undefined) {
+            description = "No name available";
+            var source = "";
+            if (properties['plant:source'] !== undefined) source = properties['plant:source'];
+            if (properties['generator:source'] !== undefined) source = properties['generator:source'];
+            if (source === "solar") description = "Solar Farm";
+            if (source === "wind") description = "Wind Farm";
+          }
         }
         this.setState({'showpopup': true});
         var popup = this.popupRef.current;
@@ -1081,6 +1125,13 @@ export class MapContainer extends Component  {
           }
 
         } else {
+          var properties = event.features[0].properties;
+
+          // Don't respond to clicking on power lines or substations
+          if (properties['power'] !== undefined) {
+            if (['line', 'minor_line', 'cable', 'substation'].includes(properties['power'])) return;
+          }
+
           var entityid = event.features[0].properties.id;
           this.selectEntity(entityid);
         }

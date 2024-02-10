@@ -112,7 +112,7 @@
         "id": "landcover_grass",
         "paint": {
           "fill-color": "hsl(82, 46%, 72%)",
-          "fill-opacity": 0.45
+          "fill-opacity": 0.1
         },
         "source": "openmaptiles",
         "source-layer": "landcover",
@@ -132,7 +132,7 @@
             "stops": [
               [
                 8,
-                0.6
+                0.1
               ],
               [
                 22,
@@ -1547,8 +1547,8 @@
             [">=", ["to-number", ["get", "maxvoltage"]], 550000], "#e892a2",
             [">=", ["to-number", ["get", "maxvoltage"]], 310000], "#e892a2",
             [">=", ["to-number", ["get", "maxvoltage"]], 220000], "#f9b29c",
-            [">=", ["to-number", ["get", "maxvoltage"]], 132000], "#f9b29c",
-            [">=", ["to-number", ["get", "maxvoltage"]], 33000], "#fcd6a4",
+            [">=", ["to-number", ["get", "maxvoltage"]], 132000], "#f9e09a",
+            [">=", ["to-number", ["get", "maxvoltage"]], 33000], "#f9f19a",
             [">=", ["to-number", ["get", "maxvoltage"]], 10000], "#f7fabf",
             "#f7fabf"
           ],
@@ -1574,11 +1574,11 @@
             [
               "case",
               ["==", ["to-number", ["get", "maxvoltage"]], 0], 0,
-              [">=", ["to-number", ["get", "maxvoltage"]], 550000], 2,
+              [">=", ["to-number", ["get", "maxvoltage"]], 550000], 3,
               [">=", ["to-number", ["get", "maxvoltage"]], 310000], 2,
-              [">=", ["to-number", ["get", "maxvoltage"]], 220000], 1,
-              [">=", ["to-number", ["get", "maxvoltage"]], 132000], 1,
-              [">=", ["to-number", ["get", "maxvoltage"]], 33000], 0,
+              [">=", ["to-number", ["get", "maxvoltage"]], 220000], 1.2,
+              [">=", ["to-number", ["get", "maxvoltage"]], 132000], 0.8,
+              [">=", ["to-number", ["get", "maxvoltage"]], 33000], 0.4,
               [">=", ["to-number", ["get", "maxvoltage"]], 10000], 0,
               0
             ],  
@@ -1586,8 +1586,8 @@
             [
               "case",
               ["==", ["to-number", ["get", "maxvoltage"]], 0], 0,
-              [">=", ["to-number", ["get", "maxvoltage"]], 550000], 2.3,
-              [">=", ["to-number", ["get", "maxvoltage"]], 310000], 2.3,
+              [">=", ["to-number", ["get", "maxvoltage"]], 550000], 3,
+              [">=", ["to-number", ["get", "maxvoltage"]], 310000], 2,
               [">=", ["to-number", ["get", "maxvoltage"]], 220000], 2,
               [">=", ["to-number", ["get", "maxvoltage"]], 132000], 2,
               [">=", ["to-number", ["get", "maxvoltage"]], 33000], 0,
@@ -1598,16 +1598,26 @@
             [
               "case",
               ["==", ["to-number", ["get", "maxvoltage"]], 0], 0,
-              [">=", ["to-number", ["get", "maxvoltage"]], 550000], 2.6,
-              [">=", ["to-number", ["get", "maxvoltage"]], 310000], 2.6,
-              [">=", ["to-number", ["get", "maxvoltage"]], 220000], 2.3,
-              [">=", ["to-number", ["get", "maxvoltage"]], 132000], 2.3,
-              [">=", ["to-number", ["get", "maxvoltage"]], 33000], 0,
+              [">=", ["to-number", ["get", "maxvoltage"]], 550000], 3,
+              [">=", ["to-number", ["get", "maxvoltage"]], 310000], 2.7,
+              [">=", ["to-number", ["get", "maxvoltage"]], 220000], 2.4,
+              [">=", ["to-number", ["get", "maxvoltage"]], 132000], 2.1,
+              [">=", ["to-number", ["get", "maxvoltage"]], 33000], 2.1,
               [">=", ["to-number", ["get", "maxvoltage"]], 10000], 0,
               0
             ],  
             10, 
-            3
+            [
+              "case",
+              ["==", ["to-number", ["get", "maxvoltage"]], 0], 1,
+              [">=", ["to-number", ["get", "maxvoltage"]], 550000], 4,
+              [">=", ["to-number", ["get", "maxvoltage"]], 310000], 3.8,
+              [">=", ["to-number", ["get", "maxvoltage"]], 220000], 3.5,
+              [">=", ["to-number", ["get", "maxvoltage"]], 132000], 3.2,
+              [">=", ["to-number", ["get", "maxvoltage"]], 33000], 3,
+              [">=", ["to-number", ["get", "maxvoltage"]], 10000], 2,
+              1
+            ]
           ]
         },
         "source": "grid",
@@ -1657,8 +1667,8 @@
             [
               "case",
               ["==", ["to-number", ["get", "maxvoltage"]], 0], 0,
-              [">=", ["to-number", ["get", "maxvoltage"]], 550000], 0.1,
-              [">=", ["to-number", ["get", "maxvoltage"]], 310000], 0.1,
+              [">=", ["to-number", ["get", "maxvoltage"]], 550000], 0,
+              [">=", ["to-number", ["get", "maxvoltage"]], 310000], 0,
               [">=", ["to-number", ["get", "maxvoltage"]], 220000], 0,
               [">=", ["to-number", ["get", "maxvoltage"]], 132000], 0,
               [">=", ["to-number", ["get", "maxvoltage"]], 33000], 0,
@@ -1669,8 +1679,8 @@
             [
               "case",
               ["==", ["to-number", ["get", "maxvoltage"]], 0], 0,
-              [">=", ["to-number", ["get", "maxvoltage"]], 550000], 0.1,
-              [">=", ["to-number", ["get", "maxvoltage"]], 310000], 0.1,
+              [">=", ["to-number", ["get", "maxvoltage"]], 550000], 0,
+              [">=", ["to-number", ["get", "maxvoltage"]], 310000], 0,
               [">=", ["to-number", ["get", "maxvoltage"]], 220000], 0,
               [">=", ["to-number", ["get", "maxvoltage"]], 132000], 0,
               [">=", ["to-number", ["get", "maxvoltage"]], 33000], 0,
@@ -1681,16 +1691,20 @@
             [
               "case",
               ["==", ["to-number", ["get", "maxvoltage"]], 0], 0,
-              [">=", ["to-number", ["get", "maxvoltage"]], 550000], 0.1,
-              [">=", ["to-number", ["get", "maxvoltage"]], 310000], 0.1,
-              [">=", ["to-number", ["get", "maxvoltage"]], 220000], 0.1,
-              [">=", ["to-number", ["get", "maxvoltage"]], 132000], 0.1,
+              [">=", ["to-number", ["get", "maxvoltage"]], 550000], 0,
+              [">=", ["to-number", ["get", "maxvoltage"]], 310000], 0,
+              [">=", ["to-number", ["get", "maxvoltage"]], 220000], 0,
+              [">=", ["to-number", ["get", "maxvoltage"]], 132000], 0,
               [">=", ["to-number", ["get", "maxvoltage"]], 33000], 0,
               [">=", ["to-number", ["get", "maxvoltage"]], 10000], 0,
               0
             ],  
             10, 
-            0.2
+            0.2,
+            12,
+            0.5,
+            13,
+            0.75
           ],
           "line-opacity": 1,
           "line-gap-width": 
@@ -2148,7 +2162,12 @@
         "id": "renewables_background",
         "paint": {
           "fill-color": "#666666",
-          "fill-opacity": 0.6          
+          "fill-opacity": [
+            "step",
+            ["zoom"],
+            0,
+            9, 0.6 
+          ]          
         },
         "source": "renewables",
         "source-layer": "renewables",

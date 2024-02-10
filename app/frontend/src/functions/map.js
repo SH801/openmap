@@ -88,3 +88,16 @@ export function mapRefreshWindspeed(showwindspeed, map) {
     if (showwindspeed) map.setLayoutProperty('windspeed', 'visibility', 'visible');
     else map.setLayoutProperty('windspeed', 'visibility', 'none');
 }
+
+export function mapRefreshElectricity(showelectricity, map) {
+    if (showelectricity) {
+        map.setLayoutProperty('grid', 'visibility', 'visible');
+        map.setLayoutProperty('grid_outline', 'visibility', 'visible');
+        map.setLayoutProperty('grid_substation', 'visibility', 'visible');
+    } 
+    else {
+        map.setLayoutProperty('grid', 'visibility', 'none');
+        map.setLayoutProperty('grid_outline', 'visibility', 'none');
+        map.setLayoutProperty('grid_substation', 'visibility', 'none');
+    }
+}

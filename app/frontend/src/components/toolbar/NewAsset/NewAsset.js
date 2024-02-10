@@ -2,7 +2,18 @@ import React, { Component }  from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { global, search } from "../../../actions";
-import { addCircle, addCircleOutline, create, createOutline, shapes, shapesOutline, speedometer, speedometerOutline, closeOutline } from 'ionicons/icons';
+import { 
+    addCircle, 
+    addCircleOutline, 
+    create, 
+    createOutline, 
+    shapes, 
+    shapesOutline, 
+    speedometer, 
+    speedometerOutline, 
+    flash,
+    flashOutline,
+    closeOutline } from 'ionicons/icons';
 import { 
     IonIcon,
     IonModal, 
@@ -15,7 +26,7 @@ import {
     IonText,
     IonList,
 } from '@ionic/react';
-import { getBoundingBox, mapRefreshPlanningConstraints, mapRefreshWindspeed } from '../../../functions/map';
+import { getBoundingBox, mapRefreshPlanningConstraints, mapRefreshWindspeed, mapRefreshElectricity } from '../../../functions/map';
 import { convertMapDraw2GeoJSON } from '../../../functions/mapdraw';
 
 export class NewAsset extends Component {
@@ -133,6 +144,13 @@ export class NewAsset extends Component {
         });
     }
 
+    toggleElectricity = () => {
+        var map = this.props.global.mapref.current.getMap();
+        this.props.setGlobalState({showelectricity: !(this.props.global.showelectricity)}).then(() => {
+            mapRefreshElectricity(this.props.global.showelectricity, map);          
+        });
+    }
+
     closeModal = () => {
         this.setState({shownewassetmodal: false});
     }
@@ -167,6 +185,10 @@ export class NewAsset extends Component {
                 ) : (<>Wind</>)}            
                     
                 </div>
+            </div>
+            <div className="toolbar-button-container" onClick={this.toggleElectricity} >
+                <IonIcon title="Toggle electricity grid layer" slot="icon-only" icon={this.props.global.showelectricity ? flash: flashOutline} className="editcustomgeojson-icon toolbar-button"/>
+                <div className="toolbar-button-caption">Grid</div>
             </div>
             {this.state.shownewassetmodal ? (
                 <IonModal 

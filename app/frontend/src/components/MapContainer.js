@@ -515,6 +515,9 @@ export class MapContainer extends Component  {
       'renewables_windturbine',
       'customgeojson_windturbine',
       'customgeojson_solarfarm',
+      'grid',
+      'grid_outline',
+      'grid_substation',
       'windspeed'
     ].concat(idsinstylesheet);
 
@@ -524,7 +527,7 @@ export class MapContainer extends Component  {
   incorporateBaseDomain = (baseurl, planningconstraints, json) => {
 
     let newjson = JSON.parse(JSON.stringify(json));
-    const sources_list = ['openmaptiles', 'terrainSource', 'hillshadeSource', 'planningconstraints', 'windspeed', 'renewables', 'positivefarms'];
+    const sources_list = ['openmaptiles', 'terrainSource', 'hillshadeSource', 'planningconstraints', 'windspeed', 'renewables', 'grid', 'positivefarms'];
 
     for(let i = 0; i < sources_list.length; i++) {
       var id = sources_list[i];

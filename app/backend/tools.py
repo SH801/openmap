@@ -125,6 +125,15 @@ osm = [
 ]
 
 osm_output = 'osm/renewables_output.geojson'
+windspeed_geojson = '/Volumes/A027/planningconstraints/planningconstraints/Wind/windspeed_m_per_second_100m.geojson'
+grid_geojson = '/Volumes/A027/planningconstraints/grid.geojson'
+grid_geojson_output = '/Volumes/A027/planningconstraints/grid_output.geojson'
+grid_geojson_lines_output = '/Volumes/A027/planningconstraints/grid_output_lines.geojson'
+grid_geojson_lines_1_output = '/Volumes/A027/planningconstraints/grid_output_lines_1.geojson'
+grid_geojson_lines_2_output = '/Volumes/A027/planningconstraints/grid_output_lines_2.geojson'
+grid_geojson_lines_3_output = '/Volumes/A027/planningconstraints/grid_output_lines_3.geojson'
+grid_geojson_lines_4_output = '/Volumes/A027/planningconstraints/grid_output_lines_4.geojson'
+grid_geojson_poles_output = '/Volumes/A027/planningconstraints/grid_output_poles.geojson'
 
 subregion_scotland_correction = "subregions/Counties_and_Unitary_Authorities_GB_2018.json"
 
@@ -1326,6 +1335,142 @@ def computerenewablesareas():
 
     print("MW / hectare ratio:", totalpoweroutput, totalarea, float(totalpoweroutput / totalarea))
 
+def computerenewableswind():
+    """
+    Gets details of wind speed for all wind turbine sites
+    """
+
+    from turf import centroid, boolean_point_in_polygon
+
+    with open(osm_output, "r", encoding='UTF-8') as readerfileobj: osm_geojson = json.load(readerfileobj)
+    # with open(windspeed_geojson, "r", encoding='UTF-8') as readerfileobj: wind_geojson = json.load(readerfileobj)
+
+    # osm_lookup = {}
+    # windspeedindex = 1
+    # for windspeedsector in wind_geojson['features']:
+    #     print(windspeedindex)
+    #     windspeedindex += 1
+
+    outputfeatures = []
+    for feature in osm_geojson['features']:
+        if feature['properties']['renewabletype'] == 'wind':
+            singlepoint = feature['geometry']['coordinates']
+            # if len(feature['geometry']['coordinates']) > 2:
+            #     singlepointcentroid = centroid(feature)
+            #     singlepoint = singlepointcentroid['geometry']['coordinates']
+            #     feature['geometry']['coordinates'] = singlepoint
+            outputfeatures.append(feature)
+            print(feature['properties']['name'], singlepoint)
+
+    with open('gis/windturbines.geojson', "w", encoding='UTF-8') as writerfileobj:
+        json.dump({"type": "FeatureCollection", "features": outputfeatures}, writerfileobj, indent=2)
+                
+    # with open(windspeed_geojson, "r", encoding='UTF-8') as readerfileobj: windspeeds = json.load(readerfileobj)
+        
+    # for entity in windfarm_osm:
+    #     print(entity)
+    #     if entity.extraproperties is not None:
+    #         extraproperties = json.loads(entity.extraproperties)
+    #         poweroutput = None
+    #         area = None
+
+    #         if "plant:output:electricity" in extraproperties: poweroutput = extraproperties['plant:output:electricity']
+    #         if "generator:output:electricity" in extraproperties: poweroutput = extraproperties['generator:output:electricity']
+    #         if "site:area" in extraproperties: area = extraproperties['site:area']
+
+    #         if poweroutput is not None:
+    #             poweroutput = poweroutput.strip().upper().split()
+    #             # Sanitize poweroutput if no space between value and units, eg. '250MW'
+    #             if len(poweroutput) == 1:
+    #                 if (poweroutput[0][-2:] == 'KW'): poweroutput = [poweroutput[0][:-2], 'KW']
+    #                 if (poweroutput[0][-2:] == 'MW'): poweroutput = [poweroutput[0][:-2], 'MW']
+    #             if len(poweroutput) == 2:
+    #                 if poweroutput[1] == 'KW': 
+    #                     poweroutput[0] = float(float(poweroutput[0]) / 1000)
+    #                     poweroutput[1] = 'MW'
+
+    #                 if (poweroutput[1] == 'MW') and (area is not None):
+    #                     totalpoweroutput += float(poweroutput[0])
+    #                     area = area.strip().split()
+    #                     totalarea += float(area[0])
+
+    # print("MW / hectare ratio:", totalpoweroutput, totalarea, float(totalpoweroutput / totalarea))
+
+def cleangrid():
+    """
+    Clean grid.geojson
+    """
+
+    with open(grid_geojson, "r", encoding='UTF-8') as readerfileobj: gridfeatures = json.load(readerfileobj)
+
+    outputfeatures, outputfeatures_lines, outputfeatures_poles = [], [], []
+    outputfeatures_lines_1, outputfeatures_lines_2, outputfeatures_lines_3, outputfeatures_lines_4 = [], [], [], []
+    for feature in gridfeatures['features']:
+        if 'voltage' in feature['properties']:
+            maxvoltage = 0
+            voltage = feature['properties']['voltage'].strip()
+            if voltage.isnumeric() is True:
+                maxvoltage = int(voltage)
+                if maxvoltage < 1000: maxvoltage = (1000 * maxvoltage)
+            else:
+                if voltage == 'low': maxvoltage = 11000
+                else:
+                    if voltage == 'medium': maxvoltage = 33000
+                    else:
+                        voltage = voltage\
+                            .lower()\
+                            .replace('?', '11000')\
+                            .replace(' ', '')\
+                            .replace('_', '')\
+                            .replace('/', ';')\
+                            .replace(',', ';')\
+                            .replace(":", ';')\
+                            .replace('kv', '000')\
+                            .replace('v', '')
+                        voltageelements = voltage.split(";")
+                        maxvoltage = 0
+                        if voltageelements[0].isnumeric():
+                            maxvoltage = int(voltageelements[0])
+                            if maxvoltage < 1000: maxvoltage = (1000 * maxvoltage)
+                            for element in voltageelements:
+                                element = int(element)
+                                # If voltage is less than 1000, must be kV
+                                if element < 1000: element = (1000 * element)
+                                if element > maxvoltage: maxvoltage = element
+                            print(maxvoltage)
+                        else: print("Couldn't parse", voltageelements[0])
+            feature['properties']['maxvoltage'] = maxvoltage
+        outputfeatures.append(feature)
+        if feature['geometry']['type'] == 'Point': outputfeatures_poles.append(feature)
+        else: 
+            outputfeatures_lines.append(feature)
+            if maxvoltage >= 310000: outputfeatures_lines_1.append(feature)
+            elif maxvoltage >= 13200: outputfeatures_lines_2.append(feature)
+            elif maxvoltage >= 3300: outputfeatures_lines_3.append(feature)
+            else: outputfeatures_lines_4.append(feature)
+
+    print("Outputting modified grid geojson")
+    # with open(grid_geojson_output, "w", encoding='UTF-8') as writerfileobj:
+    #     json.dump({"type": "FeatureCollection", "features": outputfeatures}, writerfileobj, indent=2)
+
+    with open(grid_geojson_lines_1_output, "w", encoding='UTF-8') as writerfileobj:
+        json.dump({"type": "FeatureCollection", "features": outputfeatures_lines_1}, writerfileobj, indent=2)
+
+    with open(grid_geojson_lines_2_output, "w", encoding='UTF-8') as writerfileobj:
+        json.dump({"type": "FeatureCollection", "features": outputfeatures_lines_2}, writerfileobj, indent=2)
+
+    with open(grid_geojson_lines_3_output, "w", encoding='UTF-8') as writerfileobj:
+        json.dump({"type": "FeatureCollection", "features": outputfeatures_lines_3}, writerfileobj, indent=2)
+
+    with open(grid_geojson_lines_4_output, "w", encoding='UTF-8') as writerfileobj:
+        json.dump({"type": "FeatureCollection", "features": outputfeatures_lines_4}, writerfileobj, indent=2)
+
+    # with open(grid_geojson_poles_output, "w", encoding='UTF-8') as writerfileobj:
+    #     json.dump({"type": "FeatureCollection", "features": outputfeatures_poles}, writerfileobj, indent=2)
+
+    print("Finished outputting modified grid geojson")
+
+
 def importgroups():
     """
     Imports environmental groups data
@@ -1439,7 +1584,13 @@ processrenewables
 
 computerenewablesareas
   Computes area of renewables assets and determines MW/hectare for solar
-          
+
+computerenewableswind
+  Gets details of wind speed for all wind turbine sites
+
+cleangrid
+  Cleans grid.geojson
+                   
 importgroups
   Process environmental group data
 
@@ -1485,6 +1636,10 @@ else:
         processrenewables()
     if primaryargument == "computerenewablesareas":
         computerenewablesareas()
+    if primaryargument == "computerenewableswind":
+        computerenewableswind()
+    if primaryargument == "cleangrid":
+        cleangrid()
     if primaryargument == "importgroups":
         importgroups()
     if primaryargument == "importdata":

@@ -66,6 +66,7 @@ export const initialStateGlobal = {
         }
     }),  
     showwindspeed: false,
+    showelectricity: false,
     windspeed: 0,
     showplanningconstraints: false,
     planningconstraints: {

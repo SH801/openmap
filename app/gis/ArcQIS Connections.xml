@@ -1,0 +1,24 @@
+<!DOCTYPE connections>
+<qgsARCGISFEATURESERVERConnections version="1.0">
+    <arcgisfeatureserver username="" url="https://services.arcgis.com/JJzESW51TqeY9uat/arcgis/rest/services/Areas_of_Outstanding_Natural_Beauty_England/FeatureServer/" password="" authcfg="" name="AONB - England"/>
+    <arcgisfeatureserver username="" url="https://ckan.positiveplaces.org/dataset/ancient-woodlands---england/resource/02b642d2-5b20-4030-bed4-9777fc21a787#:~:text=https%3A//services.arcgis.com/JJzESW51TqeY9uat/arcgis/rest/services/Ancient_Woodland_England/FeatureServer/" password="" authcfg="" name="Ancient woodlands - England"/>
+    <arcgisfeatureserver username="" url="https://services1.arcgis.com/LM9GyVFsughzHdbO/arcgis/rest/services/Ancient_Woodland_Inventory/FeatureServer/" password="" authcfg="" name="Ancient woodlands - Scotland"/>
+    <arcgisfeatureserver username="" url="https://services-eu1.arcgis.com/ZOdPfBS3aqqDYPUQ/arcgis/rest/services/Conservation_Areas/FeatureServer/" password="" authcfg="" name="Conservation areas - England"/>
+    <arcgisfeatureserver username="" url="https://services.arcgis.com/JJzESW51TqeY9uat/arcgis/rest/services/Heritage_Coasts_England/FeatureServer/" password="" authcfg="" name="Heritage Coasts - England"/>
+    <arcgisfeatureserver username="" url="https://services1.arcgis.com/LM9GyVFsughzHdbO/arcgis/rest/services/Marine_Protected_Areas/FeatureServer/" password="" authcfg="" name="Heritage Coasts - Scotland"/>
+    <arcgisfeatureserver username="" url="https://services-eu1.arcgis.com/ZOdPfBS3aqqDYPUQ/arcgis/rest/services/National_Heritage_List_for_England_NHLE_v02_VIEW/FeatureServer/" password="" authcfg="" name="Listed buildings - England"/>
+    <arcgisfeatureserver username="" url="https://services.arcgis.com/JJzESW51TqeY9uat/arcgis/rest/services/National_Nature_Reserves_England/FeatureServer/" password="" authcfg="" name="NNR - England"/>
+    <arcgisfeatureserver username="" url="https://services1.arcgis.com/LM9GyVFsughzHdbO/arcgis/rest/services/National_Nature_Reserves/FeatureServer/" password="" authcfg="" name="NNR - Scotland"/>
+    <arcgisfeatureserver username="" url="https://maps.gov.scot/server/rest/services/ScotGov/ProtectedSites/MapServer/" password="" authcfg="" name="NSA - Scotland"/>
+    <arcgisfeatureserver username="" url="https://services-eu1.arcgis.com/ZOdPfBS3aqqDYPUQ/arcgis/rest/services/National_Heritage_List_for_England_NHLE_v02_VIEW/FeatureServer/" password="" authcfg="" name="National Heritage List - England"/>
+    <arcgisfeatureserver username="" url="https://services.arcgis.com/JJzESW51TqeY9uat/arcgis/rest/services/National_Parks_England/FeatureServer/" password="" authcfg="" name="National Parks - England"/>
+    <arcgisfeatureserver username="" url="https://services2.arcgis.com/ppIFLOeUcdFMQzkH/arcgis/rest/services/National_Parks___Scotland/FeatureServer/" password="" authcfg="" name="National Parks - Scotland"/>
+    <arcgisfeatureserver username="" url="https://services.arcgis.com/JJzESW51TqeY9uat/arcgis/rest/services/Ramsar_England/FeatureServer/" password="" authcfg="" name="Ramsar - England"/>
+    <arcgisfeatureserver username="" url="https://services1.arcgis.com/LM9GyVFsughzHdbO/arcgis/rest/services/RAMSAR_Wetlands_of_International_Importance/FeatureServer/" password="" authcfg="" name="Ramsar - Scotland"/>
+    <arcgisfeatureserver username="" url="https://services.arcgis.com/JJzESW51TqeY9uat/arcgis/rest/services/Special_Areas_of_Conservation_England/FeatureServer/" password="" authcfg="" name="SAC - England"/>
+    <arcgisfeatureserver username="" url="https://services1.arcgis.com/LM9GyVFsughzHdbO/arcgis/rest/services/Special_Areas_of_Conservation/FeatureServer/" password="" authcfg="" name="SAC - Scotland"/>
+    <arcgisfeatureserver username="" url="https://services.arcgis.com/JJzESW51TqeY9uat/arcgis/rest/services/Special_Areas_of_Conservation_England/FeatureServer/" password="" authcfg="" name="SPA - England"/>
+    <arcgisfeatureserver username="" url="https://services1.arcgis.com/LM9GyVFsughzHdbO/arcgis/rest/services/Special_Protection_Areas/FeatureServer/" password="" authcfg="" name="SPA - Scotland"/>
+    <arcgisfeatureserver username="" url="https://services.arcgis.com/JJzESW51TqeY9uat/arcgis/rest/services/SSSI_England/FeatureServer/" password="" authcfg="" name="SSSI - England"/>
+    <arcgisfeatureserver username="" url="https://services1.arcgis.com/LM9GyVFsughzHdbO/arcgis/rest/services/Sites_of_Special_Scientific_Interest/FeatureServer/" password="" authcfg="" name="SSSI - Scotland"/>
+</qgsARCGISFEATURESERVERConnections>

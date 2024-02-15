@@ -94,10 +94,12 @@ export function mapRefreshElectricity(showelectricity, map) {
         map.setLayoutProperty('grid', 'visibility', 'visible');
         map.setLayoutProperty('grid_outline', 'visibility', 'visible');
         map.setLayoutProperty('grid_substation', 'visibility', 'visible');
+        map.setLayoutProperty('grid_label', 'visibility', 'visible');
     } 
     else {
         map.setLayoutProperty('grid', 'visibility', 'none');
         map.setLayoutProperty('grid_outline', 'visibility', 'none');
         map.setLayoutProperty('grid_substation', 'visibility', 'none');
+        map.setLayoutProperty('grid_label', 'visibility', 'none');
     }
 }

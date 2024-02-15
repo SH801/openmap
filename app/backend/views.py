@@ -8,6 +8,7 @@ backend/views.py
 Django views for rendering default React page and delivering data to frontend
 """
 
+import uuid
 import sys
 import json
 import re
@@ -554,16 +555,41 @@ def CustomGeoJSONFetch(request):
     except ValueError:
         return OutputError()
 
+    id = None
     if data['cookie'] is None: data['cookie'] = ''
     if data['shortcode'] is None: data['shortcode'] = ''
-    customgeojson = CustomGeoJSON.objects.filter(cookie=data['cookie'], shortcode=data['shortcode']).values_list('customgeojson', flat=True).first()
+    if data['cookie'] != '':
+        customgeojson = CustomGeoJSON.objects.filter(cookie=data['cookie']).first()
+        if customgeojson is not None: id = customgeojson.shortcode
+    if data['shortcode'] != '':
+        customgeojson = CustomGeoJSON.objects.filter(shortcode=data['shortcode']).first()
     if customgeojson is None:
         customgeojson = {'type': 'FeatureCollection', 'features': []}
     else:
         try:
-            customgeojson = json.loads(customgeojson)
+            customgeojson = json.loads(customgeojson.customgeojson)
         except ValueError:
             customgeojson = {'type': 'FeatureCollection', 'features': []}
+    
+    if id is not None: customgeojson['id'] = id
+
+    return OutputJson(customgeojson)
+
+@csrf_exempt
+def CustomGeoJSONExternal(request, customgeojsonid):
+    """
+    Retrieves CustomGeoJSON using shortcode id included in URL
+    """
+
+    customgeojson = CustomGeoJSON.objects.filter(shortcode=customgeojsonid).values_list('customgeojson', flat=True).first()
+    if customgeojson is None:
+        customgeojson = {'type': 'FeatureCollection', 'id': customgeojsonid, 'features': []}
+    else:
+        try:
+            customgeojson = json.loads(customgeojson)
+            customgeojson['id'] = customgeojsonid
+        except ValueError:
+            customgeojson = {'type': 'FeatureCollection', 'id': customgeojsonid, 'features': []}
     return OutputJson(customgeojson)
 
 @csrf_exempt
@@ -579,11 +605,23 @@ def CustomGeoJSONUpdate(request):
 
     if data['cookie'] is None: data['cookie'] = ''
     if data['shortcode'] is None: data['shortcode'] = ''
-    customgeojson = CustomGeoJSON.objects.filter(cookie=data['cookie'], shortcode=data['shortcode']).first()
+
+    if data['cookie'] != '':
+        customgeojson = CustomGeoJSON.objects.filter(cookie=data['cookie']).first()
+    if data['shortcode'] != '':
+        customgeojson = CustomGeoJSON.objects.filter(shortcode=data['shortcode']).first()
     if customgeojson is None: customgeojson = CustomGeoJSON(cookie=data['cookie'], shortcode=data['shortcode'])
+    if (customgeojson.cookie != '') and (customgeojson.shortcode == ''):
+        customgeojson.shortcode = uuid.uuid4()
+    customgeojson.modified = Now()
+    customgeojson.browseragent = request.META['HTTP_USER_AGENT']
     customgeojson.customgeojson = json.dumps(data['customgeojson'], cls=DjangoJSONEncoder, indent=2)
     customgeojson.save()
-    return OutputJson({'result': 'success'})
+    # Return customgeojson id if updating via cookie
+    if customgeojson.cookie != '':
+        return OutputJson({'result': 'success', 'id': customgeojson.shortcode})
+    else:
+        return OutputJson({'result': 'success', 'id': None})
 
 @csrf_exempt
 def LocationPosition(request):

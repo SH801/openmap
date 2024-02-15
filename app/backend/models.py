@@ -439,6 +439,8 @@ class CustomGeoJSON(models.Model):
 
     cookie = models.CharField(default='', max_length=255)
     shortcode = models.CharField(default='', max_length=255)
+    modified = models.DateTimeField(auto_now=True)
+    browseragent = models.CharField(default='', max_length=500)
     customgeojson = models.TextField(default='')
 
     class Meta:
@@ -449,7 +451,7 @@ class CustomGeoJSON(models.Model):
         verbose_name_plural = "Custom GeoJSONs"
 
 class CustomGeoJSONAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'cookie', 'shortcode']
+    list_display = ['pk', 'cookie', 'shortcode', 'modified', 'browseragent']
 
     search_fields = (
         'cookie',

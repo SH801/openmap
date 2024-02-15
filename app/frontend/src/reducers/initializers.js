@@ -46,6 +46,7 @@ export const initialStateGlobal = {
     externalreferencedid: null,
     editcustomgeojson: null,
     customgeojson: {type: 'FeatureCollection', features: []},
+    customgeojsonid: null,
     mapdraw: new MapboxDraw({
         displayControlsDefault: false,
         controls: {

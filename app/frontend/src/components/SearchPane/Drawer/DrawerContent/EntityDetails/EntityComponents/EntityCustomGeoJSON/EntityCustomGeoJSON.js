@@ -4,7 +4,7 @@ import { IonText, IonIcon, IonAlert, IonButton } from '@ionic/react';
 import { downloadOutline, closeOutline } from 'ionicons/icons';
 import { area, center, bbox, point, destination } from '@turf/turf';
 import { global } from "../../../../../../../actions";
-import { POSITIVE_SITE, WINDTURBINE_HEIGHT } from "../../../../../../../constants";
+import { DOMAIN_BASEURL, POSITIVE_SITE, WINDTURBINE_HEIGHT } from "../../../../../../../constants";
 export class EntityCustomGeoJSON extends Component {
 
   state = {
@@ -118,13 +118,27 @@ export class EntityCustomGeoJSON extends Component {
 
     switch (type) {
       case 'qgis':
-        anchor.href =  URL.createObjectURL(new Blob([JSON.stringify(geojson, null, 2)], {type: "application/x-qgis"}));
+        var boundingbox = bbox(geojson);
+        var qgis = require("../../../../../../../constants/qgis_template.qgs");
+        fetch(qgis)
+        .then(r => r.text())
+        .then(qgistext => {
+          anchor.download += ".qgs";
+          qgistext = qgistext.replaceAll("##XMIN##", boundingbox[0]);
+          qgistext = qgistext.replaceAll("##XMAX##", boundingbox[2]);
+          qgistext = qgistext.replaceAll("##YMIN##", boundingbox[1]);
+          qgistext = qgistext.replaceAll("##YMAX##", boundingbox[3]);
+          qgistext = qgistext.replaceAll("##CUSTOMGEOJSONURL##", DOMAIN_BASEURL + '/customgeojson/' + this.props.global.customgeojsonid);
+          qgistext = qgistext.replaceAll("##CUSTOMGEOJSONID##", this.props.global.customgeojsonid);
+          anchor.href =  URL.createObjectURL(new Blob([qgistext], {type: "application/x-qgis"}));
+          anchor.click();
+       });
         break;
       default:
         anchor.href =  URL.createObjectURL(new Blob([JSON.stringify(geojson, null, 2)], {type: "application/geo+json"}));
+        anchor.click();
         break;
     }
-    anchor.click();
   }
 
   convertForDisplay = (value) => {

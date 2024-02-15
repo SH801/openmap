@@ -1774,6 +1774,61 @@
           [
             "==",
             "$type",
+            "LineString"
+          ],
+          [
+            "in",
+            "power",
+            "line",
+            "cable",
+            "minor_line"
+          ]
+        ],
+        "id": "grid_label",
+        "layout": {
+          "symbol-placement": "line",
+          "text-field": "{voltage}",
+          "text-font": [
+            "Noto Sans Regular"
+          ],
+          "text-letter-spacing": 0.1,
+          "text-rotation-alignment": "map",
+          "text-size": {
+            "base": 1.4,
+            "stops": [
+              [
+                10,
+                8
+              ],
+              [
+                20,
+                14
+              ]
+            ]
+          },
+          "text-transform": "uppercase"
+        },
+        "paint": {
+          "text-color": "#000",
+          "text-halo-color": "hsl(0, 0%, 100%)",
+          "text-halo-width": 2,
+          "text-opacity": [
+            "step",
+            ["zoom"],
+            0,
+            8, 1 
+          ]
+        },
+        "source": "grid",
+        "source-layer": "grid",
+        "type": "symbol"
+      },
+      {
+        "filter": [
+          "all",
+          [
+            "==",
+            "$type",
             "Point"
           ],
           [

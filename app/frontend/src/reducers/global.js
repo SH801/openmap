@@ -75,10 +75,14 @@ export default function selector(state=initialStateGlobal, action) {
             return newState;
 
         case 'FETCH_CUSTOMGEOJSON':
-            newState = {...newState, customgeojson: action.customgeojson};
+            newState = {...newState, customgeojsonid: action.id, customgeojson: action.customgeojson};
             return newState;
 
         case 'UPDATE_CUSTOMGEOJSON':
+            if (action.id !== undefined) newState = {...newState, customgeojsonid: action.id};
+            else newState = {...newState};
+            return newState;
+
         case 'UPDATE_ENTITY':
         case 'MESSAGE_ENTITY':
             // Do nothing

@@ -537,8 +537,10 @@ export const fetchCustomGeoJSON = (cookie, shortcode) => {
             const map = mapref.current.getMap();   
             map.getSource("customgeojson").setData(res.data);
           }
-          
-          return dispatch({type: 'FETCH_CUSTOMGEOJSON', customgeojson: res.data});
+
+          var id = '';
+          if (res.data['id'] !== undefined) id = res.data['id'];
+          return dispatch({type: 'FETCH_CUSTOMGEOJSON', id: id, customgeojson: res.data});
         }         
       })
   }
@@ -577,7 +579,9 @@ export const updateCustomGeoJSON = (cookie, shortcode, customgeojson) => {
       })
       .then(res => {
         if (res.status === 200) {
-          return dispatch({type: 'UPDATE_CUSTOMGEOJSON', customgeojson: res.data});
+          var id = '';
+          if (res.data['id'] !== undefined) id = res.data['id'];
+          return dispatch({type: 'UPDATE_CUSTOMGEOJSON', id: id, customgeojson: res.data});
         }         
       })
   }

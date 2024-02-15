@@ -1,0 +1,6 @@
+<!DOCTYPE connections>
+<qgsVectorTileConnections version="1.0">
+    <vectortile serviceType="" username="" referer="" url="https://tiles.positiveplaces.org/data/openmaptiles/{z}/{x}/{y}.pbf" authcfg="" password="" zmax="14" name="Positive Places - OpenMapTiles" http-header:referer="" zmin="0" styleUrl=""/>
+    <vectortile serviceType="" username="" referer="" url="https://tiles.positiveplaces.org/data/planningconstraints/{z}/{x}/{y}.pbf" authcfg="" password="" zmax="14" name="Positive Places - Planning constraints - UK" http-header:referer="" zmin="0" styleUrl=""/>
+    <vectortile serviceType="" username="" referer="" url="https://tiles.positiveplaces.org/data/windspeed/{z}/{x}/{y}.pbf" authcfg="" password="" zmax="14" name="Positive Places - Windspeed" http-header:referer="" zmin="0" styleUrl="https://tiles.positiveplaces.org/styles/Inadequate wind - UK/style.json"/>
+</qgsVectorTileConnections>

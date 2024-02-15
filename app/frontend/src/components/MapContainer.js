@@ -40,7 +40,7 @@ import {
   DESKTOP_PADDING,
   DEFAULT_MAXBOUNDS
 } from "../constants";
-import { getBoundingBox, mapSelectEntity, mapRefreshPlanningConstraints, mapRefreshWindspeed} from '../functions/map';
+import { getBoundingBox, mapSelectEntity, mapRefreshPlanningConstraints, mapRefreshWindspeed, mapRefreshElectricity} from '../functions/map';
 import { convertMapDraw2GeoJSON } from '../functions/mapdraw';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 
@@ -206,6 +206,7 @@ export class PitchToggle extends Component{
           _this._mapcontainer.props.global.planningconstraints, 
           _this._map);
         mapRefreshWindspeed(_this._mapcontainer.props.global.showwindspeed, _this._map);
+        mapRefreshElectricity(_this._mapcontainer.props.global.showelectricity, _this._map);          
       });
       if (newsatellite) {
           map.easeTo({pitch: _this._pitch});
@@ -972,9 +973,9 @@ export class MapContainer extends Component  {
 
         var featurecentroid = centroid(event.features[0]);
         var description = properties.name;
+        var source = "";
         if (properties['power'] !== undefined) {
 
-          var source = "";
           if (properties['plant:source'] !== undefined) source = properties['plant:source'];
           if (properties['generator:source'] !== undefined) source = properties['generator:source'];
           if (description === undefined) {
@@ -1011,7 +1012,7 @@ export class MapContainer extends Component  {
         } else {
           if (description === undefined) {
             description = "No name available";
-            var source = "";
+            source = "";
             if (properties['plant:source'] !== undefined) source = properties['plant:source'];
             if (properties['generator:source'] !== undefined) source = properties['generator:source'];
             if (source === "solar") description = "Solar Farm";

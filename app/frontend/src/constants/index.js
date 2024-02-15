@@ -38,6 +38,9 @@ export const API_URL = isDev() ? "http://localhost:80" : "";
 // Base url of tile server
 export const TILESERVER_BASEURL = isDev() ? "http://localhost:8080" : ("https://tiles." + POSITIVE_SITE.shortcode + '.org');
 
+// Base url of tile server
+export const DOMAIN_BASEURL = isDev() ? "http://localhost" : ("https://" + POSITIVE_SITE.shortcode + '.org');
+
 // Height of wind turbine in metres in order to calculate bounding box for wind turbine points
 export const WINDTURBINE_HEIGHT = 160;
 

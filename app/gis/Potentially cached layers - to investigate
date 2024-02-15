@@ -1,0 +1,11 @@
+/vsizip//vsicurl/https://www.daera-ni.gov.uk/sites/default/files/publications/daera/AONB%20-%20Irish%20National%20Grid_0.zip/AONB.shp|layername=AON
+/vsizip//vsicurl/https://admin.opendatani.gov.uk/dataset/e5354413-a97c-4f1b-92e5-cebf0ca824b5/resource/574e0e6a-ccff-4ecd-bd75-459a25f398f0/download/listed-buildings.zip/Listed Buildings/Listed_Buildings20240212.shp|layername=Listed_Buildings20240212
+/vsizip//vsicurl/https://admin.opendatani.gov.uk/dataset/2d5504bb-e628-49d5-bed6-8ed5bc633f2e/resource/4ff445d7-8480-44df-b5ff-d7be3dfb68c7/download/worldheritagesite.zip/WorldHeritageSite.shp|layername=WorldHeritageSite
+/vsizip//vsicurl/https://admin.opendatani.gov.uk/dataset/450ecccb-5573-45d4-ab12-09126ed07196/resource/51affed7-b6e4-43d9-9e1f-23d53e03846e/download/scheduled-zones.zip/Scheduled Zones/Scheduled_Zones20240212.shp|layername=Scheduled_Zones20240212
+/vsizip//vsicurl/https://admin.opendatani.gov.uk/dataset/c6529642-8fa0-4205-bd56-734e9fda2cb0/resource/1f59b6a5-4f8d-4456-9009-e00586062b4d/download/historic-parks-and-gardens.zip/Historic Parks and Gardens/Historic_Parks_and_Gardens20240212.shp|layername=Historic_Parks_and_Gardens20240212
+/vsizip//vsicurl/https://www.daera-ni.gov.uk/sites/default/files/publications/daera/ASSI%20-%20Irish%20National%20Grid_5.zip/ASSI.shp|layername=ASSI
+vsizip//vsicurl/https://www.daera-ni.gov.uk/sites/default/files/publications/daera/Ramsar%20Sites%20-%20Irish%20National%20Grid_1.zip/ramsar.shp|layername=ramsar
+vsizip//vsicurl/https://www.daera-ni.gov.uk/sites/default/files/publications/daera/Special%20Areas%20of%20Conservation%20-%20Irish%20National%20Grid_1.zip/Special Areas of Conservation - Irish National Grid/SAC.shp|layername=SAC
+/vsizip//vsicurl/https://www.daera-ni.gov.uk/sites/default/files/publications/daera/Special%20Protected%20Areas%20-%20Irish%20National%20Grid_1.zip/Special Protected Areas - Irish National Grid/SPA.shp|layername=SPA
+vsizip//vsicurl/https://admin.opendatani.gov.uk/dataset/a249ddf4-b497-4a87-acd1-0260a92bc39b/resource/60cc3299-be66-4983-9869-ec57787d31e8/download/priorityhabitats_woodland.zip/PriorityHabitats_Woodland.shp|layername=PriorityHabitats_Woodland
+vsizip//vsicurl/https://www.daera-ni.gov.uk/sites/default/files/publications/daera/National%20Nature%20Reserves%20-%20Irish%20National%20Grid_1.zip/NNR_and_NR.shp|layername=NNR_and_NR

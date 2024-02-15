@@ -1080,10 +1080,10 @@
   <mapcanvas name="mAreaCanvas" annotationsVisible="1">
     <units>degrees</units>
     <extent>
-      <xmin>0</xmin>
-      <ymin>0</ymin>
-      <xmax>0</xmax>
-      <ymax>0</ymax>
+      <xmin>##XMIN##</xmin>
+      <ymin>##YMIN##</ymin>
+      <xmax>##XMAX##</xmax>
+      <ymax>##YMAX##</ymax>
     </extent>
     <rotation>0</rotation>
     <destinationsrs>
@@ -1155,16 +1155,16 @@
   <projectlayers>
     <maplayer readOnly="0" labelsEnabled="0" minScale="100000000" simplifyDrawingTol="1" simplifyAlgorithm="0" hasScaleBasedVisibilityFlag="0" autoRefreshEnabled="0" simplifyDrawingHints="1" simplifyLocal="1" symbologyReferenceScale="-1" refreshOnNotifyEnabled="0" simplifyMaxScale="1" type="vector" geometry="Polygon" legendPlaceholderImage="" maxScale="0" refreshOnNotifyMessage="" styleCategories="AllStyleCategories" autoRefreshTime="0" wkbType="Polygon">
       <extent>
-        <xmin>-0.49713134765625</xmin>
-        <ymin>51.0601166381756002</ymin>
-        <xmax>-0.48163964090207401</xmax>
-        <ymax>51.06573327026106313</ymax>
+        <xmin>##XMIN##</xmin>
+        <ymin>##YMIN##</ymin>
+        <xmax>##XMAX##</xmax>
+        <ymax>##YMAX##</ymax>
       </extent>
       <wgs84extent>
-        <xmin>-0.49713134765625</xmin>
-        <ymin>51.0601166381756002</ymin>
-        <xmax>-0.48163964090207401</xmax>
-        <ymax>51.06573327026106313</ymax>
+        <xmin>##XMIN##</xmin>
+        <ymin>##YMIN##</ymin>
+        <xmax>##XMAX##</xmax>
+        <ymax>##YMAX##</ymax>
       </wgs84extent>
       <id>3d55ad61_d657_44c7_8613_59dbd48c98dc_267cd15b_e116_4395_9a43_aac7bc2b43df</id>
       <datasource>##CUSTOMGEOJSONURL##|layername=##CUSTOMGEOJSONID##|geometrytype=Polygon</datasource>
@@ -1623,16 +1623,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer readOnly="0" labelsEnabled="0" minScale="100000000" simplifyDrawingTol="1" simplifyAlgorithm="0" hasScaleBasedVisibilityFlag="0" autoRefreshEnabled="0" simplifyDrawingHints="0" simplifyLocal="1" symbologyReferenceScale="-1" refreshOnNotifyEnabled="0" simplifyMaxScale="1" type="vector" geometry="Point" legendPlaceholderImage="" maxScale="0" refreshOnNotifyMessage="" styleCategories="AllStyleCategories" autoRefreshTime="0" wkbType="Point">
       <extent>
-        <xmin>-0.49713134765625</xmin>
-        <ymin>51.0601166381756002</ymin>
-        <xmax>-0.48163964090207401</xmax>
-        <ymax>51.06573327026106313</ymax>
+        <xmin>##XMIN##</xmin>
+        <ymin>##YMIN##</ymin>
+        <xmax>##XMAX##</xmax>
+        <ymax>##YMAX##</ymax>
       </extent>
       <wgs84extent>
-        <xmin>-0.49713134765625</xmin>
-        <ymin>51.0601166381756002</ymin>
-        <xmax>-0.48163964090207401</xmax>
-        <ymax>51.06573327026106313</ymax>
+        <xmin>##XMIN##</xmin>
+        <ymin>##YMIN##</ymin>
+        <xmax>##XMAX##</xmax>
+        <ymax>##YMAX##</ymax>
       </wgs84extent>
       <id>3d55ad61_d657_44c7_8613_59dbd48c98dc_9f0d008d_a08d_4974_9a82_69cf62373166</id>
       <datasource>##CUSTOMGEOJSONURL##|layername=##CUSTOMGEOJSONID##|geometrytype=Point</datasource>

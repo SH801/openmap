@@ -190,12 +190,12 @@ export class EntityCustomGeoJSON extends Component {
                         {this.props.entity.name}&nbsp;
 
                         {((calculations.numwind > 0) || (calculations.numsolar > 0)) ? (
-                        <>
+                        <div style={{display: "inline-block", whiteSpace: "nowrap"}}>
                           <IonButton onClick={() => {this.downloadFile('geojson')}} color="light" size="small" fill="default" style={{textTransform: "default", marginBottom: "20px"}}>
                           <IonIcon slot="start" icon={downloadOutline}></IonIcon>GeoJSON</IonButton>
                           <IonButton onClick={() => {this.downloadFile('qgis')}} color="light" size="small" fill="default" style={{textTransform: "default", marginBottom: "20px"}}>
                           <IonIcon slot="start" icon={downloadOutline}></IonIcon>QGIS</IonButton>
-                        </>): null }
+                          </div>): null }
 
 
                       </IonText>

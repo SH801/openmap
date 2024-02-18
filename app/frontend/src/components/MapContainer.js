@@ -48,6 +48,7 @@ export const isDev = () =>  !process.env.NODE_ENV || process.env.NODE_ENV === 'd
 
 const ANIMATION_INTERVAL = 800;
 
+
 export class ExtrusionControl extends Component{
     
   constructor(props) {
@@ -803,7 +804,7 @@ export class MapContainer extends Component  {
       }
     }  
   }
-
+  
   onLoad = (event) => {
     this.props.setGlobalState({"mapref": this.mapRef}).then(() => {
       setInterval(this.fetchLastExport, 15000);
@@ -1402,6 +1403,7 @@ export class MapContainer extends Component  {
         {this.props.global.mapinitialized ? (
           <Map ref={this.mapRef}
           onLoad={this.onLoad}
+          onStyleData={this.onStyleData}
           onRender={this.onRender}
           onMouseEnter={this.onMouseEnter}
           onMouseMove={this.onMouseMove}

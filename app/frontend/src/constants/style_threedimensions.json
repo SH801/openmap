@@ -553,6 +553,7 @@
           ],
           "id": "grid_label",
           "layout": {
+            "visibility": "none",
             "symbol-placement": "line",
             "text-field": "{voltage}",
             "text-font": [

@@ -102,6 +102,15 @@ export class EntityCustomGeoJSON extends Component {
     }
   }
 
+  epsg4326toEpsg3857 = (coordinates) => {
+    let x = (coordinates[0] * 20037508.34) / 180;
+    let y =
+      Math.log(Math.tan(((90 + coordinates[1]) * Math.PI) / 360)) /
+      (Math.PI / 180);
+    y = (y * 20037508.34) / 180;
+    return [x, y];
+  }
+
   downloadFile = (type) => {
 
     const anchor = document.createElement("a");
@@ -119,15 +128,19 @@ export class EntityCustomGeoJSON extends Component {
     switch (type) {
       case 'qgis':
         var boundingbox = bbox(geojson);
-        var qgis = require("../../../../../../../constants/qgis_template.qgs");
+        var qgis = require("../../../../../../../constants/qgis_template_EPSG3857.qgs");
         fetch(qgis)
         .then(r => r.text())
         .then(qgistext => {
           anchor.download += ".qgs";
-          qgistext = qgistext.replaceAll("##XMIN##", boundingbox[0]);
-          qgistext = qgistext.replaceAll("##XMAX##", boundingbox[2]);
-          qgistext = qgistext.replaceAll("##YMIN##", boundingbox[1]);
-          qgistext = qgistext.replaceAll("##YMAX##", boundingbox[3]);
+          var bottomleft = [boundingbox[0], boundingbox[1]];
+          var topright = [boundingbox[2], boundingbox[3]];
+          var convertedbottomleft = this.epsg4326toEpsg3857(bottomleft);
+          var convertedtopright = this.epsg4326toEpsg3857(topright);
+          qgistext = qgistext.replaceAll("##XMIN##", convertedbottomleft[0]);
+          qgistext = qgistext.replaceAll("##YMIN##", convertedbottomleft[1]);
+          qgistext = qgistext.replaceAll("##XMAX##", convertedtopright[0]);
+          qgistext = qgistext.replaceAll("##YMAX##", convertedtopright[1]);
           qgistext = qgistext.replaceAll("##CUSTOMGEOJSONURL##", DOMAIN_BASEURL + '/customgeojson/' + this.props.global.customgeojsonid);
           qgistext = qgistext.replaceAll("##CUSTOMGEOJSONID##", this.props.global.customgeojsonid);
           anchor.href =  URL.createObjectURL(new Blob([qgistext], {type: "application/x-qgis"}));

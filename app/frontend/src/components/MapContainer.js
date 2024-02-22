@@ -501,8 +501,8 @@ export class MapContainer extends Component  {
         if (!idsinstylesheet.includes(id)) {
           idsinstylesheet.push(id);
           var idelements = id.split("_");
-          var layerid = idelements[1];
-          idelements.splice(0, 2);
+          idelements.splice(0, 1);
+          var layerid = idelements.splice(0, idelements.length - 2).join("_");
           var styletype = idelements.join("_");
           var styleelement = JSON.parse(JSON.stringify(this.style_planningconstraints_defaults[styletype]));
           styleelement['id'] = id;

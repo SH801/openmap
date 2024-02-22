@@ -35,7 +35,7 @@
         },
         "planningconstraints": {
           "type": "vector",
-          "url": "/data/planningconstraints.json",
+          "url": "/data/planningconstraints_dissolved.json",
           "attribution": "Source data copyright of multiple organisations - for list of data sources, see https://positiveplaces.org/datasets"
         },  
         "grid": {

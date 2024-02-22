@@ -42,3 +42,4 @@ app/gis/*.mbtiles
 app/gis/*.qmd
 app/osm/wildlifereserves.geojson
 downloadinglargeOSM.txt
+app/gis/clip_ecology_and_wildlife.qgz

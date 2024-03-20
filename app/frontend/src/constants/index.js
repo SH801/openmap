@@ -38,7 +38,7 @@ export const API_URL = isDev() ? "http://localhost:80" : "";
 // Base url of tile server
 export const TILESERVER_BASEURL = isDev() ? "http://localhost:8080" : ("https://tiles." + POSITIVE_SITE.shortcode + '.org');
 
-// Base url of tile server
+// Base url of main website
 export const DOMAIN_BASEURL = isDev() ? "http://localhost" : ("https://" + POSITIVE_SITE.shortcode + '.org');
 
 // Height of wind turbine in metres in order to calculate bounding box for wind turbine points
@@ -114,8 +114,10 @@ export const PLANNING_CONSTRAINTS = {
         "colour": "red",
         "layers": 
         [
-            "constraint_other_technical_constraints_fill_colour",
-            "constraint_other_technical_constraints_fill_pattern"
+            "constraint_other_technical_constraints_lo_fill_colour",
+            "constraint_other_technical_constraints_lo_fill_pattern",
+            "constraint_other_technical_constraints_hi_fill_colour",
+            "constraint_other_technical_constraints_hi_fill_pattern"
         ]
     }
 };
